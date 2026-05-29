@@ -120,6 +120,7 @@ git push -u origin main
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `ANTHROPIC_API_KEY`
    - `N8N_WEBHOOK_URL` (optionnel)
+   - `N8N_WEBHOOK_SECRET` (recommandé si `N8N_WEBHOOK_URL` est défini — voir ÉTAPE 6)
    - `ALLOWED_ORIGINS` (origines autorisées pour `/api/chat`, `/api/contact`)
    - `DEMO_CABINET_ID` (optionnel — voir ÉTAPE 7, active la carte « reçu par le cabinet »)
 6. Clique **Deploy**
@@ -172,10 +173,13 @@ Si `ALLOWED_ORIGINS` est vide ou contient `*`, toutes les origines sont accepté
 
 1. Crée un workflow n8n avec un trigger **Webhook**
 2. Copie l'URL du webhook → mets-la dans `N8N_WEBHOOK_URL`
-3. Dans le workflow, branche :
+3. **Sécurise le webhook** : définis une valeur secrète dans `N8N_WEBHOOK_SECRET` (Vercel). Claire
+   l'envoie alors dans l'en-tête `X-Claire-Secret`. Dans n8n, ajoute un nœud **IF** en début de
+   workflow qui rejette toute requête dont l'en-tête ne correspond pas → empêche les appels falsifiés.
+4. Dans le workflow, branche :
    - Un nœud **Email** (Gmail/SMTP) qui envoie au `notif_email` du cabinet
    - Un nœud **WhatsApp Business** (optionnel) pour les urgences élevées
-4. Re-deploy Vercel pour qu'il prenne en compte la variable
+5. Re-deploy Vercel pour qu'il prenne en compte les variables
 
 ---
 
