@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Claire — Assistante de réception pour cabinets dentaires</title>
-<meta name="description" content="Claire répond à vos patients 24h/24 et transmet à votre cabinet une demande déjà qualifiée, avec son niveau d'urgence. Essayez la démo en ligne." />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Claire — Réponse patient 24h/24 pour cabinets dentaires | Lyon</title>
+<meta name="description" content="Claire répond aux messages de vos patients sur votre site, qualifie leur besoin en quelques questions, puis transmet à votre cabinet une demande déjà qualifiée — avec son niveau d'urgence. Programme cabinets fondateurs à Lyon." />
 <link rel="canonical" href="https://claireassistante.fr/" />
 
 <!-- Open Graph -->
@@ -17,7 +17,6 @@
 <meta property="og:image" content="https://claireassistante.fr/icons/og-image.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Claire — Assistante de réception pour cabinets dentaires" />
 <meta name="twitter:description" content="Claire répond à vos patients 24h/24 et transmet une demande déjà qualifiée à votre cabinet." />
@@ -35,17 +34,31 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Claire">
 
+<script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "Claire",
-  "applicationCategory": "BusinessApplication",
-  "operatingSystem": "Web, iOS, Android",
-  "description": "Assistante de réception en ligne pour cabinets dentaires : Claire répond aux patients 24h/24 et transmet au cabinet une demande qualifiée avec son niveau d'urgence.",
+  "@type": "LocalBusiness",
+  "name": "Claire — Assistante de réception pour cabinets dentaires",
+  "description": "Claire répond aux messages des patients sur le site du cabinet dentaire, 24h/24, qualifie le besoin et transmet une demande qualifiée au cabinet.",
   "url": "https://claireassistante.fr/",
-  "inLanguage": "fr",
-  "offers": { "@type": "Offer", "availability": "https://schema.org/InStock" }
+  "telephone": "+33605800594",
+  "email": "contact@claireassistante.fr",
+  "areaServed": { "@type": "City", "name": "Lyon" },
+  "founder": { "@type": "Person", "name": "Mamadou Tafsir Bah" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Sur quel canal Claire répond-elle ?", "acceptedAnswer": { "@type": "Answer", "text": "Claire répond aux messages écrits des patients, directement sur le site du cabinet, 24h/24. Elle ne répond pas au téléphone." } },
+    { "@type": "Question", "name": "Comment le cabinet reçoit-il les demandes ?", "acceptedAnswer": { "@type": "Answer", "text": "Pour chaque échange utile, le cabinet reçoit une demande qualifiée dans son tableau de bord : nom du patient, motif et niveau d'urgence." } },
+    { "@type": "Question", "name": "Est-ce sécurisé pour les données des patients ?", "acceptedAnswer": { "@type": "Answer", "text": "Les données sont hébergées en Europe et chaque cabinet est strictement cloisonné. Claire ne collecte que les informations utiles à la demande du patient." } },
+    { "@type": "Question", "name": "Que fait Claire si elle ne sait pas répondre ?", "acceptedAnswer": { "@type": "Answer", "text": "Claire ne pose jamais de diagnostic et transmet au cabinet tout cas sensible ou incertain. Elle reste dans son rôle d'accueil." } }
+  ]
 }
 </script>
 
@@ -56,64 +69,90 @@
       radial-gradient(circle at 85% 95%, rgba(31,61,53,0.06), transparent 42%),
       var(--cream);
   }
-  .nav {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 22px clamp(20px, 5vw, 56px); max-width: 1100px; margin: 0 auto;
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 40px); }
+  section { scroll-margin-top: 90px; }
+
+  /* ---------- NAV ---------- */
+  nav.topnav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 14px 0;
+    background: rgba(245,240,232,0.86);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(31,61,53,0.08);
   }
+  .nav-inner { max-width: 1100px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 40px); display: flex; align-items: center; justify-content: space-between; }
   .logo { display: flex; align-items: center; gap: 10px; font-family: var(--serif); font-size: 24px; font-weight: 600; color: var(--forest); }
-  .logo-mark {
-    width: 36px; height: 36px; background: var(--forest); border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--cream); font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 18px;
-  }
-  .nav-actions { display: flex; align-items: center; gap: 10px; }
+  .logo-mark { width: 34px; height: 34px; background: var(--forest); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--cream); font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 17px; }
+  .nav-links { display: flex; gap: 22px; align-items: center; font-size: 14px; font-weight: 500; }
+  .nav-links a:not(.btn):hover { color: var(--gold-dark); }
 
-  .hero { max-width: 760px; margin: clamp(32px, 6vw, 72px) auto 0; padding: 0 24px; text-align: center; }
-  .eyebrow {
-    display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: 0.08em;
-    text-transform: uppercase; color: var(--gold-dark);
-    background: var(--gold-soft); padding: 6px 14px; border-radius: 100px; margin-bottom: 22px;
+  .sticky-mobile-cta { display: none; position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 200; padding: 14px 18px; border-radius: 999px; background: var(--gold); color: #fff; text-align: center; font-weight: 600; box-shadow: 0 12px 28px rgba(0,0,0,0.18); }
+
+  @media (max-width: 768px) {
+    .nav-links a.nav-hide { display: none; }
+    .sticky-mobile-cta { display: block; }
   }
-  .hero h1 { font-family: var(--serif); font-weight: 500; line-height: 1.08; font-size: clamp(34px, 6vw, 56px); color: var(--forest); margin-bottom: 20px; }
+
+  /* ---------- HERO ---------- */
+  .hero { padding: 130px 0 70px; text-align: center; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; background: var(--gold-soft); border: 1px solid rgba(196,148,90,0.2); border-radius: 100px; font-size: 12px; font-weight: 600; color: var(--gold-dark); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 26px; }
+  .hero h1 { font-family: var(--serif); font-size: clamp(36px, 6.5vw, 68px); font-weight: 500; line-height: 1.06; letter-spacing: -0.02em; color: var(--forest); margin: 0 auto 20px; max-width: 880px; }
   .hero h1 em { font-style: italic; color: var(--gold); }
-  .hero p { color: var(--slate); font-size: clamp(16px, 2.5vw, 19px); line-height: 1.6; max-width: 580px; margin: 0 auto 32px; }
-  .actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-  .hero-status { margin-top: 16px; font-size: 13px; color: var(--slate-soft); letter-spacing: 0.01em; }
+  .hero p.lead { font-size: clamp(16px, 2.4vw, 19px); line-height: 1.6; color: var(--slate); max-width: 700px; margin: 0 auto 32px; }
+  .hero .actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .hero-micro { margin-top: 16px; font-size: 13px; color: var(--slate-soft); font-style: italic; }
 
-  .section { max-width: 980px; margin: 0 auto; padding: 0 24px; }
-  .section-head { text-align: center; max-width: 620px; margin: clamp(56px, 9vw, 96px) auto clamp(28px, 4vw, 44px); }
-  .section-head h2 { font-family: var(--serif); font-weight: 500; font-size: clamp(26px, 4vw, 38px); color: var(--forest); line-height: 1.12; }
-  .section-head p { color: var(--slate); margin-top: 12px; font-size: 16px; line-height: 1.6; }
+  /* ---------- SECTIONS ---------- */
+  .section { padding: clamp(56px, 8vw, 88px) 0; }
+  .section-warm { background: var(--cream-warm); }
+  .section-dark { background: var(--forest); color: var(--cream); }
+  .section-header { text-align: center; max-width: 660px; margin: 0 auto 44px; }
+  .section-eyebrow { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gold-dark); margin-bottom: 14px; }
+  .section-dark .section-eyebrow { color: var(--gold); }
+  .section-title { font-family: var(--serif); font-size: clamp(28px, 4.5vw, 48px); font-weight: 500; line-height: 1.12; letter-spacing: -0.02em; color: var(--forest); margin-bottom: 16px; }
+  .section-dark .section-title { color: var(--cream); }
+  .section-title em { font-style: italic; color: var(--gold); }
+  .section-lead { font-size: 17px; line-height: 1.6; color: var(--slate); }
+  .section-dark .section-lead { color: rgba(245,240,232,0.82); }
 
-  /* ---- DÉMO ---- */
-  .demo { max-width: 620px; margin: clamp(36px, 6vw, 64px) auto 0; padding: 0 24px; }
-  .demo-card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); overflow: hidden; }
-  .demo-head { display: flex; align-items: center; gap: 12px; padding: 16px 20px; background: var(--forest); color: var(--cream); }
-  .demo-head .logo-mark { width: 32px; height: 32px; background: var(--gold); font-size: 15px; }
-  .demo-head-title { font-family: var(--serif); font-size: 17px; }
-  .demo-head-sub { font-size: 12px; color: rgba(245,240,232,0.7); }
-  .demo-live { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: rgba(245,240,232,0.85); }
-  .demo-live::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #6fcf97; box-shadow: 0 0 0 0 rgba(111,207,151,0.6); animation: pulse 1.8s infinite; }
-  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(111,207,151,0.6);} 70%{ box-shadow: 0 0 0 7px rgba(111,207,151,0);} 100%{ box-shadow:0 0 0 0 rgba(111,207,151,0);} }
-  .demo-stream { padding: 20px; height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: var(--cream); }
-  .demo-msg { display: flex; max-width: 82%; }
+  /* ---------- CHAT DÉMO ---------- */
+  .chat-wrapper { max-width: 560px; margin: 0 auto; background: #ECE5DD; border-radius: 24px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.18); }
+  .chat-header { background: #075E54; color: #fff; padding: 14px 18px; display: flex; align-items: center; gap: 12px; }
+  .chat-avatar { width: 40px; height: 40px; background: var(--cream); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-style: italic; font-weight: 600; color: var(--forest); font-size: 18px; flex-shrink: 0; }
+  .chat-header-name { font-weight: 600; }
+  .chat-header-status { font-size: 12px; opacity: 0.85; }
+  .chat-status-dot { display: inline-block; width: 8px; height: 8px; background: #4ade80; border-radius: 50%; margin-right: 6px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .chat-messages { height: 420px; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 8px; background: #ECE5DD; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+  .demo-msg { display: flex; max-width: 82%; animation: bubbleIn 0.3s ease forwards; }
   .demo-msg-user { align-self: flex-end; justify-content: flex-end; }
   .demo-msg-assistant { align-self: flex-start; }
-  .demo-bubble { padding: 11px 15px; border-radius: 16px; font-size: 14.5px; line-height: 1.5; }
-  .demo-msg-assistant .demo-bubble { background: #fff; border: 1px solid var(--line); color: var(--charcoal); border-bottom-left-radius: 4px; }
-  .demo-msg-user .demo-bubble { background: var(--forest); color: var(--cream); border-bottom-right-radius: 4px; }
+  .demo-bubble { padding: 10px 14px; border-radius: 14px; font-size: 14.5px; line-height: 1.45; word-wrap: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+  .demo-msg-assistant .demo-bubble { background: #fff; color: #1a1a1a; border-bottom-left-radius: 4px; }
+  .demo-msg-user .demo-bubble { background: #DCF8C6; color: #1a1a1a; border-bottom-right-radius: 4px; }
+  @keyframes bubbleIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
   .demo-typing { display: inline-flex; gap: 4px; }
-  .demo-typing span { width: 7px; height: 7px; border-radius: 50%; background: var(--slate-soft); animation: blink 1.2s infinite both; }
-  .demo-typing span:nth-child(2){ animation-delay: .2s; } .demo-typing span:nth-child(3){ animation-delay: .4s; }
-  @keyframes blink { 0%,80%,100%{ opacity:.3;} 40%{ opacity:1;} }
-  .demo-form { display: flex; gap: 8px; padding: 14px; border-top: 1px solid var(--line); background: #fff; }
-  .demo-form input { flex: 1; padding: 12px 14px; border: 1px solid var(--line); border-radius: 100px; font-size: 16px; outline: none; }
-  .demo-form input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
-  .demo-caption { text-align: center; font-size: 12.5px; color: var(--slate-soft); margin-top: 12px; }
-  #demoNotice { color: var(--gold-dark); }
+  .demo-typing span { width: 7px; height: 7px; border-radius: 50%; background: #999; animation: blink 1.3s infinite both; }
+  .demo-typing span:nth-child(2){ animation-delay: 0.2s; } .demo-typing span:nth-child(3){ animation-delay: 0.4s; }
+  @keyframes blink { 0%,80%,100%{ opacity: 0.3; } 40%{ opacity: 1; } }
 
-  /* ---- CARTE « reçu par le cabinet » ---- */
-  .demo-summary { margin-top: 14px; background: #fff; border: 1px solid var(--gold); border-radius: var(--radius-lg); padding: 18px 20px; box-shadow: var(--shadow); }
+  .chat-suggestions { padding: 12px 14px; display: flex; gap: 8px; flex-wrap: wrap; background: #ECE5DD; }
+  .chat-suggestion { padding: 8px 15px; background: #fff; border-radius: 100px; font-size: 12.5px; font-weight: 500; color: var(--forest); cursor: pointer; transition: all var(--t-fast); border: 1px solid rgba(0,0,0,0.05); }
+  .chat-suggestion:hover { background: var(--forest); color: var(--cream); }
+
+  .chat-input-row { display: flex; gap: 10px; padding: 12px 14px; background: #fff; border-top: 1px solid rgba(0,0,0,0.05); }
+  .chat-input-row input { flex: 1; border: none; background: #f0f0f0; border-radius: 100px; padding: 12px 18px; font-family: inherit; font-size: 16px; outline: none; }
+  .chat-input-row input:disabled { opacity: 0.5; }
+  .chat-send { width: 44px; height: 44px; background: var(--forest); color: var(--cream); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background var(--t-fast); flex-shrink: 0; }
+  .chat-send:hover { background: var(--forest-deep); }
+  .chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
+  .chat-back { display: none; align-items: center; justify-content: center; width: 36px; height: 36px; margin-right: 4px; background: rgba(255,255,255,0.15); border-radius: 50%; color: #fff; cursor: pointer; flex-shrink: 0; }
+  .chat-back:hover { background: rgba(255,255,255,0.28); }
+
+  .demo-note { text-align: center; margin-top: 16px; font-size: 13px; color: rgba(245,240,232,0.6); font-style: italic; }
+
+  /* Carte « reçu par le cabinet » */
+  .demo-summary { max-width: 560px; margin: 16px auto 0; background: #fff; border: 1px solid var(--gold); border-radius: var(--radius-lg); padding: 18px 20px; box-shadow: var(--shadow); color: var(--charcoal); }
   .ds-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
   .ds-badge { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold-dark); }
   .ds-row { display: flex; gap: 12px; padding: 7px 0; border-top: 1px solid var(--line-soft); font-size: 14px; }
@@ -121,238 +160,514 @@
   .ds-label { min-width: 92px; color: var(--slate); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
   .ds-value { color: var(--charcoal); }
 
-  /* ---- ÉTAPES ---- */
-  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .step { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 26px 22px; }
-  .step-num { width: 34px; height: 34px; border-radius: 50%; background: var(--forest); color: var(--cream); font-family: var(--serif); display: flex; align-items: center; justify-content: center; font-size: 16px; margin-bottom: 14px; }
-  .step h3 { font-family: var(--serif); font-size: 18px; font-weight: 500; color: var(--forest); margin-bottom: 6px; }
-  .step p { color: var(--slate); font-size: 14px; line-height: 1.55; }
+  /* ---------- EXEMPLE DE CONVERSATION ---------- */
+  .example-convo { max-width: 580px; margin: 0 auto; background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 28px; box-shadow: var(--shadow); }
+  .example-line { display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; }
+  .example-line:last-child { margin-bottom: 0; }
+  .example-who { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; }
+  .example-line.patient .example-who { color: var(--slate); }
+  .example-line.claire .example-who { color: var(--gold-dark); }
+  .example-text { font-size: 15px; line-height: 1.55; color: var(--charcoal); background: var(--cream); border-radius: 12px; padding: 12px 16px; }
+  .example-line.claire .example-text { background: var(--forest-soft); }
+  .example-summary { margin-top: 8px; border: 1px dashed rgba(31,61,53,0.25); border-radius: 14px; padding: 18px 20px; background: var(--cream-warm); }
+  .example-summary-head { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; color: var(--forest); margin-bottom: 12px; }
+  .example-summary-row { font-size: 14px; color: var(--charcoal); line-height: 1.5; margin-bottom: 8px; }
+  .example-summary-row:last-child { margin-bottom: 0; }
+  .example-summary-row strong { color: var(--forest); }
+  .caption { text-align: center; margin-top: 20px; font-size: 13px; color: var(--slate-soft); font-style: italic; }
+  .section-dark .caption { color: rgba(245,240,232,0.55); }
 
-  /* ---- FEATURES ---- */
-  .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .feature { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 28px 24px; }
+  /* ---------- GRILLES ---------- */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; max-width: 880px; margin: 0 auto; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  @media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  .compare-card { padding: 30px; background: #fff; border-radius: 16px; border: 1px solid var(--line); }
+  .compare-card h3 { font-family: var(--serif); font-size: 20px; font-weight: 600; color: var(--forest); margin-bottom: 16px; }
+  .compare-card ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .compare-card li { display: flex; gap: 10px; font-size: 15px; color: var(--slate); line-height: 1.5; }
+  .compare-card li span { flex-shrink: 0; font-weight: 700; }
+  .compare-card.before li span { color: var(--danger); }
+  .compare-card.after { background: var(--forest); color: var(--cream); border: none; }
+  .compare-card.after h3 { color: var(--cream); }
+  .compare-card.after li { color: rgba(245,240,232,0.85); }
+  .compare-card.after li span { color: var(--gold); }
+
+  /* ---------- ÉTAPES / FEATURES / TRUST ---------- */
+  .step-card, .feature-card { padding: 30px 26px; background: #fff; border-radius: 16px; border: 1px solid var(--line); }
+  .step-num { font-family: var(--serif); font-style: italic; font-size: 30px; color: var(--gold); margin-bottom: 10px; }
+  .step-card h3, .feature-card h3 { font-family: var(--serif); font-size: 19px; font-weight: 600; color: var(--forest); margin-bottom: 8px; }
+  .step-card p, .feature-card p { font-size: 14px; color: var(--slate); line-height: 1.6; }
   .feature-icon { width: 44px; height: 44px; border-radius: var(--radius); background: var(--forest-soft); color: var(--forest); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
   .feature-icon svg { width: 22px; height: 22px; }
-  .feature h3 { font-family: var(--serif); font-size: 19px; font-weight: 500; color: var(--forest); margin-bottom: 8px; }
-  .feature p { color: var(--slate); font-size: 14px; line-height: 1.55; }
 
-  /* ---- TRUST ---- */
-  .trust { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: clamp(36px,6vw,56px); }
-  .trust-item { display: flex; gap: 12px; align-items: flex-start; font-size: 13.5px; color: var(--slate); }
-  .trust-item strong { color: var(--forest); display: block; font-weight: 600; margin-bottom: 2px; }
-  .trust-item svg { width: 20px; height: 20px; color: var(--gold-dark); flex-shrink: 0; margin-top: 1px; }
+  .trust-card { padding: 30px; background: #fff; border-radius: 16px; border: 1px solid var(--line); }
+  .trust-icon { width: 40px; height: 40px; background: var(--forest); color: var(--cream); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+  .trust-icon svg { width: 20px; height: 20px; }
+  .trust-card h3 { font-family: var(--serif); font-size: 19px; font-weight: 600; color: var(--forest); margin-bottom: 8px; }
+  .trust-card p { font-size: 14px; color: var(--slate); line-height: 1.55; }
 
-  /* ---- FAQ ---- */
-  .faq { max-width: 720px; }
-  .faq details { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 12px; padding: 4px 18px; }
-  .faq summary { cursor: pointer; padding: 14px 0; font-weight: 600; color: var(--forest); list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq summary::-webkit-details-marker { display: none; }
-  .faq summary::after { content: '+'; font-size: 22px; color: var(--gold); font-weight: 400; }
-  .faq details[open] summary::after { content: '–'; }
-  .faq details p { color: var(--slate); font-size: 14.5px; line-height: 1.6; padding: 0 0 16px; }
+  /* ---------- NEEDS ---------- */
+  .needs-list { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+  .needs-item { display: flex; gap: 14px; align-items: flex-start; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 18px 22px; }
+  .needs-check { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--gold-soft); color: var(--gold-dark); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+  .needs-item p { font-size: 15px; color: var(--charcoal); line-height: 1.5; }
 
-  /* ---- CONTACT ---- */
-  .contact-wrap { max-width: 620px; margin: 0 auto; background: #fff; border: 1px solid var(--line); border-radius: var(--radius-xl); padding: clamp(26px, 4vw, 40px); box-shadow: var(--shadow); }
+  /* ---------- À PROPOS ---------- */
+  .story-grid { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 56px; align-items: center; }
+  .story-photo { aspect-ratio: 4/5; background: var(--forest); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: var(--cream); font-family: var(--serif); font-style: italic; font-size: 26px; text-align: center; box-shadow: var(--shadow-lg); padding: 24px; }
+  .story-quote { font-family: var(--serif); font-style: italic; font-size: 20px; color: var(--forest); padding-left: 22px; border-left: 3px solid var(--gold); margin: 26px 0; line-height: 1.5; }
+  @media (max-width: 768px) { .story-grid { grid-template-columns: 1fr; } .story-photo { max-width: 280px; margin: 0 auto; } }
+
+  /* ---------- PROGRAMME FONDATEURS ---------- */
+  .founders-card { padding: 42px 36px; background: var(--forest); color: var(--cream); border-radius: 16px; text-align: center; max-width: 600px; margin: 0 auto; }
+  .founders-tag { font-family: var(--serif); font-style: italic; opacity: 0.85; margin-bottom: 6px; }
+  .founders-price { font-family: var(--serif); font-size: 46px; font-weight: 600; line-height: 1; margin: 12px 0 6px; color: var(--gold); }
+  .founders-sub { font-size: 14px; opacity: 0.8; }
+  .founders-features { list-style: none; margin: 26px 0; display: flex; flex-direction: column; gap: 12px; text-align: left; }
+  .founders-features li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.5; }
+  .founders-features li span { color: var(--gold); flex-shrink: 0; font-weight: 700; }
+  .founders-reassure { margin-top: 16px; font-size: 13px; opacity: 0.75; }
+
+  /* ---------- FORMULAIRE CONTACT ---------- */
+  .contact-wrap { max-width: 620px; margin: 36px auto 0; background: #fff; border: 1px solid var(--line); border-radius: var(--radius-xl); padding: clamp(26px, 4vw, 40px); box-shadow: var(--shadow); }
   .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
   .contact-grid .field-full { grid-column: 1 / -1; }
   @media (max-width: 560px) { .contact-grid { grid-template-columns: 1fr; } }
 
-  .footer { margin-top: clamp(56px,9vw,96px); border-top: 1px solid var(--line); }
-  .footer-inner { max-width: 980px; margin: 0 auto; padding: 28px 24px; display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between; font-size: 13px; color: var(--slate-soft); }
-  .footer-links { display: flex; gap: 18px; flex-wrap: wrap; }
-  .footer-links a { color: var(--slate); }
-  .footer-links a:hover { color: var(--gold-dark); }
+  /* ---------- CALENDLY ---------- */
+  .calendly-inline-widget { min-width: 320px; height: 700px; border-radius: 16px; overflow: hidden; max-width: 720px; margin: 0 auto; }
 
-  @media (max-width: 760px) { .features, .trust, .steps { grid-template-columns: 1fr; } }
-  /* Mobile : hauteur du flux démo en unités viewport pour rester lisible clavier ouvert */
+  /* ---------- FAQ ---------- */
+  .faq { max-width: 720px; margin: 0 auto; }
+  .faq details { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 12px; padding: 4px 18px; }
+  .faq summary { cursor: pointer; padding: 16px 0; font-family: var(--serif); font-size: 17px; font-weight: 500; color: var(--forest); list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; font-size: 24px; color: var(--gold); font-weight: 400; flex-shrink: 0; }
+  .faq details[open] summary::after { content: '–'; }
+  .faq details p { color: var(--slate); font-size: 14.5px; line-height: 1.65; padding: 0 0 16px; }
+
+  /* ---------- SELF TEST ---------- */
+  .self-test { max-width: 680px; margin: 0 auto; text-align: center; background: var(--forest); color: var(--cream); border-radius: 20px; padding: 44px 32px; }
+  .self-test h3 { font-family: var(--serif); font-size: 26px; font-weight: 500; margin-bottom: 14px; color: var(--cream); }
+  .self-test p { font-size: 16px; line-height: 1.6; color: rgba(245,240,232,0.85); max-width: 520px; margin: 0 auto 26px; }
+
+  /* ---------- FINAL CTA ---------- */
+  .final-cta { text-align: center; padding: 100px 0; background: var(--forest-deep); color: var(--cream); }
+  .final-cta h2 { font-family: var(--serif); font-size: clamp(30px, 5vw, 52px); font-weight: 500; margin-bottom: 18px; }
+  .final-cta h2 em { font-style: italic; color: var(--gold); }
+  .final-cta p { font-size: 18px; opacity: 0.8; margin-bottom: 34px; }
+
+  /* ---------- FOOTER ---------- */
+  .footer { padding: 36px 0; background: var(--forest-deep); color: rgba(245,240,232,0.6); font-size: 13px; border-top: 1px solid rgba(255,255,255,0.06); }
+  .footer-inner { max-width: 1100px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 40px); display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between; }
+  .footer-links { display: flex; gap: 18px; flex-wrap: wrap; }
+  .footer-links a { color: rgba(245,240,232,0.7); }
+  .footer-links a:hover { color: var(--gold); }
+
+  /* ---------- PLEIN ÉCRAN MOBILE (corrige le clavier) ---------- */
+  @media (max-width: 680px) {
+    .chat-wrapper.chat-fullscreen {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000; margin: 0; width: 100%; max-width: none;
+      border-radius: 0; box-shadow: none; display: flex; flex-direction: column;
+      height: 100vh; height: 100dvh;
+      animation: chatSlideUp 0.28s ease;
+    }
+    .chat-wrapper.chat-fullscreen .chat-back { display: flex; }
+    .chat-wrapper.chat-fullscreen .chat-header { flex-shrink: 0; padding-top: max(14px, env(safe-area-inset-top)); }
+    .chat-wrapper.chat-fullscreen .chat-messages { flex: 1; height: auto; min-height: 0; }
+    .chat-wrapper.chat-fullscreen .chat-suggestions { flex-shrink: 0; }
+    .chat-wrapper.chat-fullscreen .chat-input-row { flex-shrink: 0; padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+    body.chat-open { overflow: hidden; position: fixed; width: 100%; }
+  }
+  @keyframes chatSlideUp { from { transform: translateY(100%); opacity: 0.4; } to { transform: translateY(0); opacity: 1; } }
+
   @media (max-width: 560px) {
-    .demo-stream { height: 56dvh; max-height: 360px; }
+    .chat-messages { height: 56dvh; max-height: 380px; }
+    .hero { padding: 110px 0 50px; }
   }
 </style>
 </head>
 <body>
 
-<header class="nav">
-  <a href="/" class="logo" aria-label="Accueil Claire"><span class="logo-mark">C</span><span>Claire</span></a>
-  <div class="nav-actions">
-    <a href="#demo" class="btn btn-ghost btn-sm">La démo</a>
-    <a href="/login.html" class="btn btn-primary btn-sm">Espace cabinet</a>
+<a class="sr-only" href="#demo">Aller au contenu principal</a>
+
+<nav class="topnav">
+  <div class="nav-inner">
+    <a href="/" class="logo" aria-label="Accueil Claire"><span class="logo-mark">C</span><span>Claire</span></a>
+    <div class="nav-links">
+      <a href="#demo" class="nav-hide">Démo</a>
+      <a href="#offre" class="nav-hide">Offre</a>
+      <a href="#a-propos" class="nav-hide">À propos</a>
+      <a href="/login.html" class="btn btn-ghost btn-sm">Espace cabinet</a>
+      <a href="#booking" class="btn btn-gold btn-sm">Réserver une démo</a>
+    </div>
   </div>
-</header>
+</nav>
+
+<a href="#booking" class="sticky-mobile-cta">Réserver une démo</a>
 
 <main>
   <!-- HERO -->
   <section class="hero">
-    <span class="eyebrow">Assistante de réception en ligne</span>
-    <h1>Vos patients toujours accueillis, <em>votre équipe soulagée</em>.</h1>
-    <p>
-      Appels manqués, ligne saturée, urgences difficiles à filtrer, messages laissés sans réponse
-      le soir et le week-end… Claire accueille chaque patient à toute heure, recueille son motif et
-      ses coordonnées, oriente les urgences vitales vers le 15, et transmet à votre cabinet une
-      demande déjà qualifiée — avec son niveau d'urgence.
-    </p>
-    <div class="actions">
-      <a href="#demo" class="btn btn-primary">Essayer Claire maintenant</a>
-      <a href="#demande-demo" class="btn btn-ghost">Devenir cabinet pilote</a>
+    <div class="container">
+      <span class="eyebrow">Programme cabinets fondateurs · Lyon</span>
+      <h1>Aucun patient sans réponse, <em>même cabinet fermé</em>.</h1>
+      <p class="lead">
+        Claire répond aux messages de vos patients directement sur votre site, qualifie leur besoin
+        en quelques questions, oriente les urgences vitales vers le 15, puis transmet à votre cabinet
+        une demande déjà qualifiée : le nom, le motif et le niveau d'urgence. Les demandes du soir et
+        du week-end ne se perdent plus.
+      </p>
+      <div class="actions">
+        <a href="#demo" class="btn btn-primary">Essayer Claire maintenant</a>
+        <a href="#booking" class="btn btn-ghost">Réserver une démo</a>
+      </div>
+      <p class="hero-micro">Un patient qui n'obtient pas de réponse appelle souvent le cabinet d'à côté. Claire évite ça.</p>
     </div>
-    <p class="hero-status">Version de démonstration · déploiement en cours · accès sur présentation</p>
   </section>
 
-  <!-- DÉMONSTRATION INTERACTIVE -->
-  <section class="demo" id="demo">
-    <div class="demo-card">
-      <div class="demo-head">
-        <span class="logo-mark">C</span>
-        <div>
-          <div class="demo-head-title">Claire</div>
-          <div class="demo-head-sub">Assistante du cabinet</div>
-        </div>
-        <span class="demo-live">en ligne</span>
+  <!-- DÉMO INTERACTIVE -->
+  <section class="section section-dark" id="demo">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Tester Claire en direct</div>
+        <h2 class="section-title">Posez une question. <em>Claire répond.</em></h2>
+        <p class="section-lead">Écrivez à Claire comme le ferait un de vos patients. Vous verrez comment elle accueille, qualifie le besoin, et prépare la demande pour le cabinet.</p>
       </div>
-      <div class="demo-stream" id="demoStream" aria-live="polite"></div>
-      <form class="demo-form" id="demoForm" autocomplete="off">
-        <input type="text" id="demoInput" maxlength="2000" placeholder="Écrivez à Claire… ex : « J'ai mal à une dent depuis hier »" aria-label="Votre message" />
-        <button type="submit" class="btn btn-primary btn-sm" id="demoSend">Envoyer</button>
-      </form>
+
+      <div class="chat-wrapper" id="chatWrapper">
+        <div class="chat-header">
+          <button class="chat-back" id="chatBackBtn" aria-label="Retour" type="button">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <div class="chat-avatar">C</div>
+          <div>
+            <div class="chat-header-name">Claire · Cabinet dentaire</div>
+            <div class="chat-header-status"><span class="chat-status-dot"></span>en ligne · répond en quelques secondes</div>
+          </div>
+        </div>
+
+        <div class="chat-messages" id="demoStream" role="log" aria-live="polite" aria-relevant="additions text"></div>
+
+        <div class="chat-suggestions" id="demoSuggestions" aria-label="Suggestions de questions">
+          <button class="chat-suggestion" type="button" data-msg="J'ai mal à une dent depuis hier soir">J'ai mal à une dent</button>
+          <button class="chat-suggestion" type="button" data-msg="Quels sont vos horaires ?">Vos horaires ?</button>
+          <button class="chat-suggestion" type="button" data-msg="Je voudrais prendre rendez-vous">Prendre rendez-vous</button>
+          <button class="chat-suggestion" type="button" data-msg="J'ai cassé une dent ce week-end">Urgence week-end</button>
+        </div>
+
+        <form class="chat-input-row" id="demoForm" autocomplete="off">
+          <label for="demoInput" class="sr-only">Votre question</label>
+          <input type="text" id="demoInput" maxlength="2000" placeholder="Écrivez votre question…" aria-label="Votre question" />
+          <button type="submit" class="chat-send" id="demoSend" aria-label="Envoyer">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          </button>
+        </form>
+      </div>
+
+      <div class="demo-summary" id="demoSummary" hidden></div>
+      <p class="demo-note" id="demoNotice">Démonstration en conditions réelles · Posez votre question comme un patient.</p>
     </div>
-    <div class="demo-summary" id="demoSummary" hidden></div>
-    <p class="demo-caption" id="demoNotice">Démonstration en conditions réelles. Claire qualifie ensuite la demande pour le cabinet.</p>
+  </section>
+
+  <!-- EXEMPLE DE CONVERSATION -->
+  <section class="section section-warm">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Exemple de conversation</div>
+        <h2 class="section-title">Un échange <em>typique avec Claire.</em></h2>
+        <p class="section-lead">Un samedi soir, cabinet fermé. Claire accueille, comprend le besoin, récupère les bonnes informations, et prépare la demande pour le cabinet.</p>
+      </div>
+      <div class="example-convo">
+        <div class="example-line patient"><span class="example-who">Patient · 21h12</span><div class="example-text">Bonsoir, j'ai une douleur à une dent depuis vendredi soir, ça s'est aggravé aujourd'hui.</div></div>
+        <div class="example-line claire"><span class="example-who">Claire</span><div class="example-text">Bonsoir, je comprends, ce n'est pas agréable. La douleur est-elle constante, et avez-vous remarqué un gonflement ou de la fièvre ?</div></div>
+        <div class="example-line patient"><span class="example-who">Patient</span><div class="example-text">C'est constant depuis ce matin, et la joue est un peu gonflée.</div></div>
+        <div class="example-line claire"><span class="example-who">Claire</span><div class="example-text">Merci. Le cabinet est fermé ce soir, mais je transmets votre demande pour qu'on vous recontacte en priorité dès l'ouverture. À quel nom et sur quel numéro peut-on vous joindre ?</div></div>
+        <div class="example-line patient"><span class="example-who">Patient</span><div class="example-text">Sophie Marin, 06 12 34 56 78. J'aimerais un rendez-vous le plus tôt possible, plutôt en matinée.</div></div>
+        <div class="example-line claire"><span class="example-who">Claire</span><div class="example-text">C'est noté, Sophie. Je transmets tout au cabinet : ils vous rappellent dès demain matin. En cas de douleur très intense ou de fièvre forte cette nuit, n'hésitez pas à contacter le 15.</div></div>
+        <div class="example-summary">
+          <div class="example-summary-head">Demande transmise au cabinet</div>
+          <div class="example-summary-row"><strong>Patiente :</strong> Sophie Marin · 06 12 34 56 78</div>
+          <div class="example-summary-row"><strong>Motif :</strong> Douleur dentaire depuis vendredi, constante depuis ce matin, joue gonflée.</div>
+          <div class="example-summary-row"><strong>Souhait :</strong> Rendez-vous rapide, de préférence en matinée.</div>
+          <div class="example-summary-row"><strong>Urgence :</strong> À recontacter en priorité dès l'ouverture.</div>
+        </div>
+      </div>
+      <p class="caption">Exemple illustratif. Vous pouvez tester vous-même dans la démo ci-dessus.</p>
+    </div>
+  </section>
+
+  <!-- AVANT / APRÈS -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Ce que Claire change</div>
+        <h2 class="section-title">Avant. <em>Après.</em></h2>
+      </div>
+      <div class="grid-2">
+        <div class="compare-card before">
+          <h3>Aujourd'hui</h3>
+          <ul>
+            <li><span>—</span> Les demandes du soir et du week-end attendent le lundi, ou se perdent.</li>
+            <li><span>—</span> Votre secrétaire est interrompue en permanence par les mêmes questions.</li>
+            <li><span>—</span> Un patient sans réponse appelle le cabinet d'à côté.</li>
+          </ul>
+        </div>
+        <div class="compare-card after">
+          <h3>Avec Claire</h3>
+          <ul>
+            <li><span>+</span> Chaque patient obtient une réponse immédiate, à toute heure, même cabinet fermé.</li>
+            <li><span>+</span> Les questions répétitives sont gérées : votre équipe se concentre sur les patients en salle.</li>
+            <li><span>+</span> Vous démarrez la journée avec des demandes qualifiées : nom, motif, urgence.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="caption">Le meilleur moyen de juger : posez une question à Claire dans la démo ci-dessus.</p>
+    </div>
   </section>
 
   <!-- COMMENT ÇA MARCHE -->
-  <div class="section">
-    <div class="section-head">
-      <h2>Comment ça marche</h2>
-      <p>Trois étapes, zéro friction pour vos patients comme pour votre équipe.</p>
+  <section class="section section-warm">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Comment ça marche</div>
+        <h2 class="section-title">Simple, et sous <em>votre contrôle.</em></h2>
+      </div>
+      <div class="grid-3">
+        <article class="step-card"><div class="step-num">01</div><h3>On configure</h3><p>Je m'occupe de l'installation sur votre site. J'adapte Claire à vos horaires et à vos règles de réponse. Vous n'avez rien à faire techniquement.</p></article>
+        <article class="step-card"><div class="step-num">02</div><h3>Claire répond</h3><p>Les patients écrivent sur votre site, à toute heure. Claire accueille, qualifie le besoin et garde le fil de la conversation.</p></article>
+        <article class="step-card"><div class="step-num">03</div><h3>Vous gardez la main</h3><p>Une demande qualifiée arrive dans votre tableau de bord (et par email si vous le souhaitez). Pour tout cas sensible, Claire transmet directement.</p></article>
+      </div>
     </div>
-    <div class="steps">
-      <article class="step">
-        <div class="step-num">1</div>
-        <h3>Le patient écrit à Claire</h3>
-        <p>Depuis votre site ou un lien dédié, à toute heure — y compris le soir et le week-end.</p>
-      </article>
-      <article class="step">
-        <div class="step-num">2</div>
-        <h3>Claire comprend et qualifie</h3>
-        <p>Elle pose les bonnes questions, recueille le nom, le téléphone, le motif et estime l'urgence.</p>
-      </article>
-      <article class="step">
-        <div class="step-num">3</div>
-        <h3>Vous recevez la demande</h3>
-        <p>Une fiche claire arrive dans votre tableau de bord, et par email si vous le souhaitez.</p>
-      </article>
-    </div>
-  </div>
+  </section>
 
   <!-- FONCTIONNALITÉS -->
-  <div class="section">
-    <div class="section-head">
-      <h2>Ce que Claire fait pour votre cabinet</h2>
+  <section class="section" id="fonctionnalites">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Ce que Claire fait</div>
+        <h2 class="section-title">Pensée pour <em>votre cabinet.</em></h2>
+      </div>
+      <div class="grid-3">
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+          <h3>Accueil 24h/24</h3>
+          <p>Claire répond aux messages des patients à toute heure, avec un ton bienveillant, et oriente les urgences vitales vers le 15.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+          <h3>Demandes qualifiées</h3>
+          <p>Pour chaque échange, Claire extrait le nom, le téléphone, le motif et le souhait du patient, puis estime un niveau d'urgence.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg></div>
+          <h3>Tableau de bord + mobile</h3>
+          <p>Conversations, demandes à traiter et urgences du jour dans un espace simple — installable sur le téléphone de l'équipe comme une application.</p>
+        </article>
+      </div>
     </div>
-    <div class="features" id="fonctionnalites">
-      <article class="feature">
-        <div class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
-        <h3>Accueil 24h/24</h3>
-        <p>Claire répond aux messages des patients à toute heure, avec un ton bienveillant, et oriente les urgences vitales vers le 15.</p>
-      </article>
-      <article class="feature">
-        <div class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
-        <h3>Demandes qualifiées</h3>
-        <p>Pour chaque échange, Claire extrait le nom, le téléphone, le motif et le souhait du patient, puis estime un niveau d'urgence.</p>
-      </article>
-      <article class="feature">
-        <div class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg></div>
-        <h3>Tableau de bord + mobile</h3>
-        <p>Conversations, demandes à traiter et urgences du jour dans un espace simple — installable sur le téléphone de l'équipe comme une application.</p>
-      </article>
-    </div>
+  </section>
 
-    <!-- CONFIANCE -->
-    <div class="trust" aria-label="Confiance et sécurité">
-      <div class="trust-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <div><strong>Données hébergées en Europe</strong>Base en région européenne, en phase avec les exigences RGPD.</div>
+  <!-- À QUI ÇA S'ADRESSE -->
+  <section class="section section-warm">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">À qui s'adresse Claire</div>
+        <h2 class="section-title">Si vous vous reconnaissez <em>ici.</em></h2>
+        <p class="section-lead">Claire est pensée pour les cabinets qui veulent rester joignables sans alourdir leur secrétariat.</p>
       </div>
-      <div class="trust-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-        <div><strong>Cloisonnement strict</strong>Chaque cabinet n'accède qu'à ses propres données (Row Level Security).</div>
-      </div>
-      <div class="trust-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
-        <div><strong>Jamais de diagnostic</strong>Claire recueille et transmet ; aucun avis médical. C'est le cabinet qui décide.</div>
+      <div class="needs-list">
+        <div class="needs-item"><span class="needs-check">✓</span><p>Vous ne voulez plus perdre les demandes qui arrivent le soir et le week-end, quand personne ne peut répondre.</p></div>
+        <div class="needs-item"><span class="needs-check">✓</span><p>Votre secrétariat est interrompu toute la journée par les mêmes questions, et vous aimeriez l'en décharger.</p></div>
+        <div class="needs-item"><span class="needs-check">✓</span><p>Vous voulez accueillir et rassurer vos patients même quand le cabinet est fermé, sans embaucher.</p></div>
       </div>
     </div>
-  </div>
+  </section>
+
+  <!-- À PROPOS -->
+  <section class="section" id="a-propos">
+    <div class="container">
+      <div class="story-grid">
+        <div class="story-photo">Mamadou Tafsir Bah<br>Fondateur · Lyon</div>
+        <div>
+          <div class="section-eyebrow">Pourquoi je lance Claire</div>
+          <h2 class="section-title" style="text-align:left;">Une personne derrière Claire. <em>Moi.</em></h2>
+          <p style="font-size:16px;line-height:1.7;color:var(--slate);margin-top:18px;">Claire est une assistante de réception pensée pour un seul métier : l'accueil des patients d'un cabinet dentaire. Je l'installe et je l'adapte à chaque cabinet, avec un cadre strict sur ce qu'elle dit et ne dit pas.</p>
+          <blockquote class="story-quote">« Vous seriez parmi mes premiers cabinets, et c'est une force pour vous : un accompagnement direct et un service que j'ajuste à votre fonctionnement. »</blockquote>
+          <p style="font-size:15px;color:var(--slate);">Pas d'agence, pas de standard, pas de pitch agressif. Une démo de 10 minutes, et vous décidez. Vous échangez directement avec la personne qui s'occupe de tout.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OFFRE / PROGRAMME FONDATEURS -->
+  <section class="section section-warm" id="offre">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Programme cabinets fondateurs</div>
+        <h2 class="section-title">Gratuit, <em>sans engagement.</em></h2>
+        <p class="section-lead">Claire est en phase pilote. Nous cherchons quelques cabinets partenaires pour la tester et nous donner leur avis d'expert.</p>
+      </div>
+      <div class="founders-card">
+        <div class="founders-tag">Accès fondateur</div>
+        <div class="founders-price">Gratuit</div>
+        <div class="founders-sub">pendant la phase pilote · sans paiement à ce stade</div>
+        <ul class="founders-features">
+          <li><span>✓</span> Mise en place et configuration complète incluses.</li>
+          <li><span>✓</span> Aucun engagement : vous arrêtez quand vous voulez.</li>
+          <li><span>✓</span> Votre retour terrain construit l'outil.</li>
+          <li><span>✓</span> Conditions privilégiées au lancement, réservées aux fondateurs.</li>
+          <li><span>✓</span> Mon numéro direct pour tout ajustement.</li>
+        </ul>
+        <a href="#booking" class="btn btn-gold btn-block">Réserver ma place fondateur</a>
+        <p class="founders-reassure">Installation personnalisée pour chaque cabinet · Vous gardez toujours la main.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- GARANTIES -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Vos garanties</div>
+        <h2 class="section-title">Ce sur quoi je <em>m'engage.</em></h2>
+      </div>
+      <div class="grid-3">
+        <div class="trust-card">
+          <div class="trust-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <h3>Données en Europe</h3>
+          <p>Base hébergée en région européenne, en phase avec les exigences RGPD. Chaque cabinet est strictement cloisonné.</p>
+        </div>
+        <div class="trust-card">
+          <div class="trust-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg></div>
+          <h3>Joignable directement</h3>
+          <p>Vous avez mon numéro. Pas de standard, pas d'intermédiaire. Un problème ? Je réponds.</p>
+        </div>
+        <div class="trust-card">
+          <div class="trust-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+          <h3>Cadré et prudent</h3>
+          <p>Claire ne pose jamais de diagnostic. Pour tout cas sensible, elle transmet au cabinet.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CE QUE CLAIRE NE FAIT PAS -->
+  <section class="section section-warm">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Un périmètre clair</div>
+        <h2 class="section-title">Ce que Claire <em>ne fait pas.</em></h2>
+        <p class="section-lead">Claire reste dans son rôle d'accueil. Un cadre strict, c'est ce qui rend le service fiable et sûr pour votre cabinet.</p>
+      </div>
+      <div class="grid-2">
+        <div class="compare-card before">
+          <h3>Claire ne&nbsp;:</h3>
+          <ul>
+            <li><span>✕</span> ne pose aucun diagnostic et ne donne aucun conseil médical.</li>
+            <li><span>✕</span> ne remplace pas votre secrétariat ni vos praticiens.</li>
+            <li><span>✕</span> ne prend aucune décision à la place du cabinet.</li>
+            <li><span>✕</span> ne gère pas les urgences vitales : elle invite alors à appeler le 15.</li>
+          </ul>
+        </div>
+        <div class="compare-card after">
+          <h3>Claire&nbsp;:</h3>
+          <ul>
+            <li><span>✓</span> accueille le patient et comprend sa demande.</li>
+            <li><span>✓</span> pose quelques questions utiles pour qualifier le besoin.</li>
+            <li><span>✓</span> transmet une demande qualifiée à votre cabinet.</li>
+            <li><span>✓</span> oriente immédiatement vers vous pour tout cas sensible.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- FAQ -->
-  <div class="section">
-    <div class="section-head">
-      <h2>Questions fréquentes</h2>
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Questions fréquentes</div>
+        <h2 class="section-title">Ce qu'on me demande <em>souvent.</em></h2>
+      </div>
+      <div class="faq">
+        <details><summary>Claire remplace-t-elle ma secrétaire ?</summary><p>Non. Claire prend le relais quand personne ne peut répondre — le soir, le week-end, ou pendant les pics d'appels — et prépare des demandes déjà qualifiées. Votre équipe garde la main sur les rendez-vous et les décisions.</p></details>
+        <details><summary>Sur quel canal Claire répond-elle ?</summary><p>Claire répond aux messages écrits de vos patients, directement sur votre site, 24h/24. Elle ne répond pas au téléphone.</p></details>
+        <details><summary>Comment je reçois les demandes ?</summary><p>Pour chaque échange utile, une demande qualifiée arrive dans votre tableau de bord : nom du patient, motif et niveau d'urgence. Vous décidez ensuite de la suite.</p></details>
+        <details><summary>Et les urgences ?</summary><p>Claire ne pose aucun diagnostic. Pour toute urgence vitale, elle invite immédiatement à appeler le 15, et signale le niveau d'urgence sur la demande transmise au cabinet.</p></details>
+        <details><summary>Mes données et celles des patients sont-elles protégées ?</summary><p>Les données sont hébergées en Europe et chaque cabinet est strictement cloisonné (Row Level Security) : un cabinet n'accède qu'à ses propres conversations et demandes.</p></details>
+        <details><summary>Combien ça coûte ?</summary><p>Claire est en phase pilote : aujourd'hui, l'accès est <strong>gratuit et sans engagement</strong> pour les cabinets fondateurs qui acceptent de la tester et de nous donner leur avis. Les conditions tarifaires seront fixées au lancement — les cabinets fondateurs y bénéficieront de conditions privilégiées.</p></details>
+      </div>
     </div>
-    <div class="faq">
-      <details>
-        <summary>Claire remplace-t-elle ma secrétaire ?</summary>
-        <p>Non. Claire prend le relais quand personne ne peut répondre — le soir, le week-end, ou pendant les pics d'appels — et prépare des demandes déjà qualifiées. Votre équipe garde la main sur les rendez-vous et les décisions.</p>
-      </details>
-      <details>
-        <summary>Comment Claire connaît-elle mon cabinet ?</summary>
-        <p>Vous renseignez vos horaires et vos règles de réponse dans les paramètres. Claire s'appuie dessus pour répondre aux patients de façon cohérente avec votre fonctionnement.</p>
-      </details>
-      <details>
-        <summary>Et les urgences ?</summary>
-        <p>Claire ne pose aucun diagnostic. Pour toute urgence vitale, elle invite immédiatement à appeler le 15, et signale le niveau d'urgence sur la demande transmise au cabinet.</p>
-      </details>
-      <details>
-        <summary>Mes données et celles des patients sont-elles protégées ?</summary>
-        <p>Les données sont hébergées en Europe et chaque cabinet est strictement cloisonné (Row Level Security) : un cabinet n'accède qu'à ses propres conversations et demandes.</p>
-      </details>
-      <details>
-        <summary>Combien ça coûte ?</summary>
-        <p>Claire est en phase pilote : aujourd'hui, l'accès est <strong>gratuit et sans engagement</strong> pour les cabinets fondateurs qui acceptent de la tester et de nous donner leur avis. Les conditions tarifaires seront fixées au lancement — les cabinets fondateurs y bénéficieront de conditions privilégiées.</p>
-      </details>
-    </div>
-  </div>
+  </section>
 
-  <!-- PROGRAMME CABINETS FONDATEURS -->
-  <div class="section" id="demande-demo">
-    <div class="section-head">
-      <h2>Programme cabinets fondateurs</h2>
-      <p>Nous cherchons quelques cabinets partenaires pour tester Claire et nous donner leur avis
-        d'expert. Accès <strong>gratuit, sans engagement, sans paiement à ce stade</strong> — votre
-        retour terrain construit l'outil et vous donne des conditions privilégiées au lancement.</p>
+  <!-- AUTO-TEST -->
+  <section class="section section-warm">
+    <div class="container">
+      <div class="self-test">
+        <h3>Vous n'avez pas à me croire sur parole.</h3>
+        <p>Remontez en haut et testez Claire vous-même, comme le ferait un de vos patients. Posez-lui une vraie question. C'est la meilleure façon de juger.</p>
+        <a href="#demo" class="btn btn-gold">Tester Claire maintenant</a>
+      </div>
     </div>
-    <div class="contact-wrap">
-      <div id="contactAlert"></div>
-      <form id="contactForm" novalidate>
-        <div class="contact-grid">
-          <div class="field"><label for="c-nom">Votre nom *</label><input id="c-nom" name="nom" type="text" required autocomplete="name" /></div>
-          <div class="field"><label for="c-cabinet">Cabinet</label><input id="c-cabinet" name="cabinet" type="text" autocomplete="organization" /></div>
-          <div class="field"><label for="c-email">Email *</label><input id="c-email" name="email" type="email" required autocomplete="email" placeholder="vous@cabinet.fr" /></div>
-          <div class="field"><label for="c-tel">Téléphone</label><input id="c-tel" name="telephone" type="tel" autocomplete="tel" placeholder="+33 6 12 34 56 78" /></div>
-          <div class="field field-full">
-            <label for="c-interet">Vous souhaitez</label>
-            <select id="c-interet" name="interet">
-              <option value="">— Choisir —</option>
-              <option value="Tester Claire dans mon cabinet">Tester Claire dans mon cabinet</option>
-              <option value="Donner mon avis d'expert">Donner mon avis d'expert</option>
-              <option value="Être recontacté au lancement">Être recontacté(e) au lancement</option>
-            </select>
+  </section>
+
+  <!-- RÉSERVER UNE DÉMO (Calendly + formulaire) -->
+  <section class="section" id="booking">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Réserver une démo</div>
+        <h2 class="section-title">Voyons ensemble si <em>Claire</em> convient à votre cabinet.</h2>
+        <p class="section-lead">10 minutes, sans engagement. Réservez un créneau directement, ou laissez-moi un message — au choix.</p>
+      </div>
+
+      <div class="calendly-inline-widget" data-url="https://calendly.com/contact-claireassistante/demo-claire-10-minutes"></div>
+
+      <div class="contact-wrap" id="demande-demo">
+        <p style="text-align:center;color:var(--slate);font-size:14px;margin-bottom:20px;">Vous préférez écrire ? Rejoignez le programme cabinets fondateurs :</p>
+        <div id="contactAlert"></div>
+        <form id="contactForm" novalidate>
+          <div class="contact-grid">
+            <div class="field"><label for="c-nom">Votre nom *</label><input id="c-nom" name="nom" type="text" required autocomplete="name" /></div>
+            <div class="field"><label for="c-cabinet">Cabinet</label><input id="c-cabinet" name="cabinet" type="text" autocomplete="organization" /></div>
+            <div class="field"><label for="c-email">Email *</label><input id="c-email" name="email" type="email" required autocomplete="email" placeholder="vous@cabinet.fr" /></div>
+            <div class="field"><label for="c-tel">Téléphone</label><input id="c-tel" name="telephone" type="tel" autocomplete="tel" placeholder="+33 6 12 34 56 78" /></div>
+            <div class="field field-full">
+              <label for="c-interet">Vous souhaitez</label>
+              <select id="c-interet" name="interet">
+                <option value="">— Choisir —</option>
+                <option value="Tester Claire dans mon cabinet">Tester Claire dans mon cabinet</option>
+                <option value="Donner mon avis d'expert">Donner mon avis d'expert</option>
+                <option value="Être recontacté au lancement">Être recontacté(e) au lancement</option>
+              </select>
+            </div>
+            <div class="field field-full"><label for="c-msg">Votre message</label><textarea id="c-msg" name="message" rows="4" placeholder="Parlez-nous de votre cabinet et de ce qui vous ferait gagner du temps…"></textarea></div>
           </div>
-          <div class="field field-full"><label for="c-msg">Votre message</label><textarea id="c-msg" name="message" rows="4" placeholder="Parlez-nous de votre cabinet et de ce qui vous ferait gagner du temps…"></textarea></div>
-        </div>
-        <button type="submit" class="btn btn-primary btn-block" id="contactSubmit">Rejoindre le programme</button>
-      </form>
+          <button type="submit" class="btn btn-primary btn-block" id="contactSubmit">Rejoindre le programme</button>
+        </form>
+      </div>
     </div>
-  </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta">
+    <div class="container">
+      <h2>Discutons. 10 minutes, <em>sans engagement.</em></h2>
+      <p>Vous me parlez de votre cabinet, je vous montre Claire.</p>
+      <a href="https://wa.me/33605800594?text=Bonjour%2C%20je%20suis%20int%C3%A9ress%C3%A9%20par%20le%20programme%20fondateurs%20Claire" class="btn btn-gold">Me contacter sur WhatsApp</a>
+      <p style="margin-top:28px;font-size:15px;opacity:0.7;">contact@claireassistante.fr · 06 05 80 05 94</p>
+    </div>
+  </section>
 </main>
 
 <footer class="footer">
   <div class="footer-inner">
-    <span>© <span id="year"></span> Claire</span>
+    <span>© <span id="year"></span> Claire · Conçu à Lyon pour les cabinets dentaires</span>
     <nav class="footer-links" aria-label="Liens de pied de page">
       <a href="#demo">Démo</a>
-      <a href="#fonctionnalites">Fonctionnalités</a>
-      <a href="#demande-demo">Contact</a>
+      <a href="#offre">Offre</a>
+      <a href="#booking">Contact</a>
       <a href="/etude-de-cas.html">Étude de cas</a>
       <a href="/mentions-legales.html">Mentions légales</a>
       <a href="/confidentialite.html">Confidentialité</a>
