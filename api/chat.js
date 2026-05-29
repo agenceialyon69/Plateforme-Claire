@@ -319,18 +319,21 @@ Réponds UNIQUEMENT avec le JSON.`;
     })
     .eq('id', conversationId);
 
-  // ---------- WEBHOOK n8n ----------
-  if (process.env.N8N_WEBHOOK_URL) {
+  // ---------- WEBHOOK D'AUTOMATISATION (Make, n8n, Zapier…) ----------
+  // NOTIFY_* est le nom retenu ; N8N_* reste accepté pour rétrocompatibilité.
+  const webhookUrl = process.env.NOTIFY_WEBHOOK_URL || process.env.N8N_WEBHOOK_URL;
+  const webhookSecret = process.env.NOTIFY_WEBHOOK_SECRET || process.env.N8N_WEBHOOK_SECRET;
+  if (webhookUrl) {
     const { data: cabinet } = await supabaseAdmin
       .from('cabinets')
       .select('nom, notif_email, notif_telephone')
       .eq('id', cabinetId)
       .single();
-    fetch(process.env.N8N_WEBHOOK_URL, {
+    fetch(webhookUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(process.env.N8N_WEBHOOK_SECRET ? { 'X-Claire-Secret': process.env.N8N_WEBHOOK_SECRET } : {}),
+        ...(webhookSecret ? { 'X-Claire-Secret': webhookSecret } : {}),
       },
       body: JSON.stringify({
         event: 'nouvelle_demande',
@@ -338,6 +341,6 @@ Réponds UNIQUEMENT avec le JSON.`;
         demande: safe,
         conversation_id: conversationId,
       }),
-    }).catch(e => console.error('Webhook n8n failed:', e));
+    }).catch(e => console.error('Webhook notif failed:', e));
   }
 }

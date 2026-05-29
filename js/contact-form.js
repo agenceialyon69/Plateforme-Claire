@@ -15,12 +15,19 @@ form?.addEventListener('submit', async (e) => {
   e.preventDefault();
   slot.innerHTML = '';
 
+  // L'intérêt choisi est préfixé au message (aucun changement de schéma côté API).
+  const interet = form.interet?.value.trim() || '';
+  const messageBrut = form.message.value.trim();
+  const message = interet
+    ? `[Intérêt : ${interet}]${messageBrut ? `\n${messageBrut}` : ''}`
+    : messageBrut;
+
   const payload = {
     nom: form.nom.value.trim(),
     cabinet: form.cabinet.value.trim(),
     email: form.email.value.trim(),
     telephone: form.telephone.value.trim(),
-    message: form.message.value.trim(),
+    message,
   };
 
   if (!payload.nom || !payload.email) {

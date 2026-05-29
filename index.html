@@ -107,7 +107,7 @@
   .demo-typing span:nth-child(2){ animation-delay: .2s; } .demo-typing span:nth-child(3){ animation-delay: .4s; }
   @keyframes blink { 0%,80%,100%{ opacity:.3;} 40%{ opacity:1;} }
   .demo-form { display: flex; gap: 8px; padding: 14px; border-top: 1px solid var(--line); background: #fff; }
-  .demo-form input { flex: 1; padding: 12px 14px; border: 1px solid var(--line); border-radius: 100px; font-size: 14.5px; outline: none; }
+  .demo-form input { flex: 1; padding: 12px 14px; border: 1px solid var(--line); border-radius: 100px; font-size: 16px; outline: none; }
   .demo-form input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
   .demo-caption { text-align: center; font-size: 12.5px; color: var(--slate-soft); margin-top: 12px; }
   #demoNotice { color: var(--gold-dark); }
@@ -164,6 +164,10 @@
   .footer-links a:hover { color: var(--gold-dark); }
 
   @media (max-width: 760px) { .features, .trust, .steps { grid-template-columns: 1fr; } }
+  /* Mobile : hauteur du flux démo en unités viewport pour rester lisible clavier ouvert */
+  @media (max-width: 560px) {
+    .demo-stream { height: 56dvh; max-height: 360px; }
+  }
 </style>
 </head>
 <body>
@@ -189,7 +193,7 @@
     </p>
     <div class="actions">
       <a href="#demo" class="btn btn-primary">Essayer Claire maintenant</a>
-      <a href="#demande-demo" class="btn btn-ghost">Réserver une démo</a>
+      <a href="#demande-demo" class="btn btn-ghost">Devenir cabinet pilote</a>
     </div>
     <p class="hero-status">Version de démonstration · déploiement en cours · accès sur présentation</p>
   </section>
@@ -304,16 +308,18 @@
       </details>
       <details>
         <summary>Combien ça coûte ?</summary>
-        <p>L'offre dépend de votre cabinet et de vos besoins. Réservez une démo : on regarde votre situation ensemble et on construit la proposition avec vous.</p>
+        <p>Claire est en phase pilote : aujourd'hui, l'accès est <strong>gratuit et sans engagement</strong> pour les cabinets fondateurs qui acceptent de la tester et de nous donner leur avis. Les conditions tarifaires seront fixées au lancement — les cabinets fondateurs y bénéficieront de conditions privilégiées.</p>
       </details>
     </div>
   </div>
 
-  <!-- DEMANDE DE DÉMO -->
+  <!-- PROGRAMME CABINETS FONDATEURS -->
   <div class="section" id="demande-demo">
     <div class="section-head">
-      <h2>Réserver une démonstration</h2>
-      <p>Laissez-nous vos coordonnées, nous vous montrons Claire en conditions réelles sur votre cabinet.</p>
+      <h2>Programme cabinets fondateurs</h2>
+      <p>Nous cherchons quelques cabinets partenaires pour tester Claire et nous donner leur avis
+        d'expert. Accès <strong>gratuit, sans engagement, sans paiement à ce stade</strong> — votre
+        retour terrain construit l'outil et vous donne des conditions privilégiées au lancement.</p>
     </div>
     <div class="contact-wrap">
       <div id="contactAlert"></div>
@@ -323,9 +329,18 @@
           <div class="field"><label for="c-cabinet">Cabinet</label><input id="c-cabinet" name="cabinet" type="text" autocomplete="organization" /></div>
           <div class="field"><label for="c-email">Email *</label><input id="c-email" name="email" type="email" required autocomplete="email" placeholder="vous@cabinet.fr" /></div>
           <div class="field"><label for="c-tel">Téléphone</label><input id="c-tel" name="telephone" type="tel" autocomplete="tel" placeholder="+33 6 12 34 56 78" /></div>
-          <div class="field field-full"><label for="c-msg">Votre message</label><textarea id="c-msg" name="message" rows="4" placeholder="Parlez-nous de votre cabinet et de vos besoins…"></textarea></div>
+          <div class="field field-full">
+            <label for="c-interet">Vous souhaitez</label>
+            <select id="c-interet" name="interet">
+              <option value="">— Choisir —</option>
+              <option value="Tester Claire dans mon cabinet">Tester Claire dans mon cabinet</option>
+              <option value="Donner mon avis d'expert">Donner mon avis d'expert</option>
+              <option value="Être recontacté au lancement">Être recontacté(e) au lancement</option>
+            </select>
+          </div>
+          <div class="field field-full"><label for="c-msg">Votre message</label><textarea id="c-msg" name="message" rows="4" placeholder="Parlez-nous de votre cabinet et de ce qui vous ferait gagner du temps…"></textarea></div>
         </div>
-        <button type="submit" class="btn btn-primary btn-block" id="contactSubmit">Demander ma démo</button>
+        <button type="submit" class="btn btn-primary btn-block" id="contactSubmit">Rejoindre le programme</button>
       </form>
     </div>
   </div>
@@ -338,6 +353,7 @@
       <a href="#demo">Démo</a>
       <a href="#fonctionnalites">Fonctionnalités</a>
       <a href="#demande-demo">Contact</a>
+      <a href="/etude-de-cas.html">Étude de cas</a>
       <a href="/mentions-legales.html">Mentions légales</a>
       <a href="/confidentialite.html">Confidentialité</a>
       <a href="/login.html">Espace cabinet</a>
