@@ -177,6 +177,51 @@ Si `ALLOWED_ORIGINS` est vide ou contient `*`, toutes les origines sont accepté
 
 ---
 
+## ÉTAPE 7 — Widget de démo de la page d'accueil
+
+La page d'accueil (`index.html`) contient un **chat de démonstration en conditions réelles** :
+le visiteur échange avec Claire via le vrai endpoint `/api/chat`, mais sur un **cabinet de démo
+dédié** dont les données restent isolées de tes vrais cabinets.
+
+### 7.1 Créer le cabinet de démo
+
+Dans **Authentication → Users → Add user**, crée par exemple `demo@claire.fr` (Auto Confirm coché),
+puis dans le **SQL Editor** :
+
+```sql
+insert into public.cabinets (id, nom, email, ville)
+values ('COLLE-ICI-L-UUID-DE-DEMO', 'Cabinet Démo', 'demo@claire.fr', 'Lyon');
+```
+
+### 7.2 Renseigner l'UUID dans le widget
+
+Ouvre `js/demo-chat.js` et remplace :
+
+```js
+const DEMO_CABINET_ID = 'DEMO_CABINET_ID_HERE';
+```
+
+par l'UUID du cabinet de démo. Tant que ce n'est pas fait, le widget reste **désactivé proprement**
+(il affiche un message neutre, sans erreur).
+
+> ⚠️ Le widget appelle Claude à chaque message : ces échanges de démo consomment ton crédit
+> `ANTHROPIC_API_KEY`. Le rate-limit (20 req/min/IP) est déjà en place dans `api/chat.js`.
+
+---
+
+## ÉTAPE 8 — Installer Claire en application (PWA)
+
+La plateforme est une **PWA installable** : sur le téléphone de l'équipe, elle s'ajoute à l'écran
+d'accueil et s'ouvre en plein écran comme une application native (`manifest.webmanifest` + `sw.js`).
+
+- **iPhone (Safari)** : Partager → *Sur l'écran d'accueil*
+- **Android (Chrome)** : menu ⋮ → *Installer l'application*
+
+Rien à configurer : c'est actif dès que le site est servi en HTTPS (Vercel le fait par défaut).
+Le service worker ne met **jamais** en cache les appels `/api/*` ni les données Supabase.
+
+---
+
 ## Tester de bout en bout
 
 1. Va sur ton site landing → clique sur "Tester Claire"

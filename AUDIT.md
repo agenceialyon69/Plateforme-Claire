@@ -55,9 +55,22 @@ n'était justifiée. L'audit a porté sur la **mise au propre** et la correction
 
 ---
 
-## Recommandations pour la suite (non réalisées — hors périmètre « sans inventer »)
+## Améliorations conversion & mobile (livrées)
+
+Ajoutées sans inventer de fonctionnalité : tout s'appuie sur ce qui existait déjà.
+
+- **Démo interactive** sur `index.html` : le visiteur échange réellement avec Claire via
+  l'endpoint `/api/chat` existant, sur un **cabinet de démo isolé** (`js/demo-chat.js`).
+  Dégradation propre tant que l'UUID de démo n'est pas configuré.
+- **Signaux de confiance véridiques** (hébergement Europe/RGPD, cloisonnement RLS, aucun
+  diagnostic) — aucun chiffre, tarif ni témoignage fabriqué.
+- **PWA installable** : `manifest.webmanifest`, `sw.js` (app shell + hors-ligne, **jamais** de
+  cache sur `/api/*`), icônes générées, `js/pwa.js`. La V2 « App mobile (PWA) » de la roadmap
+  est ainsi couverte.
+
+## Recommandations pour la suite (non réalisées)
 
 1. Ajouter un `package-lock.json` pour figer les versions.
-2. Remplacer le rate-limit mémoire par un store partagé si le trafic augmente.
+2. Remplacer le rate-limit mémoire par un store partagé (Upstash/Redis) si le trafic augmente.
 3. Tests automatisés sur la validation des endpoints publics.
-4. Widget de chat patient officiel dans ce dépôt (aujourd'hui hébergé sur la landing).
+4. Notifications push via la PWA (déjà dans la roadmap V2).
