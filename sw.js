@@ -5,10 +5,12 @@
 //  - /api/*           → réseau uniquement (jamais mis en cache)
 //  - cross-origin     → réseau uniquement (Supabase, esm.sh, fonts)
 //  - navigations HTML → réseau d'abord, cache en repli (mode hors-ligne)
-//  - assets statiques → cache d'abord, puis réseau (mise à jour en fond)
+//  - JS / CSS         → réseau d'abord (le code reste toujours à jour),
+//                       cache en repli si hors-ligne
+//  - images / icônes  → cache d'abord (rarement modifiées)
 // ================================================================
 
-const CACHE = 'claire-v3';
+const CACHE = 'claire-v4';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -46,6 +48,14 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// Détecte les ressources de "code" (HTML, JS, CSS) : on veut toujours
+// la dernière version → réseau d'abord, cache seulement en repli hors-ligne.
+function isCodeRequest(request, url) {
+  if (request.mode === 'navigate') return true;
+  if (request.destination === 'script' || request.destination === 'style' || request.destination === 'document') return true;
+  return /\.(?:js|mjs|css|html)$/i.test(url.pathname);
+}
+
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET') return;
@@ -61,21 +71,25 @@ self.addEventListener('fetch', (event) => {
     return; // laisse le navigateur gérer normalement
   }
 
-  // Navigations : réseau d'abord, repli cache si hors-ligne
-  if (request.mode === 'navigate') {
+  // HTML / JS / CSS : réseau d'abord (le code reste à jour), cache en repli
+  if (isCodeRequest(request, url)) {
     event.respondWith(
       fetch(request)
         .then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(request, copy)).catch(() => {});
+          if (res && res.ok && res.type === 'basic') {
+            const copy = res.clone();
+            caches.open(CACHE).then((c) => c.put(request, copy)).catch(() => {});
+          }
           return res;
         })
-        .catch(() => caches.match(request).then((r) => r || caches.match('/index.html')))
+        .catch(() =>
+          caches.match(request).then((r) => r || (request.mode === 'navigate' ? caches.match('/index.html') : undefined))
+        )
     );
     return;
   }
 
-  // Assets statiques : cache d'abord
+  // Autres assets (images, icônes, polices locales) : cache d'abord
   event.respondWith(
     caches.match(request).then((cached) => {
       if (cached) return cached;
