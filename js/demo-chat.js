@@ -82,9 +82,7 @@ form?.addEventListener('submit', async (e) => {
     const data = await res.json().catch(() => ({}));
 
     if (!res.ok || !data.reply) {
-      // Diagnostic temporaire : on affiche l'erreur réelle du serveur.
-      const detail = data.error ? ` (${res.status} : ${data.error})` : ` (${res.status})`;
-      addBubble('assistant', "Désolée, je n'ai pas pu répondre à l'instant." + detail);
+      addBubble('assistant', "Désolée, je n'ai pas pu répondre à l'instant. Réessayez dans un instant.");
       return;
     }
 
@@ -228,10 +226,15 @@ function syncFullscreenHeight() {
   scrollToBottom();
 }
 
+let savedScrollY = 0;
+
 function openFullscreen() {
   if (!chatWrapper || !isMobile() || chatWrapper.classList.contains('chat-fullscreen')) return;
+  // Mémorise la position de la page pour la restaurer à la fermeture (évite le saut)
+  savedScrollY = window.scrollY || window.pageYOffset || 0;
   chatWrapper.classList.add('chat-fullscreen');
   document.body.classList.add('chat-open');
+  document.body.style.top = `-${savedScrollY}px`;
   syncFullscreenHeight();
   [120, 300, 500].forEach((d) => setTimeout(syncFullscreenHeight, d));
 }
@@ -240,8 +243,11 @@ function closeFullscreen() {
   if (!chatWrapper || !chatWrapper.classList.contains('chat-fullscreen')) return;
   chatWrapper.classList.remove('chat-fullscreen');
   document.body.classList.remove('chat-open');
+  document.body.style.top = '';
   chatWrapper.style.height = '';
   chatWrapper.style.top = '';
+  // Restaure la position exacte où l'utilisateur était sur la page
+  window.scrollTo(0, savedScrollY);
   if (input) input.blur();
 }
 
