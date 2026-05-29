@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" role="img" aria-label="Architecture de Claire : du patient au cabinet">
+  <defs>
+    <style>
+      .bg { fill: #f5f0e8; }
+      .box { fill: #ffffff; stroke: rgba(31,61,53,0.18); stroke-width: 1.5; }
+      .box-forest { fill: #1f3d35; }
+      .box-gold { fill: #fbf3e7; stroke: #c4945a; stroke-width: 1.5; }
+      .t-title { font-family: 'Fraunces', Georgia, serif; font-size: 19px; fill: #1f3d35; font-weight: 600; }
+      .t-title-light { font-family: 'Fraunces', Georgia, serif; font-size: 19px; fill: #f5f0e8; font-weight: 600; }
+      .t { font-family: 'Inter Tight', Arial, sans-serif; font-size: 13px; fill: #4a4a4a; }
+      .t-light { font-family: 'Inter Tight', Arial, sans-serif; font-size: 13px; fill: rgba(245,240,232,0.85); }
+      .t-gold { font-family: 'Inter Tight', Arial, sans-serif; font-size: 12px; fill: #b07d3e; font-weight: 600; letter-spacing: .04em; }
+      .lbl { font-family: 'Inter Tight', Arial, sans-serif; font-size: 11.5px; fill: #7a7a7a; }
+      .flow { stroke: #1f3d35; stroke-width: 2; fill: none; }
+      .flow-gold { stroke: #c4945a; stroke-width: 2; fill: none; stroke-dasharray: 5 4; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#1f3d35"/>
+    </marker>
+    <marker id="arrow-gold" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#c4945a"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="960" height="560" rx="20"/>
+
+  <!-- Titre -->
+  <text x="40" y="48" class="t-title" style="font-size:22px">Claire — architecture de bout en bout</text>
+  <text x="40" y="72" class="lbl">Du message du patient à la fiche qualifiée reçue par le cabinet</text>
+
+  <!-- 1. Patient -->
+  <rect class="box" x="40" y="110" width="180" height="92" rx="14"/>
+  <text x="60" y="142" class="t-title">Patient</text>
+  <text x="60" y="166" class="t">Écrit à Claire 24h/24</text>
+  <text x="60" y="186" class="t">(web / PWA mobile)</text>
+
+  <!-- 2. Frontend / Edge -->
+  <rect class="box" x="290" y="110" width="200" height="92" rx="14"/>
+  <text x="310" y="142" class="t-title">Front vanilla</text>
+  <text x="310" y="166" class="t">HTML/CSS/JS + PWA</text>
+  <text x="310" y="186" class="t">Vercel (HTTPS, CDN)</text>
+
+  <!-- 3. API serverless -->
+  <rect class="box-forest" x="560" y="110" width="200" height="92" rx="14"/>
+  <text x="580" y="142" class="t-title-light">/api/chat</text>
+  <text x="580" y="166" class="t-light">Function serverless</text>
+  <text x="580" y="186" class="t-light">CORS · rate-limit · valid.</text>
+
+  <!-- 4. Anthropic -->
+  <rect class="box" x="560" y="250" width="200" height="86" rx="14"/>
+  <text x="580" y="282" class="t-title">Claude (Anthropic)</text>
+  <text x="580" y="306" class="t">Réponse + extraction</text>
+  <text x="580" y="324" class="t">JSON qualifié assaini</text>
+
+  <!-- 5. Supabase -->
+  <rect class="box" x="290" y="250" width="200" height="86" rx="14"/>
+  <text x="310" y="282" class="t-title">Supabase</text>
+  <text x="310" y="306" class="t">Postgres + Auth</text>
+  <text x="310" y="324" class="t-gold">Row Level Security</text>
+
+  <!-- 6. Dashboard cabinet -->
+  <rect class="box" x="40" y="250" width="180" height="86" rx="14"/>
+  <text x="60" y="282" class="t-title">Cabinet</text>
+  <text x="60" y="306" class="t">Tableau de bord</text>
+  <text x="60" y="324" class="t">demandes + urgences</text>
+
+  <!-- 7. Webhook + Make -->
+  <rect class="box-gold" x="560" y="392" width="200" height="86" rx="14"/>
+  <text x="580" y="424" class="t-gold">WEBHOOK SIGNÉ</text>
+  <text x="580" y="446" class="t">Make / n8n / Zapier</text>
+  <text x="580" y="464" class="t">→ email / WhatsApp</text>
+
+  <!-- Flows -->
+  <!-- patient -> front -->
+  <path class="flow" d="M220 156 L286 156" marker-end="url(#arrow)"/>
+  <!-- front -> api -->
+  <path class="flow" d="M490 156 L556 156" marker-end="url(#arrow)"/>
+  <!-- api -> anthropic -->
+  <path class="flow" d="M660 202 L660 246" marker-end="url(#arrow)"/>
+  <text x="668" y="228" class="lbl">appel LLM</text>
+  <!-- api -> supabase -->
+  <path class="flow" d="M560 175 C520 210, 470 215, 460 246" marker-end="url(#arrow)"/>
+  <text x="468" y="225" class="lbl">sauvegarde</text>
+  <!-- supabase -> dashboard -->
+  <path class="flow" d="M290 293 L224 293" marker-end="url(#arrow)"/>
+  <text x="232" y="282" class="lbl">RLS par cabinet</text>
+  <!-- api -> webhook -->
+  <path class="flow-gold" d="M700 202 C720 280, 700 340, 680 388" marker-end="url(#arrow-gold)"/>
+  <text x="712" y="300" class="t-gold">notif</text>
+
+  <!-- légende sécurité -->
+  <text x="40" y="520" class="lbl">Sécurité : clé service_role côté serveur uniquement · sortie LLM whitelistée &amp; tronquée · webhook signé (X-Claire-Secret) · hébergement Europe (RGPD)</text>
+</svg>

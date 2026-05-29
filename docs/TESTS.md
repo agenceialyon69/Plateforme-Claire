@@ -14,10 +14,11 @@ dérouler à la main** avant chaque mise en ligne importante (aucun framework re
 1. Écrire « saignement abondant qui ne s'arrête pas ».
 2. **Attendu** : Claire invite explicitement à appeler le **15**, urgence marquée élevée.
 
-## 3. Formulaire « Réserver une démo »
+## 3. Formulaire « Programme cabinets fondateurs »
 1. Envoyer le formulaire sans nom/email → message d'erreur clair.
 2. Envoyer avec un email invalide → message d'erreur.
-3. Envoyer un cas valide → message de confirmation ; le lead apparaît dans `contact_leads`.
+3. Choisir un **intérêt** dans la liste + envoyer un cas valide → message de confirmation ; le lead
+   apparaît dans `contact_leads` avec `[Intérêt : …]` en tête du champ `message`.
 4. Spammer le formulaire (>5 envois/min) → réponse 429 (rate-limit).
 
 ## 4. Espace cabinet — états vides
@@ -41,6 +42,20 @@ dérouler à la main** avant chaque mise en ligne importante (aucun framework re
 ## 8. PWA / mobile
 1. Sur mobile, vérifier l'affichage responsive de la landing et de l'espace cabinet.
 2. Installer l'app (Ajouter à l'écran d'accueil) → elle s'ouvre en plein écran.
+3. **iOS** : au focus d'un champ (démo et formulaire fondateurs), l'écran **ne zoome pas**.
+4. Le flux de chat de démo reste lisible clavier ouvert (hauteur en `dvh`).
+
+## 10. Étude de cas (portfolio)
+1. Ouvrir `/etude-de-cas.html` : le diagramme d'architecture s'affiche, les liens vers `/#demande-demo`
+   et l'accueil fonctionnent.
+2. Vérifier le lien « Étude de cas » dans le pied de page de l'accueil.
+
+## 11. Webhook de notification (Make/n8n)
+1. Définir `NOTIFY_WEBHOOK_URL` (+ `NOTIFY_WEBHOOK_SECRET`) vers un webhook de test.
+2. Déclencher une demande qualifiée → le scénario reçoit `event: "nouvelle_demande"` avec l'en-tête
+   `X-Claire-Secret`.
+3. Falsifier/omettre le secret → l'automatisation doit **rejeter** l'appel.
+4. (Rétrocompat) Avec seulement `N8N_WEBHOOK_URL` défini, la notification part quand même.
 
 ## 9. Démo non configurée (dégradation)
 1. Sans `DEMO_CABINET_ID` configuré : le widget de démo reste désactivé avec un message neutre,

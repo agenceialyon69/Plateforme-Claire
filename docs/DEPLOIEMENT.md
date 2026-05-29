@@ -75,7 +75,7 @@ SUPABASE_URL=https://xxxxxxxx.supabase.co
 SUPABASE_ANON_KEY=eyJ...
 SUPABASE_SERVICE_ROLE_KEY=eyJ...
 ANTHROPIC_API_KEY=sk-ant-...
-N8N_WEBHOOK_URL=  (vide pour l'instant si tu n'as pas n8n)
+NOTIFY_WEBHOOK_URL=  (vide pour l'instant si tu n'as pas encore d'automatisation)
 ```
 
 ---
@@ -119,8 +119,8 @@ git push -u origin main
    - `SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `ANTHROPIC_API_KEY`
-   - `N8N_WEBHOOK_URL` (optionnel)
-   - `N8N_WEBHOOK_SECRET` (recommandé si `N8N_WEBHOOK_URL` est défini — voir ÉTAPE 6)
+   - `NOTIFY_WEBHOOK_URL` (optionnel — notifs cabinet via Make/n8n/Zapier, voir ÉTAPE 6)
+   - `NOTIFY_WEBHOOK_SECRET` (recommandé si `NOTIFY_WEBHOOK_URL` est défini — voir ÉTAPE 6)
    - `ALLOWED_ORIGINS` (origines autorisées pour `/api/chat`, `/api/contact`)
    - `DEMO_CABINET_ID` (optionnel — voir ÉTAPE 7, active la carte « reçu par le cabinet »)
 6. Clique **Deploy**
@@ -169,17 +169,24 @@ Si `ALLOWED_ORIGINS` est vide ou contient `*`, toutes les origines sont accepté
 
 ---
 
-## ÉTAPE 6 — Notifications n8n (optionnel, V1.1)
+## ÉTAPE 6 — Notifications au cabinet (optionnel, via Make/n8n/Zapier)
 
-1. Crée un workflow n8n avec un trigger **Webhook**
-2. Copie l'URL du webhook → mets-la dans `N8N_WEBHOOK_URL`
-3. **Sécurise le webhook** : définis une valeur secrète dans `N8N_WEBHOOK_SECRET` (Vercel). Claire
-   l'envoie alors dans l'en-tête `X-Claire-Secret`. Dans n8n, ajoute un nœud **IF** en début de
-   workflow qui rejette toute requête dont l'en-tête ne correspond pas → empêche les appels falsifiés.
-4. Dans le workflow, branche :
-   - Un nœud **Email** (Gmail/SMTP) qui envoie au `notif_email` du cabinet
-   - Un nœud **WhatsApp Business** (optionnel) pour les urgences élevées
-5. Re-deploy Vercel pour qu'il prenne en compte les variables
+Claire peut prévenir le cabinet à chaque nouvelle demande (et à chaque nouveau lead) en envoyant un
+**webhook**. C'est compatible avec n'importe quelle plateforme d'automatisation. **Recette Make pas à
+pas : voir [`MAKE.md`](MAKE.md).**
+
+1. Crée un scénario avec un trigger **Webhook** (Make : *Custom webhook* ; n8n : *Webhook*).
+2. Copie l'URL du webhook → mets-la dans `NOTIFY_WEBHOOK_URL` (Vercel).
+3. **Sécurise le webhook** : définis une valeur secrète dans `NOTIFY_WEBHOOK_SECRET` (Vercel). Claire
+   l'envoie alors dans l'en-tête `X-Claire-Secret`. Dans ton scénario, ajoute un filtre/condition en
+   début de flux qui rejette toute requête dont l'en-tête ne correspond pas → empêche les appels falsifiés.
+4. Dans le scénario, branche :
+   - Un module **Email** (Gmail/SMTP) qui envoie au `notif_email` du cabinet
+   - Un module **WhatsApp/SMS** (optionnel) pour les urgences élevées
+5. Re-deploy Vercel pour qu'il prenne en compte les variables.
+
+> Les anciens noms `N8N_WEBHOOK_URL` / `N8N_WEBHOOK_SECRET` restent acceptés (rétrocompatibilité) si
+> tu les avais déjà configurés.
 
 ---
 

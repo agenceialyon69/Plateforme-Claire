@@ -8,13 +8,20 @@ Plateforme cabinet pour Claire, l'assistante de réception en ligne pour cabinet
 - **Backend** : Vercel Serverless Functions (Node.js)
 - **Base de données + Auth** : Supabase
 - **Hébergement** : Vercel
-- **Automatisations** : n8n (via webhook)
+- **Automatisations** : Make / n8n / Zapier (via webhook signé) — voir `docs/MAKE.md`
+
+## Architecture
+
+![Architecture de Claire](icons/architecture.svg)
+
+Étude de cas complète (problème, solution, décisions d'ingénierie) : **`etude-de-cas.html`**.
 
 ## Structure
 
 ```
 claire-platform/
-├── index.html               → Landing publique (démo live, FAQ, formulaire de démo, SEO)
+├── index.html               → Landing publique (démo live, FAQ, programme fondateurs, SEO)
+├── etude-de-cas.html        → Étude de cas produit/technique (portfolio public)
 ├── login.html               → Connexion cabinet
 ├── cabinet.html             → Dashboard accueil
 ├── conversations.html       → Liste des conversations Claire ↔ patients
@@ -66,6 +73,10 @@ claire-platform/
 │   └── checks.yml           → CI : `npm run check` sur chaque PR et push `main`
 ├── docs/
 │   ├── DEPLOIEMENT.md       → Guide de déploiement détaillé, pas à pas
+│   ├── MAKE.md              → Recette Make pour les notifs cabinet (webhook)
+│   ├── TESTS.md             → Scénarios de test manuels
+│   ├── PORTFOLIO.md         → Éléments CV / LinkedIn prêts à copier
+│   ├── PITCH-CABINETS.md    → Script d'approche des cabinets (programme fondateurs)
 │   └── HOOK-SESSION.md      → Hook de dev Claude Code (optionnel, sans impact prod)
 │
 ├── MISE-EN-LIGNE.md         → Checklist 15 min pour passer en prod
@@ -81,6 +92,10 @@ Le README est le point d'entrée. Pour le détail :
 
 - **`MISE-EN-LIGNE.md`** — checklist des 3 actions de config restantes avant prod (≈15 min)
 - **`docs/DEPLOIEMENT.md`** — guide complet pas à pas (Supabase, Vercel, démo, PWA, analytics)
+- **`docs/MAKE.md`** — brancher les notifications cabinet sur Make (webhook)
+- **`docs/TESTS.md`** — scénarios de test manuels avant mise en ligne
+- **`docs/PORTFOLIO.md`** — éléments CV / LinkedIn prêts à copier
+- **`docs/PITCH-CABINETS.md`** — script d'approche des cabinets (programme fondateurs)
 - **`AUDIT.md`** — état du projet, décisions et vérifications
 - **`docs/HOOK-SESSION.md`** — hook de dev optionnel pour Claude Code on the web
 
@@ -117,7 +132,7 @@ values ('<UUID-de-l-utilisateur-créé>', 'Cabinet Demo Lyon', 'test@cabinet-dem
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `ANTHROPIC_API_KEY` (pour le chatbot Claire)
    - `ALLOWED_ORIGINS` (origines autorisées pour `/api/chat` et `/api/contact`)
-   - `N8N_WEBHOOK_URL` (optionnel, pour les notifs au dentiste)
+   - `NOTIFY_WEBHOOK_URL` (optionnel, notifs au cabinet via Make/n8n/Zapier — voir `docs/MAKE.md`)
    - `DEMO_CABINET_ID` (optionnel — active la carte « reçu par le cabinet » de la démo ;
      voir `docs/DEPLOIEMENT.md`)
 4. Configure aussi ces deux mêmes variables dans `js/supabase-client.js` (côté navigateur) :
@@ -162,7 +177,7 @@ et sur les push vers `main` (Node 22).
 - ✅ Liste + détail des conversations Claire ↔ patients
 - ✅ Demandes qualifiées avec actions (traité, à rappeler)
 - ✅ Paramètres cabinet (horaires, infos)
-- ✅ Webhook n8n pour notifs email/SMS
+- ✅ Webhook signé (Make/n8n/Zapier) pour notifs email/SMS
 - ✅ Page d'accueil avec démo interactive (branchée sur `/api/chat`)
 - ✅ Carte « reçu par le cabinet » dans la démo (`/api/demo-summary`)
 - ✅ Formulaire « Réserver une démo » → leads (`/api/contact`)

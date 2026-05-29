@@ -7,8 +7,8 @@
 // Ne JAMAIS mettre la service_role key ici.
 // ================================================================
 
-const SUPABASE_URL      = 'SUPABASE_URL_HERE';       // ex: https://abcdefgh.supabase.co
-const SUPABASE_ANON_KEY = 'SUPABASE_ANON_KEY_HERE';  // ex: eyJhbGciOi...
+const SUPABASE_URL      = 'https://fikjpaiqjiazxowxvrvo.supabase.co';       // projet plateforme dédié
+const SUPABASE_ANON_KEY = 'sb_publishable_6nC41beInFoY3LbjypWVRw_6Mv3cDx_';  // clé publique (publishable)
 
 // Import Supabase via CDN ESM
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';

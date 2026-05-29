@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /$
+Allow: /etude-de-cas.html
 Allow: /mentions-legales.html
 Allow: /confidentialite.html
 Disallow: /api/
