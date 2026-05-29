@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Conversation — Claire Platform</title>
+<meta name="robots" content="noindex,nofollow" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#1f3d35">
+<link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Claire">
+<link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <a href="/cabinet.html" class="sidebar-logo">
+      <span class="sidebar-logo-mark">C</span>
+      <span>Claire</span>
+    </a>
+    <nav class="sidebar-nav">
+      <div class="sidebar-nav-section">Pilotage</div>
+      <a href="/cabinet.html" class="sidebar-link" data-page="cabinet">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg> Accueil
+      </a>
+      <a href="/demandes.html" class="sidebar-link" data-page="demandes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg> Demandes
+      </a>
+      <a href="/conversations.html" class="sidebar-link active" data-page="conversations">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> Conversations
+      </a>
+      <div class="sidebar-nav-section" style="margin-top:16px;">Cabinet</div>
+      <a href="/parametres.html" class="sidebar-link" data-page="parametres">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg> Paramètres
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <span class="sidebar-user-avatar" data-sidebar-avatar>C</span>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" data-sidebar-name>…</div>
+          <div class="sidebar-user-mail" data-sidebar-mail></div>
+        </div>
+      </div>
+      <button class="sidebar-logout" data-logout>Se déconnecter</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <a href="/conversations.html" class="text-sm text-slate" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:16px;">
+      ← Retour aux conversations
+    </a>
+
+    <header class="page-header">
+      <div>
+        <h1 class="page-title" id="patientName">Conversation</h1>
+        <p class="page-subtitle" id="patientSub">Chargement…</p>
+      </div>
+      <div id="urgenceBadge"></div>
+    </header>
+
+    <div class="convo-layout">
+      <!-- Stream messages -->
+      <section class="convo-stream" id="messagesStream" aria-label="Historique des messages">
+        <div class="skeleton" style="height: 60px; width: 70%; margin-bottom: 16px;"></div>
+        <div class="skeleton" style="height: 60px; width: 70%; margin-left:auto; margin-bottom: 16px;"></div>
+        <div class="skeleton" style="height: 60px; width: 70%;"></div>
+      </section>
+
+      <!-- Side : résumé + actions -->
+      <aside class="convo-side">
+        <div class="summary-card">
+          <h3>Résumé qualifié</h3>
+          <div id="summaryBox">
+            <div class="skeleton" style="height:80px;"></div>
+          </div>
+          <div class="action-bar" id="actionBar"></div>
+        </div>
+
+        <div class="summary-card">
+          <h3>Contact</h3>
+          <div id="contactBox">
+            <div class="skeleton" style="height:60px;"></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<script type="module" src="/js/conversation.js"></script>
+
+<script src="/js/pwa.js"></script>
+</body>
+</html>
