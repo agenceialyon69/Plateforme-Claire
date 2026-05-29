@@ -30,10 +30,16 @@ claire-platform/
 │   ├── supabase-client.js   → Initialisation client Supabase
 │   ├── auth.js              → Login / logout / guard
 │   ├── format.js            → Helpers d'affichage partagés (dates, libellés, échappement HTML)
+│   ├── pwa.js               → Enregistrement du service worker (app installable)
+│   ├── demo-chat.js         → Widget de démo de la page d'accueil (→ /api/chat)
 │   ├── dashboard.js         → Logique dashboard accueil
 │   ├── conversations.js     → Liste + détail conversations
 │   ├── demandes.js          → Gestion des demandes
 │   └── parametres.js        → Gestion paramètres
+│
+├── icons/                   → Icônes de l'app (PWA) + favicon
+├── manifest.webmanifest     → Manifest PWA (app installable)
+├── sw.js                    → Service worker (cache app shell, hors-ligne)
 │
 ├── api/
 │   ├── chat.js              → Endpoint chatbot (sauvegarde dans Supabase)
@@ -117,9 +123,11 @@ Puis va sur `http://localhost:3000/login.html`.
 - ✅ Demandes qualifiées avec actions (traité, à rappeler)
 - ✅ Paramètres cabinet (horaires, infos)
 - ✅ Webhook n8n pour notifs email/SMS
+- ✅ Page d'accueil avec démo interactive (branchée sur `/api/chat`)
+- ✅ App mobile installable (PWA : manifest + service worker)
 
 ### V2 (plus tard)
-- App mobile (PWA)
 - Multi-utilisateurs par cabinet
 - Statistiques avancées
 - Intégration agenda (Doctolib, Julie)
+- Notifications push (PWA)

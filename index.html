@@ -4,88 +4,109 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Claire — Assistante de réception pour cabinets dentaires</title>
-<meta name="description" content="Claire répond aux messages de vos patients 24h/24 et transmet à votre cabinet une demande déjà qualifiée." />
+<meta name="description" content="Claire répond à vos patients 24h/24 et transmet à votre cabinet une demande déjà qualifiée, avec son niveau d'urgence." />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/styles.css">
 
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#1f3d35">
+<link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Claire">
+
 <style>
   body {
     background:
-      radial-gradient(circle at 15% 15%, rgba(196,148,90,0.10), transparent 42%),
-      radial-gradient(circle at 85% 90%, rgba(31,61,53,0.06), transparent 42%),
+      radial-gradient(circle at 15% 12%, rgba(196,148,90,0.10), transparent 42%),
+      radial-gradient(circle at 85% 95%, rgba(31,61,53,0.06), transparent 42%),
       var(--cream);
   }
   .nav {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 22px clamp(20px, 5vw, 56px);
-    max-width: 1100px; margin: 0 auto;
+    padding: 22px clamp(20px, 5vw, 56px); max-width: 1100px; margin: 0 auto;
   }
-  .logo {
-    display: flex; align-items: center; gap: 10px;
-    font-family: var(--serif); font-size: 24px; font-weight: 600; color: var(--forest);
-  }
+  .logo { display: flex; align-items: center; gap: 10px; font-family: var(--serif); font-size: 24px; font-weight: 600; color: var(--forest); }
   .logo-mark {
     width: 36px; height: 36px; background: var(--forest); border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     color: var(--cream); font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 18px;
   }
-  .hero {
-    max-width: 760px; margin: clamp(40px, 8vw, 90px) auto 0; padding: 0 24px; text-align: center;
-  }
+
+  .hero { max-width: 760px; margin: clamp(36px, 7vw, 80px) auto 0; padding: 0 24px; text-align: center; }
   .eyebrow {
     display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: 0.08em;
     text-transform: uppercase; color: var(--gold-dark);
     background: var(--gold-soft); padding: 6px 14px; border-radius: 100px; margin-bottom: 22px;
   }
-  .hero h1 {
-    font-family: var(--serif); font-weight: 500; line-height: 1.08;
-    font-size: clamp(34px, 6vw, 56px); color: var(--forest); margin-bottom: 20px;
-  }
+  .hero h1 { font-family: var(--serif); font-weight: 500; line-height: 1.08; font-size: clamp(34px, 6vw, 56px); color: var(--forest); margin-bottom: 20px; }
   .hero h1 em { font-style: italic; color: var(--gold); }
-  .hero p {
-    color: var(--slate); font-size: clamp(16px, 2.5vw, 19px); line-height: 1.6;
-    max-width: 580px; margin: 0 auto 32px;
-  }
+  .hero p { color: var(--slate); font-size: clamp(16px, 2.5vw, 19px); line-height: 1.6; max-width: 580px; margin: 0 auto 32px; }
   .actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 
-  .features {
-    max-width: 980px; margin: clamp(56px, 10vw, 100px) auto; padding: 0 24px;
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+  /* ---- DÉMO ---- */
+  .demo { max-width: 620px; margin: clamp(40px, 7vw, 72px) auto 0; padding: 0 24px; }
+  .demo-card {
+    background: #fff; border: 1px solid var(--line); border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg); overflow: hidden;
   }
-  .feature {
-    background: #fff; border: 1px solid var(--line); border-radius: var(--radius-lg);
-    padding: 28px 24px; text-align: left;
+  .demo-head {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 20px; background: var(--forest); color: var(--cream);
   }
-  .feature-icon {
-    width: 44px; height: 44px; border-radius: var(--radius);
-    background: var(--forest-soft); color: var(--forest);
-    display: flex; align-items: center; justify-content: center; margin-bottom: 16px;
-  }
+  .demo-head .logo-mark { width: 32px; height: 32px; background: var(--gold); font-size: 15px; }
+  .demo-head-title { font-family: var(--serif); font-size: 17px; }
+  .demo-head-sub { font-size: 12px; color: rgba(245,240,232,0.7); }
+  .demo-live { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: rgba(245,240,232,0.85); }
+  .demo-live::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #6fcf97; box-shadow: 0 0 0 0 rgba(111,207,151,0.6); animation: pulse 1.8s infinite; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(111,207,151,0.6);} 70%{ box-shadow: 0 0 0 7px rgba(111,207,151,0);} 100%{ box-shadow:0 0 0 0 rgba(111,207,151,0);} }
+
+  .demo-stream { padding: 20px; height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: var(--cream); }
+  .demo-msg { display: flex; max-width: 82%; }
+  .demo-msg-user { align-self: flex-end; justify-content: flex-end; }
+  .demo-msg-assistant { align-self: flex-start; }
+  .demo-bubble { padding: 11px 15px; border-radius: 16px; font-size: 14.5px; line-height: 1.5; }
+  .demo-msg-assistant .demo-bubble { background: #fff; border: 1px solid var(--line); color: var(--charcoal); border-bottom-left-radius: 4px; }
+  .demo-msg-user .demo-bubble { background: var(--forest); color: var(--cream); border-bottom-right-radius: 4px; }
+  .demo-typing { display: inline-flex; gap: 4px; }
+  .demo-typing span { width: 7px; height: 7px; border-radius: 50%; background: var(--slate-soft); animation: blink 1.2s infinite both; }
+  .demo-typing span:nth-child(2){ animation-delay: .2s; } .demo-typing span:nth-child(3){ animation-delay: .4s; }
+  @keyframes blink { 0%,80%,100%{ opacity:.3;} 40%{ opacity:1;} }
+
+  .demo-form { display: flex; gap: 8px; padding: 14px; border-top: 1px solid var(--line); background: #fff; }
+  .demo-form input { flex: 1; padding: 12px 14px; border: 1px solid var(--line); border-radius: 100px; font-size: 14.5px; outline: none; }
+  .demo-form input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
+  .demo-caption { text-align: center; font-size: 12.5px; color: var(--slate-soft); margin-top: 12px; }
+  #demoNotice { color: var(--gold-dark); }
+
+  /* ---- FEATURES ---- */
+  .features { max-width: 980px; margin: clamp(56px, 10vw, 100px) auto 0; padding: 0 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .feature { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 28px 24px; }
+  .feature-icon { width: 44px; height: 44px; border-radius: var(--radius); background: var(--forest-soft); color: var(--forest); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
   .feature-icon svg { width: 22px; height: 22px; }
-  .feature h3 {
-    font-family: var(--serif); font-size: 19px; font-weight: 500; color: var(--forest); margin-bottom: 8px;
-  }
+  .feature h3 { font-family: var(--serif); font-size: 19px; font-weight: 500; color: var(--forest); margin-bottom: 8px; }
   .feature p { color: var(--slate); font-size: 14px; line-height: 1.55; }
 
-  .footer {
-    text-align: center; padding: 32px 24px 48px; color: var(--slate-soft); font-size: 13px;
-  }
+  /* ---- TRUST ---- */
+  .trust { max-width: 980px; margin: clamp(40px, 7vw, 72px) auto 0; padding: 0 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .trust-item { display: flex; gap: 12px; align-items: flex-start; font-size: 13.5px; color: var(--slate); }
+  .trust-item strong { color: var(--forest); display: block; font-weight: 600; margin-bottom: 2px; }
+  .trust-item svg { width: 20px; height: 20px; color: var(--gold-dark); flex-shrink: 0; margin-top: 1px; }
+
+  .footer { text-align: center; padding: clamp(48px,8vw,90px) 24px 48px; color: var(--slate-soft); font-size: 13px; }
   .footer a { color: var(--gold); font-weight: 500; }
 
-  @media (max-width: 760px) {
-    .features { grid-template-columns: 1fr; }
-  }
+  @media (max-width: 760px) { .features, .trust { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 
 <header class="nav">
   <a href="/" class="logo" aria-label="Accueil Claire">
-    <span class="logo-mark">C</span>
-    <span>Claire</span>
+    <span class="logo-mark">C</span><span>Claire</span>
   </a>
   <a href="/login.html" class="btn btn-ghost btn-sm">Espace cabinet</a>
 </header>
@@ -96,15 +117,36 @@
     <h1>Claire répond à vos patients, <em>vous traitez l'essentiel</em>.</h1>
     <p>
       Claire accueille chaque patient, comprend sa demande, recueille ses coordonnées
-      et transmet à votre cabinet une demande déjà qualifiée — avec un niveau d'urgence.
-      Vos équipes retrouvent tout dans un tableau de bord clair.
+      et transmet à votre cabinet une demande déjà qualifiée — avec son niveau d'urgence.
+      Tout est centralisé dans un tableau de bord clair, sur ordinateur comme sur mobile.
     </p>
     <div class="actions">
-      <a href="/login.html" class="btn btn-primary">Accéder à l'espace cabinet</a>
-      <a href="#fonctionnalites" class="btn btn-ghost">Découvrir</a>
+      <a href="#demo" class="btn btn-primary">Essayer Claire maintenant</a>
+      <a href="/login.html" class="btn btn-ghost">Espace cabinet</a>
     </div>
   </section>
 
+  <!-- DÉMONSTRATION INTERACTIVE -->
+  <section class="demo" id="demo">
+    <div class="demo-card">
+      <div class="demo-head">
+        <span class="logo-mark">C</span>
+        <div>
+          <div class="demo-head-title">Claire</div>
+          <div class="demo-head-sub">Assistante du cabinet</div>
+        </div>
+        <span class="demo-live">en ligne</span>
+      </div>
+      <div class="demo-stream" id="demoStream" aria-live="polite"></div>
+      <form class="demo-form" id="demoForm" autocomplete="off">
+        <input type="text" id="demoInput" maxlength="2000" placeholder="Écrivez à Claire… ex : « J'ai mal à une dent depuis hier »" aria-label="Votre message" />
+        <button type="submit" class="btn btn-primary btn-sm" id="demoSend">Envoyer</button>
+      </form>
+    </div>
+    <p class="demo-caption" id="demoNotice">Démonstration en conditions réelles. Claire qualifie ensuite la demande pour le cabinet.</p>
+  </section>
+
+  <!-- FONCTIONNALITÉS -->
   <section class="features" id="fonctionnalites">
     <article class="feature">
       <div class="feature-icon" aria-hidden="true">
@@ -113,7 +155,6 @@
       <h3>Accueil 24h/24</h3>
       <p>Claire répond aux messages des patients à toute heure, avec un ton bienveillant et professionnel, et oriente les urgences vitales vers le 15.</p>
     </article>
-
     <article class="feature">
       <div class="feature-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
@@ -121,20 +162,38 @@
       <h3>Demandes qualifiées</h3>
       <p>Pour chaque échange, Claire extrait le nom, le téléphone, le motif et le souhait du patient, puis estime un niveau d'urgence.</p>
     </article>
-
     <article class="feature">
       <div class="feature-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
       </div>
-      <h3>Tableau de bord</h3>
-      <p>Conversations, demandes à traiter, urgences du jour : votre cabinet pilote tout depuis un espace simple, sécurisé et adapté à vos horaires.</p>
+      <h3>Tableau de bord + mobile</h3>
+      <p>Conversations, demandes à traiter et urgences du jour dans un espace simple — installable sur le téléphone de l'équipe comme une application.</p>
     </article>
+  </section>
+
+  <!-- CONFIANCE (faits réels du produit) -->
+  <section class="trust" aria-label="Confiance et sécurité">
+    <div class="trust-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <div><strong>Données hébergées en Europe</strong>Base Supabase en région européenne, en phase avec les exigences RGPD.</div>
+    </div>
+    <div class="trust-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      <div><strong>Cloisonnement strict</strong>Chaque cabinet n'accède qu'à ses propres données (Row Level Security).</div>
+    </div>
+    <div class="trust-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+      <div><strong>Jamais de diagnostic</strong>Claire recueille et transmet ; aucun avis médical. C'est le cabinet qui décide.</div>
+    </div>
   </section>
 </main>
 
 <footer class="footer">
   <p>Claire Platform — espace cabinet · <a href="/login.html">Se connecter</a></p>
 </footer>
+
+<script type="module" src="/js/demo-chat.js"></script>
+<script src="/js/pwa.js"></script>
 
 </body>
 </html>
