@@ -103,6 +103,26 @@ auth.users.id` (déjà fait), couche utilitaire API `_supabase.js` (déjà faite
 présentes (`statut`, `derniere_activite`, `note_cabinet`, `traite_le`), policies RLS d'écriture
 (inutiles : aucune écriture directe depuis le navigateur), multi-utilisateur et pièces jointes (V2).
 
+## Itération — portfolio, programme fondateurs & finition (2026-05-29)
+
+Travaux ciblés alignés sur la stratégie réelle du projet (portfolio pour l'emploi, cabinets pilotes
+sans paiement, démo solide). Aucune donnée personnelle ni promesse non fondée ajoutée.
+
+- **Page étude de cas publique** (`etude-de-cas.html`) + **diagramme d'architecture** (`icons/architecture.svg`),
+  liée au footer, au sitemap, au robots.txt et à l'app-shell du service worker (`claire-v3`). Sert de
+  vitrine technique honnête pour un recruteur ; le dépôt de code reste privé.
+- **Programme « cabinets fondateurs »** : section contact de la landing reformulée (avis d'expert +
+  test gratuit, **sans paiement à ce stade**), FAQ « combien ça coûte » mise en cohérence, champ
+  d'intérêt optionnel dans le formulaire (préfixé au message — **aucun changement de schéma/API**).
+- **Correctif mobile (iOS)** : champs passés à 16px (`.demo-form input` + `.field` via media query)
+  pour supprimer le zoom automatique au focus ; hauteur du flux de démo en `dvh` sur petit écran.
+- **Webhook provider-neutre** : `NOTIFY_WEBHOOK_URL` / `NOTIFY_WEBHOOK_SECRET` (compatibles Make,
+  n8n, Zapier) avec **fallback** sur les anciens `N8N_*` (rétrocompatible). Recette Make pas à pas
+  (`docs/MAKE.md`). `.env.example`, `README.md` et `docs/DEPLOIEMENT.md` mis à jour.
+- **Docs portfolio & prospection** : `docs/PORTFOLIO.md` (pitch, puces CV, entrée LinkedIn, gap
+  anglais assumé) et `docs/PITCH-CABINETS.md` (scripts d'approche, questions de feedback, lettre
+  d'intention).
+
 ## Recommandations pour la suite (non réalisées)
 
 1. Ajouter un `package-lock.json` pour figer les versions.

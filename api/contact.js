@@ -71,18 +71,22 @@ export default async function handler(req, res) {
       });
     if (error) return serverError(res, error);
 
-    if (process.env.N8N_WEBHOOK_URL) {
-      fetch(process.env.N8N_WEBHOOK_URL, {
+    // Webhook d'automatisation (Make, n8n, Zapier…). NOTIFY_* est le nom retenu ;
+    // N8N_* reste accepté pour rétrocompatibilité.
+    const webhookUrl = process.env.NOTIFY_WEBHOOK_URL || process.env.N8N_WEBHOOK_URL;
+    const webhookSecret = process.env.NOTIFY_WEBHOOK_SECRET || process.env.N8N_WEBHOOK_SECRET;
+    if (webhookUrl) {
+      fetch(webhookUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(process.env.N8N_WEBHOOK_SECRET ? { 'X-Claire-Secret': process.env.N8N_WEBHOOK_SECRET } : {}),
+          ...(webhookSecret ? { 'X-Claire-Secret': webhookSecret } : {}),
         },
         body: JSON.stringify({
           event: 'nouveau_lead',
           lead: { nom, cabinet, email, telephone, message },
         }),
-      }).catch(e => console.error('Webhook n8n failed:', e));
+      }).catch(e => console.error('Webhook notif failed:', e));
     }
     return ok(res, { success: true });
   } catch (err) {
