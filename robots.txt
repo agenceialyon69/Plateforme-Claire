@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /$
+Allow: /mentions-legales.html
+Allow: /confidentialite.html
+Disallow: /api/
+Disallow: /login.html
+Disallow: /cabinet.html
+Disallow: /conversations.html
+Disallow: /conversation.html
+Disallow: /demandes.html
+Disallow: /parametres.html
+
+Sitemap: https://claireassistante.fr/sitemap.xml

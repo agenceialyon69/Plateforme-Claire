@@ -120,6 +120,8 @@ git push -u origin main
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `ANTHROPIC_API_KEY`
    - `N8N_WEBHOOK_URL` (optionnel)
+   - `ALLOWED_ORIGINS` (origines autorisées pour `/api/chat`, `/api/contact`)
+   - `DEMO_CABINET_ID` (optionnel — voir ÉTAPE 7, active la carte « reçu par le cabinet »)
 6. Clique **Deploy**
 
 ### 4.3 Connecter le domaine claireassistante.fr
@@ -203,6 +205,13 @@ const DEMO_CABINET_ID = 'DEMO_CABINET_ID_HERE';
 
 par l'UUID du cabinet de démo. Tant que ce n'est pas fait, le widget reste **désactivé proprement**
 (il affiche un message neutre, sans erreur).
+
+### 7.3 (Option) Afficher « ce que reçoit le cabinet »
+
+Pour faire apparaître, sous la démo, la fiche qualifiée telle que la reçoit un cabinet, ajoute la
+variable d'environnement **`DEMO_CABINET_ID`** sur Vercel avec le **même UUID** que ci-dessus, puis
+redéploie. L'endpoint `/api/demo-summary` ne sert alors **que** ce cabinet de démo (aucune donnée
+réelle ne peut être exposée). Sans cette variable, la carte ne s'affiche simplement pas.
 
 > ⚠️ Le widget appelle Claude à chaque message : ces échanges de démo consomment ton crédit
 > `ANTHROPIC_API_KEY`. Le rate-limit (20 req/min/IP) est déjà en place dans `api/chat.js`.

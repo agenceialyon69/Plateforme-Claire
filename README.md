@@ -14,13 +14,16 @@ Plateforme cabinet pour Claire, l'assistante de réception en ligne pour cabinet
 
 ```
 claire-platform/
-├── index.html               → Landing publique (à remplacer par ta landing actuelle)
+├── index.html               → Landing publique (démo live, FAQ, formulaire de démo, SEO)
 ├── login.html               → Connexion cabinet
 ├── cabinet.html             → Dashboard accueil
 ├── conversations.html       → Liste des conversations Claire ↔ patients
 ├── conversation.html        → Détail d'une conversation
 ├── demandes.html            → Demandes qualifiées à traiter
 ├── parametres.html          → Paramètres du cabinet
+├── mentions-legales.html    → Mentions légales (identité à compléter)
+├── confidentialite.html     → Politique de confidentialité (RGPD)
+├── robots.txt / sitemap.xml → SEO
 │
 ├── css/
 │   ├── styles.css           → Styles globaux (palette commune)
@@ -32,6 +35,7 @@ claire-platform/
 │   ├── format.js            → Helpers d'affichage partagés (dates, libellés, échappement HTML)
 │   ├── pwa.js               → Enregistrement du service worker (app installable)
 │   ├── demo-chat.js         → Widget de démo de la page d'accueil (→ /api/chat)
+│   ├── contact-form.js      → Formulaire « Réserver une démo » (→ /api/contact)
 │   ├── dashboard.js         → Logique dashboard accueil
 │   ├── conversations.js     → Liste + détail conversations
 │   ├── demandes.js          → Gestion des demandes
@@ -43,7 +47,8 @@ claire-platform/
 │
 ├── api/
 │   ├── chat.js              → Endpoint chatbot (sauvegarde dans Supabase)
-│   ├── contact.js           → Formulaire de contact landing
+│   ├── contact.js           → Réception des leads (formulaire de démo)
+│   ├── demo-summary.js      → Résumé qualifié de la démo (cabinet démo uniquement)
 │   ├── conversations.js     → GET liste conversations cabinet
 │   ├── conversation.js      → GET détail conversation
 │   ├── demandes.js          → GET / PATCH demandes
