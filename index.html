@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Claire — Assistante de réception pour cabinets dentaires</title>
+<meta name="description" content="Claire répond aux messages de vos patients 24h/24 et transmet à votre cabinet une demande déjà qualifiée." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+
+<style>
+  body {
+    background:
+      radial-gradient(circle at 15% 15%, rgba(196,148,90,0.10), transparent 42%),
+      radial-gradient(circle at 85% 90%, rgba(31,61,53,0.06), transparent 42%),
+      var(--cream);
+  }
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 22px clamp(20px, 5vw, 56px);
+    max-width: 1100px; margin: 0 auto;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--serif); font-size: 24px; font-weight: 600; color: var(--forest);
+  }
+  .logo-mark {
+    width: 36px; height: 36px; background: var(--forest); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cream); font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 18px;
+  }
+  .hero {
+    max-width: 760px; margin: clamp(40px, 8vw, 90px) auto 0; padding: 0 24px; text-align: center;
+  }
+  .eyebrow {
+    display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--gold-dark);
+    background: var(--gold-soft); padding: 6px 14px; border-radius: 100px; margin-bottom: 22px;
+  }
+  .hero h1 {
+    font-family: var(--serif); font-weight: 500; line-height: 1.08;
+    font-size: clamp(34px, 6vw, 56px); color: var(--forest); margin-bottom: 20px;
+  }
+  .hero h1 em { font-style: italic; color: var(--gold); }
+  .hero p {
+    color: var(--slate); font-size: clamp(16px, 2.5vw, 19px); line-height: 1.6;
+    max-width: 580px; margin: 0 auto 32px;
+  }
+  .actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  .features {
+    max-width: 980px; margin: clamp(56px, 10vw, 100px) auto; padding: 0 24px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+  }
+  .feature {
+    background: #fff; border: 1px solid var(--line); border-radius: var(--radius-lg);
+    padding: 28px 24px; text-align: left;
+  }
+  .feature-icon {
+    width: 44px; height: 44px; border-radius: var(--radius);
+    background: var(--forest-soft); color: var(--forest);
+    display: flex; align-items: center; justify-content: center; margin-bottom: 16px;
+  }
+  .feature-icon svg { width: 22px; height: 22px; }
+  .feature h3 {
+    font-family: var(--serif); font-size: 19px; font-weight: 500; color: var(--forest); margin-bottom: 8px;
+  }
+  .feature p { color: var(--slate); font-size: 14px; line-height: 1.55; }
+
+  .footer {
+    text-align: center; padding: 32px 24px 48px; color: var(--slate-soft); font-size: 13px;
+  }
+  .footer a { color: var(--gold); font-weight: 500; }
+
+  @media (max-width: 760px) {
+    .features { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <a href="/" class="logo" aria-label="Accueil Claire">
+    <span class="logo-mark">C</span>
+    <span>Claire</span>
+  </a>
+  <a href="/login.html" class="btn btn-ghost btn-sm">Espace cabinet</a>
+</header>
+
+<main>
+  <section class="hero">
+    <span class="eyebrow">Assistante de réception en ligne</span>
+    <h1>Claire répond à vos patients, <em>vous traitez l'essentiel</em>.</h1>
+    <p>
+      Claire accueille chaque patient, comprend sa demande, recueille ses coordonnées
+      et transmet à votre cabinet une demande déjà qualifiée — avec un niveau d'urgence.
+      Vos équipes retrouvent tout dans un tableau de bord clair.
+    </p>
+    <div class="actions">
+      <a href="/login.html" class="btn btn-primary">Accéder à l'espace cabinet</a>
+      <a href="#fonctionnalites" class="btn btn-ghost">Découvrir</a>
+    </div>
+  </section>
+
+  <section class="features" id="fonctionnalites">
+    <article class="feature">
+      <div class="feature-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      </div>
+      <h3>Accueil 24h/24</h3>
+      <p>Claire répond aux messages des patients à toute heure, avec un ton bienveillant et professionnel, et oriente les urgences vitales vers le 15.</p>
+    </article>
+
+    <article class="feature">
+      <div class="feature-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      </div>
+      <h3>Demandes qualifiées</h3>
+      <p>Pour chaque échange, Claire extrait le nom, le téléphone, le motif et le souhait du patient, puis estime un niveau d'urgence.</p>
+    </article>
+
+    <article class="feature">
+      <div class="feature-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+      </div>
+      <h3>Tableau de bord</h3>
+      <p>Conversations, demandes à traiter, urgences du jour : votre cabinet pilote tout depuis un espace simple, sécurisé et adapté à vos horaires.</p>
+    </article>
+  </section>
+</main>
+
+<footer class="footer">
+  <p>Claire Platform — espace cabinet · <a href="/login.html">Se connecter</a></p>
+</footer>
+
+</body>
+</html>
