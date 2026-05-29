@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tableau de bord — Claire Platform</title>
+<meta name="robots" content="noindex,nofollow" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#1f3d35">
+<link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Claire">
+<link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+
+<div class="app">
+  <!-- =========================================================== -->
+  <!-- SIDEBAR (partagée entre toutes les pages cabinet)            -->
+  <!-- =========================================================== -->
+  <aside class="sidebar">
+    <a href="/cabinet.html" class="sidebar-logo">
+      <span class="sidebar-logo-mark">C</span>
+      <span>Claire</span>
+    </a>
+
+    <nav class="sidebar-nav" aria-label="Navigation principale">
+      <div class="sidebar-nav-section">Pilotage</div>
+      <a href="/cabinet.html" class="sidebar-link" data-page="cabinet">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+        Accueil
+      </a>
+      <a href="/demandes.html" class="sidebar-link" data-page="demandes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        Demandes
+        <span class="badge-count hidden" data-badge-demandes>0</span>
+      </a>
+      <a href="/conversations.html" class="sidebar-link" data-page="conversations">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Conversations
+      </a>
+
+      <div class="sidebar-nav-section" style="margin-top:16px;">Cabinet</div>
+      <a href="/parametres.html" class="sidebar-link" data-page="parametres">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Paramètres
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <span class="sidebar-user-avatar" data-sidebar-avatar>C</span>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" data-sidebar-name>Chargement…</div>
+          <div class="sidebar-user-mail" data-sidebar-mail></div>
+        </div>
+      </div>
+      <button class="sidebar-logout" data-logout>Se déconnecter</button>
+    </div>
+  </aside>
+
+  <!-- =========================================================== -->
+  <!-- MAIN                                                         -->
+  <!-- =========================================================== -->
+  <main class="main">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title">Bonjour, <em data-cabinet-name>…</em></h1>
+        <p class="page-subtitle" id="todayLine"></p>
+      </div>
+      <div>
+        <a href="/conversations.html" class="btn btn-ghost btn-sm">Voir les conversations</a>
+      </div>
+    </header>
+
+    <!-- KPIs -->
+    <section class="kpi-grid" aria-label="Indicateurs du jour">
+      <div class="kpi-card">
+        <div class="kpi-label">Demandes aujourd'hui</div>
+        <div class="kpi-value" data-kpi="demandes_aujourdhui">–</div>
+      </div>
+      <div class="kpi-card danger">
+        <div class="kpi-label">Urgences</div>
+        <div class="kpi-value" data-kpi="urgences_aujourdhui">–</div>
+      </div>
+      <div class="kpi-card accent">
+        <div class="kpi-label">En attente</div>
+        <div class="kpi-value" data-kpi="en_attente">–</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">À rappeler</div>
+        <div class="kpi-value" data-kpi="a_rappeler">–</div>
+      </div>
+    </section>
+
+    <!-- Demandes prioritaires -->
+    <section class="list-card mb-6">
+      <div class="list-card-header">
+        <h2 class="list-card-title">À traiter en priorité</h2>
+        <a href="/demandes.html" class="text-sm text-gold font-semibold">Tout voir →</a>
+      </div>
+      <div id="prioriteList">
+        <div class="list-row" style="cursor: default;">
+          <div class="skeleton" style="height: 18px; width: 60%;"></div>
+          <div class="skeleton" style="height: 14px; width: 80%;"></div>
+          <div class="skeleton" style="height: 14px; width: 60%;"></div>
+          <div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dernières conversations -->
+    <section class="list-card">
+      <div class="list-card-header">
+        <h2 class="list-card-title">Dernières conversations</h2>
+        <a href="/conversations.html" class="text-sm text-gold font-semibold">Tout voir →</a>
+      </div>
+      <div id="convosList">
+        <div class="list-row" style="cursor: default;">
+          <div class="skeleton" style="height: 18px; width: 60%;"></div>
+          <div class="skeleton" style="height: 14px; width: 80%;"></div>
+          <div class="skeleton" style="height: 14px; width: 60%;"></div>
+          <div></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script type="module" src="/js/dashboard.js"></script>
+
+<script src="/js/pwa.js"></script>
+</body>
+</html>

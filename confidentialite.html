@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Politique de confidentialité — Claire</title>
+<meta name="description" content="Politique de confidentialité et traitement des données personnelles de la plateforme Claire." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#1f3d35">
+<link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+
+<style>
+  .doc { max-width: 720px; margin: 0 auto; padding: 28px 24px 80px; }
+  .doc .logo { display: inline-flex; align-items: center; gap: 10px; font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--forest); margin-bottom: 28px; }
+  .doc .logo-mark { width: 32px; height: 32px; background: var(--forest); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--cream); font-family: var(--serif); font-style: italic; font-size: 16px; }
+  .doc h1 { font-family: var(--serif); font-weight: 500; font-size: clamp(28px,5vw,40px); color: var(--forest); margin-bottom: 8px; }
+  .doc .updated { color: var(--slate-soft); font-size: 13px; margin-bottom: 28px; }
+  .doc h2 { font-family: var(--serif); font-weight: 500; font-size: 21px; color: var(--forest); margin: 28px 0 10px; }
+  .doc p, .doc li { color: var(--slate); font-size: 15px; line-height: 1.65; }
+  .doc ul { padding-left: 20px; margin: 8px 0; }
+  .doc .todo { background: var(--gold-soft); color: var(--gold-dark); padding: 1px 7px; border-radius: 6px; font-size: 13px; font-weight: 600; }
+  .doc a { color: var(--gold-dark); }
+  .doc .back { display: inline-block; margin-top: 36px; }
+</style>
+</head>
+<body>
+<main class="doc">
+  <a href="/" class="logo"><span class="logo-mark">C</span><span>Claire</span></a>
+  <h1>Politique de confidentialité</h1>
+  <p class="updated">Décrit le traitement des données personnelles. Les champs entre crochets sont à compléter avant mise en ligne.</p>
+
+  <h2>Responsable du traitement</h2>
+  <p>Le responsable du traitement des données est <span class="todo">[À COMPLÉTER : raison sociale]</span>, joignable à <span class="todo">[À COMPLÉTER : email]</span>.</p>
+
+  <h2>Données collectées</h2>
+  <ul>
+    <li><strong>Via le chat avec Claire</strong> : les informations que le patient choisit de communiquer (nom, téléphone, motif de la demande, souhait).</li>
+    <li><strong>Via le formulaire de contact</strong> : nom, nom du cabinet, email, téléphone et message.</li>
+  </ul>
+
+  <h2>Finalités</h2>
+  <ul>
+    <li>Permettre au cabinet de recontacter le patient et de traiter sa demande.</li>
+    <li>Répondre aux demandes de démonstration et de contact.</li>
+  </ul>
+
+  <h2>Hébergement et sous-traitants</h2>
+  <p>Les données sont hébergées en Europe via <strong>Supabase</strong>. Interviennent également :</p>
+  <ul>
+    <li><strong>Vercel</strong> — hébergement de l'application.</li>
+    <li><strong>Anthropic</strong> — traitement des messages du chat par le modèle d'IA qui génère les réponses de Claire.</li>
+    <li><strong>n8n</strong> (le cas échéant) — acheminement des notifications vers le cabinet.</li>
+  </ul>
+  <p>Chaque cabinet est strictement cloisonné : il n'accède qu'à ses propres données (Row Level Security).</p>
+
+  <h2>Durée de conservation</h2>
+  <p>Les données sont conservées le temps nécessaire au traitement de la demande, puis pendant <span class="todo">[À COMPLÉTER : durée]</span>.</p>
+
+  <h2>Vos droits</h2>
+  <p>
+    Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation
+    et d'opposition. Pour les exercer, écrivez à <span class="todo">[À COMPLÉTER : email]</span>.
+    Vous pouvez également introduire une réclamation auprès de la CNIL.
+  </p>
+
+  <a href="/" class="btn btn-ghost btn-sm back">← Retour à l'accueil</a>
+</main>
+<script src="/js/pwa.js"></script>
+<!-- Vercel Web Analytics (cookieless) -->
+<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments);};</script>
+<script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

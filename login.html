@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Connexion — Claire Platform</title>
+<meta name="description" content="Connexion à votre espace cabinet Claire." />
+<meta name="robots" content="noindex,nofollow" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#1f3d35">
+<link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Claire">
+
+<style>
+  body {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 24px;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(196,148,90,0.10), transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(31,61,53,0.06), transparent 40%),
+      var(--cream);
+  }
+  .login-wrap {
+    max-width: 440px; width: 100%;
+  }
+  .login-logo {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    font-family: var(--serif); font-size: 26px; font-weight: 600;
+    color: var(--forest);
+    margin-bottom: 32px;
+  }
+  .login-logo-mark {
+    width: 36px; height: 36px; background: var(--forest);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cream);
+    font-family: var(--serif); font-style: italic; font-weight: 500;
+    font-size: 18px;
+  }
+  .login-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 36px 32px;
+    box-shadow: var(--shadow-lg);
+  }
+  .login-title {
+    font-family: var(--serif);
+    font-size: 28px; font-weight: 500;
+    color: var(--forest);
+    line-height: 1.15;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+  .login-subtitle {
+    text-align: center;
+    color: var(--slate);
+    font-size: 15px;
+    margin-bottom: 28px;
+  }
+  .login-footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 13px;
+    color: var(--slate-soft);
+  }
+  .login-footer a { color: var(--gold); font-weight: 500; }
+  .login-footer a:hover { color: var(--gold-dark); }
+</style>
+</head>
+<body>
+
+<main class="login-wrap">
+  <a href="/" class="login-logo" aria-label="Retour à l'accueil">
+    <span class="login-logo-mark">C</span>
+    <span>Claire</span>
+  </a>
+
+  <div class="login-card">
+    <h1 class="login-title">Espace cabinet</h1>
+    <p class="login-subtitle">Connectez-vous pour accéder à vos demandes patients.</p>
+
+    <div id="alertSlot"></div>
+
+    <form id="loginForm" novalidate>
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required autocomplete="email" placeholder="cabinet@exemple.fr" />
+      </div>
+      <div class="field">
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="••••••••" />
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
+        <span id="submitLabel">Se connecter</span>
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <p>Pas encore de compte ? <a href="/#booking">Réservez une démo</a></p>
+    </div>
+  </div>
+</main>
+
+<script type="module">
+  import { login, redirectIfAuthed } from '/js/auth.js';
+
+  // Si déjà connecté, redirige direct vers le dashboard
+  redirectIfAuthed();
+
+  const form = document.getElementById('loginForm');
+  const btn = document.getElementById('submitBtn');
+  const btnLabel = document.getElementById('submitLabel');
+  const alertSlot = document.getElementById('alertSlot');
+
+  function showError(msg) {
+    alertSlot.innerHTML = `<div class="alert alert-error">${msg}</div>`;
+  }
+  function clearError() {
+    alertSlot.innerHTML = '';
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearError();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    if (!email || !password) {
+      showError('Merci de remplir tous les champs.');
+      return;
+    }
+
+    btn.disabled = true;
+    btnLabel.innerHTML = '<span class="loader"></span>';
+
+    try {
+      await login(email, password);
+      window.location.href = '/cabinet.html';
+    } catch (err) {
+      console.error(err);
+      const msg = err.message?.includes('Invalid login')
+        ? 'Email ou mot de passe incorrect.'
+        : 'Connexion impossible. Réessayez dans un instant.';
+      showError(msg);
+      btn.disabled = false;
+      btnLabel.textContent = 'Se connecter';
+    }
+  });
+</script>
+
+<script src="/js/pwa.js"></script>
+</body>
+</html>
