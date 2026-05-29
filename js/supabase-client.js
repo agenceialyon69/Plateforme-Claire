@@ -1,0 +1,36 @@
+// ================================================================
+// Client Supabase côté navigateur
+// ----------------------------------------------------------------
+// ⚠️ IMPORTANT : remplace les deux valeurs ci-dessous par celles
+// de TON projet Supabase (Settings → API).
+// L'anon key est PUBLIQUE — c'est normal qu'elle soit dans le code.
+// Ne JAMAIS mettre la service_role key ici.
+// ================================================================
+
+const SUPABASE_URL      = 'SUPABASE_URL_HERE';       // ex: https://abcdefgh.supabase.co
+const SUPABASE_ANON_KEY = 'SUPABASE_ANON_KEY_HERE';  // ex: eyJhbGciOi...
+
+// Import Supabase via CDN ESM
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: false,
+  },
+});
+
+// Helper : récupère la session courante (ou null)
+export async function getSession() {
+  const { data, error } = await supabase.auth.getSession();
+  if (error) return null;
+  return data.session;
+}
+
+// Helper : récupère l'utilisateur courant (ou null)
+export async function getUser() {
+  const { data, error } = await supabase.auth.getUser();
+  if (error) return null;
+  return data.user;
+}
