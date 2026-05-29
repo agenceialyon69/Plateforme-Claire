@@ -7,7 +7,7 @@
 // Ne JAMAIS mettre la service_role key ici.
 // ================================================================
 
-const SUPABASE_URL      = 'SUPABASE_URL_HERE';       // ex: https://abcdefgh.supabase.co
+const SUPABASE_URL      = 'https://kinsubklpzlzprusjwqn.supabase.co';       // ex: https://abcdefgh.supabase.co
 const SUPABASE_ANON_KEY = 'SUPABASE_ANON_KEY_HERE';  // ex: eyJhbGciOi...
 
 // Import Supabase via CDN ESM
