@@ -42,7 +42,7 @@ claire-platform/
 │   ├── demandes.js          → Gestion des demandes
 │   └── parametres.js        → Gestion paramètres
 │
-├── icons/                   → Icônes de l'app (PWA) + favicon
+├── icons/                   → Icônes PWA, favicon, image de partage (Open Graph)
 ├── manifest.webmanifest     → Manifest PWA (app installable)
 ├── sw.js                    → Service worker (cache app shell, hors-ligne)
 │
@@ -60,10 +60,29 @@ claire-platform/
 │   ├── schema.sql           → Schéma complet à exécuter dans Supabase
 │   └── demo-cabinet.sql     → Crée le cabinet de démo (page d'accueil)
 │
+├── scripts/
+│   └── check.mjs            → Contrôles légers (syntaxe JS, JSON, JSON-LD) — sert de lint/test
+├── .github/workflows/
+│   └── checks.yml           → CI : `npm run check` sur chaque PR et push `main`
+├── docs/
+│   ├── DEPLOIEMENT.md       → Guide de déploiement détaillé, pas à pas
+│   └── HOOK-SESSION.md      → Hook de dev Claude Code (optionnel, sans impact prod)
+│
+├── MISE-EN-LIGNE.md         → Checklist 15 min pour passer en prod
+├── AUDIT.md                 → Audit du projet (état, choix, vérifications)
 ├── package.json
 ├── vercel.json
 └── .env.example             → Variables d'env à configurer
 ```
+
+## Documentation
+
+Le README est le point d'entrée. Pour le détail :
+
+- **`MISE-EN-LIGNE.md`** — checklist des 3 actions de config restantes avant prod (≈15 min)
+- **`docs/DEPLOIEMENT.md`** — guide complet pas à pas (Supabase, Vercel, démo, PWA, analytics)
+- **`AUDIT.md`** — état du projet, décisions et vérifications
+- **`docs/HOOK-SESSION.md`** — hook de dev optionnel pour Claude Code on the web
 
 ## Setup (étapes à suivre une fois)
 
@@ -97,7 +116,10 @@ values ('<UUID-de-l-utilisateur-créé>', 'Cabinet Demo Lyon', 'test@cabinet-dem
    - `SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `ANTHROPIC_API_KEY` (pour le chatbot Claire)
+   - `ALLOWED_ORIGINS` (origines autorisées pour `/api/chat` et `/api/contact`)
    - `N8N_WEBHOOK_URL` (optionnel, pour les notifs au dentiste)
+   - `DEMO_CABINET_ID` (optionnel — active la carte « reçu par le cabinet » de la démo ;
+     voir `docs/DEPLOIEMENT.md`)
 4. Configure aussi ces deux mêmes variables dans `js/supabase-client.js` (côté navigateur) :
    - Remplace `SUPABASE_URL_HERE` et `SUPABASE_ANON_KEY_HERE` par les vraies valeurs
    - ⚠️ NE JAMAIS exposer la SERVICE_ROLE_KEY côté navigateur
@@ -115,6 +137,17 @@ Puis va sur `http://localhost:3000/login.html`.
 
 `git push` → Vercel déploie automatiquement.
 
+## Qualité / CI
+
+Contrôles légers sans dépendance, qui servent de linter et de test :
+
+```bash
+npm run check     # syntaxe JS, validité JSON, JSON-LD, présence des fichiers SEO/PWA
+```
+
+`.github/workflows/checks.yml` exécute `npm run check` automatiquement sur chaque pull request
+et sur les push vers `main` (Node 22).
+
 ## Sécurité
 
 - **Row Level Security (RLS)** activé sur toutes les tables : chaque cabinet ne voit que ses propres données.
@@ -131,7 +164,11 @@ Puis va sur `http://localhost:3000/login.html`.
 - ✅ Paramètres cabinet (horaires, infos)
 - ✅ Webhook n8n pour notifs email/SMS
 - ✅ Page d'accueil avec démo interactive (branchée sur `/api/chat`)
+- ✅ Carte « reçu par le cabinet » dans la démo (`/api/demo-summary`)
+- ✅ Formulaire « Réserver une démo » → leads (`/api/contact`)
 - ✅ App mobile installable (PWA : manifest + service worker)
+- ✅ SEO (Open Graph, JSON-LD, sitemap, robots) + mesure de conversion cookieless
+- ✅ Pages légales (mentions, confidentialité) + CI de contrôle
 
 ### V2 (plus tard)
 - Multi-utilisateurs par cabinet
