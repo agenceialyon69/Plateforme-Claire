@@ -187,13 +187,9 @@ dédié** dont les données restent isolées de tes vrais cabinets.
 
 ### 7.1 Créer le cabinet de démo
 
-Dans **Authentication → Users → Add user**, crée par exemple `demo@claire.fr` (Auto Confirm coché),
-puis dans le **SQL Editor** :
-
-```sql
-insert into public.cabinets (id, nom, email, ville)
-values ('COLLE-ICI-L-UUID-DE-DEMO', 'Cabinet Démo', 'demo@claire.fr', 'Lyon');
-```
+1. **Authentication → Users → Add user** : crée `demo@claire.fr` (coche « Auto Confirm User »).
+2. **SQL Editor** : exécute le script prêt à l'emploi **`sql/demo-cabinet.sql`**. Il crée la fiche
+   cabinet à partir de cet utilisateur et te renvoie l'**UUID** (`demo_cabinet_id`) à reporter ensuite.
 
 ### 7.2 Renseigner l'UUID dans le widget
 
@@ -228,6 +224,23 @@ d'accueil et s'ouvre en plein écran comme une application native (`manifest.web
 
 Rien à configurer : c'est actif dès que le site est servi en HTTPS (Vercel le fait par défaut).
 Le service worker ne met **jamais** en cache les appels `/api/*` ni les données Supabase.
+
+---
+
+## ÉTAPE 9 — Mesurer la conversion (Vercel Web Analytics, sans cookies)
+
+Les pages publiques (`index.html`, mentions légales, confidentialité) sont déjà instrumentées pour
+**Vercel Web Analytics** — un suivi **sans cookie ni identifiant**, donc **aucun bandeau cookies
+n'est nécessaire**. Trois événements de conversion sont remontés :
+
+| Événement | Déclenché quand… |
+|-----------|------------------|
+| `demo_started` | le visiteur envoie son 1ᵉʳ message à Claire |
+| `demo_qualified` | Claire a qualifié la demande (carte « reçu par le cabinet ») |
+| `demo_requested` | le formulaire « Réserver une démo » est envoyé avec succès |
+
+Pour activer la collecte : dans Vercel, ouvre le projet → onglet **Analytics** → **Enable**.
+Tant que ce n'est pas activé, le script reste inerte (aucune erreur, aucune donnée envoyée).
 
 ---
 

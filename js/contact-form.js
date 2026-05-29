@@ -3,6 +3,8 @@
 // Branché sur l'endpoint existant /api/contact (table contact_leads).
 // ================================================================
 
+import { track } from '/js/track.js';
+
 const form = document.getElementById('contactForm');
 const slot = document.getElementById('contactAlert');
 const btn = document.getElementById('contactSubmit');
@@ -46,6 +48,7 @@ form?.addEventListener('submit', async (e) => {
       showAlert('error', data.error || 'Envoi impossible pour le moment. Réessayez.');
     } else {
       form.reset();
+      track('demo_requested');
       showAlert('success', 'Merci ! Votre demande est bien reçue, nous revenons vers vous très vite.');
     }
   } catch {

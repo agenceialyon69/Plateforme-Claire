@@ -51,8 +51,12 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(request.url);
 
-  // Jamais de cache pour l'API ni le cross-origin (Supabase, CDN, fonts)
-  if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) {
+  // Jamais de cache pour l'API, l'analytics Vercel, ni le cross-origin
+  if (
+    url.origin !== self.location.origin ||
+    url.pathname.startsWith('/api/') ||
+    url.pathname.startsWith('/_vercel/')
+  ) {
     return; // laisse le navigateur gérer normalement
   }
 

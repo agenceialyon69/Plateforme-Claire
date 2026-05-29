@@ -36,6 +36,7 @@ claire-platform/
 │   ├── pwa.js               → Enregistrement du service worker (app installable)
 │   ├── demo-chat.js         → Widget de démo de la page d'accueil (→ /api/chat)
 │   ├── contact-form.js      → Formulaire « Réserver une démo » (→ /api/contact)
+│   ├── track.js             → Suivi de conversion cookieless (Vercel Analytics)
 │   ├── dashboard.js         → Logique dashboard accueil
 │   ├── conversations.js     → Liste + détail conversations
 │   ├── demandes.js          → Gestion des demandes
@@ -56,7 +57,8 @@ claire-platform/
 │   └── _supabase.js         → Helper Supabase server-side
 │
 ├── sql/
-│   └── schema.sql           → Schéma complet à exécuter dans Supabase
+│   ├── schema.sql           → Schéma complet à exécuter dans Supabase
+│   └── demo-cabinet.sql     → Crée le cabinet de démo (page d'accueil)
 │
 ├── package.json
 ├── vercel.json
