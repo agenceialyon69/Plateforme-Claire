@@ -8,7 +8,7 @@
 // ================================================================
 
 const SUPABASE_URL      = 'https://kinsubklpzlzprusjwqn.supabase.co';       // ex: https://abcdefgh.supabase.co
-const SUPABASE_ANON_KEY = 'SUPABASE_ANON_KEY_HERE';  // ex: eyJhbGciOi...
+const SUPABASE_ANON_KEY = 'sb_publishable_SLdZ1HspXEEvC288h5y3Ww_3rLY40Tc';  // clé publique (publishable)
 
 // Import Supabase via CDN ESM
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
