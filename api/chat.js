@@ -328,7 +328,10 @@ Réponds UNIQUEMENT avec le JSON.`;
       .single();
     fetch(process.env.N8N_WEBHOOK_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(process.env.N8N_WEBHOOK_SECRET ? { 'X-Claire-Secret': process.env.N8N_WEBHOOK_SECRET } : {}),
+      },
       body: JSON.stringify({
         event: 'nouvelle_demande',
         cabinet,
