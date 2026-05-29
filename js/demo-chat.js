@@ -16,7 +16,7 @@
 import { escapeHtml, labelUrgence } from '/js/format.js';
 import { track } from '/js/track.js';
 
-const DEMO_CABINET_ID = 'DEMO_CABINET_ID_HERE';
+const DEMO_CABINET_ID = 'fb235b55-e53c-469b-bc12-64ab845a765f';
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const GREETING = "Bonjour, je suis Claire, l'assistante du cabinet 👋 Dites-moi ce qui vous amène et je m'occupe du reste.";
