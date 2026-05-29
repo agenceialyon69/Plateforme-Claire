@@ -82,7 +82,9 @@ form?.addEventListener('submit', async (e) => {
     const data = await res.json().catch(() => ({}));
 
     if (!res.ok || !data.reply) {
-      addBubble('assistant', "Désolée, je n'ai pas pu répondre à l'instant. Réessayez dans un instant.");
+      // Diagnostic temporaire : on affiche l'erreur réelle du serveur.
+      const detail = data.error ? ` (${res.status} : ${data.error})` : ` (${res.status})`;
+      addBubble('assistant', "Désolée, je n'ai pas pu répondre à l'instant." + detail);
       return;
     }
 
