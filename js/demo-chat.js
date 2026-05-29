@@ -66,7 +66,6 @@ form?.addEventListener('submit', async (e) => {
 
     if (res.status === 429) {
       setNotice('Beaucoup de messages d\'un coup — patientez une minute puis réessayez.');
-      setBusy(false);
       return;
     }
 
@@ -74,7 +73,6 @@ form?.addEventListener('submit', async (e) => {
 
     if (!res.ok || !data.reply) {
       addBubble('assistant', "Désolée, je n'ai pas pu répondre à l'instant. Réessayez dans un instant.");
-      setBusy(false);
       return;
     }
 
@@ -124,17 +122,26 @@ function setNotice(msg) {
 
 // ---------- « Ce que reçoit le cabinet » ----------
 let summaryShown = false;
+let summaryPolling = false;
 async function maybeRevealSummary() {
-  // La qualification serveur démarre après quelques échanges
-  if (summaryShown || !conversationId || messages.length < 4) return;
+  // La qualification serveur est asynchrone : on sonde quelques fois.
+  if (summaryShown || summaryPolling || !conversationId || messages.length < 4) return;
+  summaryPolling = true;
   try {
-    const res = await fetch(`/api/demo-summary?conversationId=${encodeURIComponent(conversationId)}`);
-    if (!res.ok) return;
-    const data = await res.json().catch(() => ({}));
-    if (!data.enabled || !data.demande) return;
-    renderSummary(data.demande);
-    summaryShown = true;
-  } catch { /* silencieux : la carte est optionnelle */ }
+    for (let attempt = 0; attempt < 4 && !summaryShown; attempt++) {
+      try {
+        const res = await fetch(`/api/demo-summary?conversationId=${encodeURIComponent(conversationId)}`);
+        if (res.ok) {
+          const data = await res.json().catch(() => ({}));
+          if (data.enabled === false) break;      // démo non configurée côté serveur
+          if (data.demande) { renderSummary(data.demande); summaryShown = true; break; }
+        }
+      } catch { /* on retente */ }
+      if (!summaryShown) await new Promise((r) => setTimeout(r, 1800));
+    }
+  } finally {
+    summaryPolling = false;
+  }
 }
 
 function renderSummary(d) {
