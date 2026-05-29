@@ -79,6 +79,11 @@ Ajoutées sans inventer de fonctionnalité : tout s'appuie sur ce qui existait d
 - **Pages légales** : `mentions-legales.html` et `confidentialite.html` — exactes sur la stack
   réelle (hébergement Europe, sous-traitants Supabase/Vercel/Anthropic/n8n), avec champs d'identité
   marqués `[À COMPLÉTER]` (aucune donnée légale inventée).
+- **Mesure de conversion sans cookies** : Vercel Web Analytics sur les pages publiques + events
+  `demo_started` / `demo_qualified` / `demo_requested` (`js/track.js`). Cookieless → **aucun bandeau
+  cookies nécessaire** (volontairement non ajouté). Le service worker ne met pas `/_vercel/` en cache.
+- **Activation démo clé en main** : `sql/demo-cabinet.sql` (création du cabinet de démo via l'email
+  Auth, renvoie l'UUID à reporter).
 
 ## Recommandations pour la suite (non réalisées)
 

@@ -12,6 +12,7 @@
 // ================================================================
 
 import { escapeHtml, labelUrgence } from '/js/format.js';
+import { track } from '/js/track.js';
 
 const DEMO_CABINET_ID = 'DEMO_CABINET_ID_HERE';
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -47,6 +48,7 @@ form?.addEventListener('submit', async (e) => {
   }
 
   input.value = '';
+  if (messages.length === 0) track('demo_started');
   addBubble('user', text);
   messages.push({ role: 'user', content: text });
 
@@ -153,4 +155,5 @@ function renderSummary(d) {
   `;
   card.hidden = false;
   card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  track('demo_qualified', { urgence: d.urgence || 'normale' });
 }
