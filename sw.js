@@ -8,7 +8,7 @@
 //  - assets statiques → cache d'abord, puis réseau (mise à jour en fond)
 // ================================================================
 
-const CACHE = 'claire-v1';
+const CACHE = 'claire-v2';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -18,6 +18,8 @@ const APP_SHELL = [
   '/conversation.html',
   '/demandes.html',
   '/parametres.html',
+  '/mentions-legales.html',
+  '/confidentialite.html',
   '/css/styles.css',
   '/css/dashboard.css',
   '/manifest.webmanifest',

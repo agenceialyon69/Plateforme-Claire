@@ -67,6 +67,18 @@ Ajoutées sans inventer de fonctionnalité : tout s'appuie sur ce qui existait d
 - **PWA installable** : `manifest.webmanifest`, `sw.js` (app shell + hors-ligne, **jamais** de
   cache sur `/api/*`), icônes générées, `js/pwa.js`. La V2 « App mobile (PWA) » de la roadmap
   est ainsi couverte.
+- **Carte « ce que reçoit le cabinet »** sous la démo : nouvel endpoint `/api/demo-summary`
+  restreint au seul cabinet de démo (`DEMO_CABINET_ID`) — montre la fiche qualifiée en conditions
+  réelles, sans jamais pouvoir exposer de données réelles.
+- **Formulaire « Réserver une démo »** branché sur l'endpoint `/api/contact` (qui existait déjà
+  mais n'était utilisé nulle part) → capture des leads. `js/contact-form.js`.
+- **Landing complète** : sections « Comment ça marche », fonctionnalités, confiance, FAQ
+  (objections, sans prix inventé), pied de page avec liens légaux.
+- **SEO & partage** : balises Open Graph + Twitter Card, données structurées JSON-LD, image de
+  partage `icons/og-image.png` (1200×630), `robots.txt`, `sitemap.xml`, `canonical`.
+- **Pages légales** : `mentions-legales.html` et `confidentialite.html` — exactes sur la stack
+  réelle (hébergement Europe, sous-traitants Supabase/Vercel/Anthropic/n8n), avec champs d'identité
+  marqués `[À COMPLÉTER]` (aucune donnée légale inventée).
 
 ## Recommandations pour la suite (non réalisées)
 

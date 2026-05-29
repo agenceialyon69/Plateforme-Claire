@@ -11,7 +11,7 @@
 // et reste désactivé (aucune erreur visible).
 // ================================================================
 
-import { escapeHtml } from '/js/format.js';
+import { escapeHtml, labelUrgence } from '/js/format.js';
 
 const DEMO_CABINET_ID = 'DEMO_CABINET_ID_HERE';
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -79,6 +79,9 @@ form?.addEventListener('submit', async (e) => {
     conversationId = data.conversationId || conversationId;
     addBubble('assistant', data.reply);
     messages.push({ role: 'assistant', content: data.reply });
+
+    // Révèle « ce que reçoit le cabinet » dès que Claire a qualifié la demande
+    maybeRevealSummary();
   } catch (err) {
     typing.remove();
     addBubble('assistant', "Connexion interrompue. Vérifiez votre réseau et réessayez.");
@@ -115,4 +118,39 @@ function setBusy(state) {
 function setNotice(msg) {
   const el = document.getElementById('demoNotice');
   if (el) el.textContent = msg;
+}
+
+// ---------- « Ce que reçoit le cabinet » ----------
+let summaryShown = false;
+async function maybeRevealSummary() {
+  // La qualification serveur démarre après quelques échanges
+  if (summaryShown || !conversationId || messages.length < 4) return;
+  try {
+    const res = await fetch(`/api/demo-summary?conversationId=${encodeURIComponent(conversationId)}`);
+    if (!res.ok) return;
+    const data = await res.json().catch(() => ({}));
+    if (!data.enabled || !data.demande) return;
+    renderSummary(data.demande);
+    summaryShown = true;
+  } catch { /* silencieux : la carte est optionnelle */ }
+}
+
+function renderSummary(d) {
+  const card = document.getElementById('demoSummary');
+  if (!card) return;
+  const row = (label, value) => value
+    ? `<div class="ds-row"><span class="ds-label">${label}</span><span class="ds-value">${escapeHtml(value)}</span></div>`
+    : '';
+  card.innerHTML = `
+    <div class="ds-head">
+      <span class="ds-badge">Reçu par le cabinet</span>
+      <span class="badge badge-urgence-${escapeHtml(d.urgence || 'normale')}">${labelUrgence(d.urgence)}</span>
+    </div>
+    ${row('Patient', d.patient_nom)}
+    ${row('Téléphone', d.patient_telephone)}
+    ${row('Motif', d.motif)}
+    ${row('Souhait', d.souhait)}
+  `;
+  card.hidden = false;
+  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
