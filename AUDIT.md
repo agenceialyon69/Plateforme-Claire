@@ -85,9 +85,28 @@ Ajoutées sans inventer de fonctionnalité : tout s'appuie sur ce qui existait d
 - **Activation démo clé en main** : `sql/demo-cabinet.sql` (création du cabinet de démo via l'email
   Auth, renvoie l'UUID à reporter).
 
+## Suite à un audit externe (points validés et appliqués)
+
+- **Positionnement honnête** : la landing affiche désormais son statut réel
+  (« version de démonstration · déploiement en cours · accès sur présentation ») et une accroche
+  centrée sur la douleur métier (appels manqués, secrétariat saturé, urgences mal filtrées).
+  Aucun « cabinet pilote » n'est revendiqué tant qu'il n'y en a pas réellement.
+- **Sécurité webhook n8n** : en-tête secret `X-Claire-Secret` (env `N8N_WEBHOOK_SECRET`) ajouté aux
+  appels sortants (`api/chat.js`, `api/contact.js`) pour que n8n rejette les requêtes falsifiées.
+- **Confidentialité** : la mesure d'audience (Vercel Analytics cookieless) est désormais décrite, et
+  une section **rétention/suppression des données** précise la durée et le droit à l'effacement.
+- **Tests** : scénarios manuels documentés (`docs/TESTS.md`) — flux patient, urgence, leads,
+  cabinet vide/chargé, cloisonnement, auth, PWA.
+
+Points de l'audit externe **non retenus** (déjà en place ou hors périmètre) : `cabinets.id =
+auth.users.id` (déjà fait), couche utilitaire API `_supabase.js` (déjà faite), colonnes déjà
+présentes (`statut`, `derniere_activite`, `note_cabinet`, `traite_le`), policies RLS d'écriture
+(inutiles : aucune écriture directe depuis le navigateur), multi-utilisateur et pièces jointes (V2).
+
 ## Recommandations pour la suite (non réalisées)
 
 1. Ajouter un `package-lock.json` pour figer les versions.
 2. Remplacer le rate-limit mémoire par un store partagé (Upstash/Redis) si le trafic augmente.
-3. Tests automatisés sur la validation des endpoints publics.
+3. Tests automatisés (au-delà des scénarios manuels de `docs/TESTS.md`).
 4. Notifications push via la PWA (déjà dans la roadmap V2).
+5. Mécanisme de purge planifiée (rétention) une fois les durées légales fixées.
