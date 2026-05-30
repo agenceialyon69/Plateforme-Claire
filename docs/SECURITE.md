@@ -12,13 +12,29 @@ données. Tout le reste découle de là.
 - Extraction LLM bien bornée : whitelist `urgence`, troncature des champs, `motif` obligatoire.
 - `contact_leads` totalement verrouillée (RLS sans policy → service_role uniquement).
 
-## ⚠️ Risques réels à garder en tête
+## 🛡️ Durcissement du chat public (implémenté dans `api/chat.js`)
 
-1. **`cabinetId` est public** (embarqué dans le widget de chat). Quelqu'un qui le récupère
-   peut spammer de fausses demandes / déclencher le webhook d'un cabinet ciblé. UUID v4 non
-   énumérable, donc ciblé et non massif. → Mitiger via captcha (Turnstile) ou rate-limit par cabinet.
-2. **Rate-limit en mémoire = par instance serverless** (`chat.js`, `contact.js`). Se réinitialise
-   et ne tient pas contre un attaquant distribué. → Store partagé (Upstash) ou WAF/Turnstile.
+Plusieurs couches de défense empilées :
+
+- **Double rate-limit** : par IP (20/min) **et** par cabinet (60/min). Borne le spam ciblé.
+- **Plafond de charge** : somme des messages ≤ 12 000 caractères par requête.
+- **Plafond de coût par conversation** : au-delà de 40 messages, clôture polie au lieu de
+  laisser filer les coûts d'API.
+- **Assainissement des entrées** : suppression des caractères de contrôle invisibles +
+  normalisation unicode (préserve accents/espaces/emojis).
+- **Anti-détournement** : règle système non négociable — les messages patient sont des
+  demandes, jamais des instructions ; refus de changement de rôle / fuite du prompt.
+- **Sortie traitée comme non fiable** : whitelist `urgence`, troncature des champs, filet
+  anti-bulle-vide, demande créée de façon idempotente.
+- **Journalisation des abus** : logs structurés `[abuse] …` (repérables dans Vercel).
+
+## ⚠️ Risques résiduels à garder en tête
+
+1. **`cabinetId` est public** (embarqué dans le widget). UUID v4 non énumérable → ciblé, non
+   massif. Le rate-limit par cabinet réduit l'impact ; un **captcha (Turnstile)** le fermerait
+   complètement.
+2. **Rate-limit en mémoire = par instance serverless**. Premier filtre efficace, mais un
+   attaquant distribué peut le diluer. → Pour la montée en charge : **store partagé (Upstash Redis)**.
 3. **CORS ≠ anti-abus** : verrouiller `ALLOWED_ORIGINS` bloque les autres sites, mais pas un
    `curl` scripté. Utile, mais ne pas s'y fier seul.
 

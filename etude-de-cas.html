@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Étude de cas — Claire, assistante de réception pour cabinets dentaires</title>
-<meta name="description" content="Étude de cas technique de Claire : problème métier, solution, architecture (Vercel, Supabase RLS, Anthropic, automatisation), décisions d'ingénierie et sécurité." />
+<meta name="description" content="Étude de cas technique de Claire : problème métier, solution, architecture (Vercel, Supabase RLS, moteur conversationnel, automatisation), décisions d'ingénierie et sécurité." />
 <link rel="canonical" href="https://claireassistante.fr/etude-de-cas.html" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -78,14 +78,14 @@
 
   <h2>Architecture</h2>
   <div class="diagram">
-    <img src="/icons/architecture.svg" alt="Schéma : le patient écrit à Claire via le front, qui appelle l'API serverless ; celle-ci interroge Claude et sauvegarde dans Supabase (RLS), le cabinet consulte ses demandes, et un webhook signé notifie via Make." />
+    <img src="/icons/architecture.svg" alt="Schéma : le patient écrit à Claire via le front, qui appelle l'API serverless ; celle-ci interroge le moteur conversationnel et sauvegarde dans Supabase (RLS), le cabinet consulte ses demandes, et un webhook signé notifie via Make." />
   </div>
   <div class="stack">
     <div><strong>Front</strong> — HTML/CSS/JS vanilla, PWA installable (offline app-shell)</div>
     <div><strong>Hébergement</strong> — Vercel (HTTPS, CDN, fonctions serverless)</div>
     <div><strong>Back</strong> — Vercel Serverless Functions (Node.js)</div>
     <div><strong>Base & Auth</strong> — Supabase (Postgres + Auth, Row Level Security)</div>
-    <div><strong>IA</strong> — API Anthropic (Claude) : conversation + extraction qualifiée</div>
+    <div><strong>Moteur conversationnel</strong> — traitement automatisé du langage : dialogue + extraction qualifiée</div>
     <div><strong>Automatisation</strong> — webhook signé → Make / n8n / Zapier</div>
     <div><strong>Mesure</strong> — analytics sans cookie (aucun bandeau requis)</div>
     <div><strong>Qualité</strong> — contrôles CI sans dépendance (lint/JSON/JSON-LD)</div>
@@ -101,8 +101,8 @@
         <code>/api/contact</code>).</p>
     </div>
     <div class="card">
-      <h3>Sortie du LLM traitée comme non fiable</h3>
-      <p>Le JSON renvoyé par le modèle est parsé puis <strong>assaini</strong> : whitelist sur le
+      <h3>Sortie du moteur traitée comme non fiable</h3>
+      <p>Le JSON renvoyé par le moteur est parsé puis <strong>assaini</strong> : whitelist sur le
         niveau d'urgence, troncature des champs, demande créée de façon idempotente (une par
         conversation).</p>
     </div>
@@ -113,14 +113,14 @@
     </div>
     <div class="card">
       <h3>Robustesse du flux patient</h3>
-      <p>Le message du patient est sauvegardé <strong>avant</strong> l'appel au modèle : même si l'IA
+      <p>Le message du patient est sauvegardé <strong>avant</strong> l'appel au moteur : même s'il
         échoue, aucun message n'est perdu. Le widget de démo se dégrade proprement s'il n'est pas
         configuré.</p>
     </div>
     <div class="card">
-      <h3>Anti-injection de prompt</h3>
-      <p>Les règles personnalisées saisies par un cabinet sont tronquées et cadrées dans le prompt
-        système pour limiter toute tentative de détournement de l'assistante.</p>
+      <h3>Cadrage strict des entrées</h3>
+      <p>Les règles personnalisées saisies par un cabinet sont tronquées et cadrées dans les
+        instructions système pour limiter toute tentative de détournement de l'assistante.</p>
     </div>
     <div class="card">
       <h3>RGPD & confidentialité par défaut</h3>
@@ -132,7 +132,7 @@
   <h2>Ce que ce projet démontre</h2>
   <ul>
     <li>Concevoir un produit de A à Z à partir d'un vrai besoin métier, sans sur-ingénierie.</li>
-    <li>Intégrer un LLM en production de façon <strong>sûre</strong> (entrées validées, sorties assainies).</li>
+    <li>Intégrer un moteur conversationnel en production de façon <strong>sûre</strong> (entrées validées, sorties assainies).</li>
     <li>Modéliser une base multi-tenant et la sécuriser avec Row Level Security.</li>
     <li>Déployer en serverless, instrumenter la conversion et automatiser les notifications métier.</li>
     <li>Documenter et tester (CI légère + scénarios manuels) pour rester maintenable.</li>
