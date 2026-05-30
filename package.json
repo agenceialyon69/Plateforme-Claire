@@ -9,7 +9,8 @@
     "check": "node scripts/check.mjs",
     "lint": "node scripts/check.mjs",
     "test": "node scripts/check.mjs",
-    "create-admin": "node scripts/create-admin.mjs"
+    "create-admin": "node scripts/create-admin.mjs",
+    "redteam": "node scripts/redteam-cross-cabinet.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
