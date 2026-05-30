@@ -26,6 +26,22 @@
   // Déjà installée → rien à proposer.
   if (isStandalone) return;
 
+  // Le bouton « Installer l'app » est réservé à l'ESPACE CABINET.
+  // Sur la vitrine publique (accueil, étude de cas, pages légales), on
+  // ne propose pas l'installation : la vitrine reste focalisée sur la
+  // réservation de démo. Le service worker, lui, reste actif partout.
+  const APP_PAGES = [
+    '/login.html',
+    '/cabinet.html',
+    '/conversations.html',
+    '/conversation.html',
+    '/demandes.html',
+    '/parametres.html',
+  ];
+  const path = window.location.pathname;
+  const isAppPage = APP_PAGES.some((p) => path === p || path === p.replace('.html', ''));
+  if (!isAppPage) return;
+
   const ua = window.navigator.userAgent || '';
   const isIOS = /iphone|ipad|ipod/i.test(ua) ||
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
