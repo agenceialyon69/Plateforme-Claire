@@ -9,7 +9,6 @@
 // À SUPPRIMER une fois le diagnostic terminé.
 // ================================================================
 
-import Anthropic from '@anthropic-ai/sdk';
 import { createClient } from '@supabase/supabase-js';
 
 const MODEL = 'claude-haiku-4-5-20251001';
@@ -66,24 +65,32 @@ export default async function handler(req, res) {
     out.etapes.supabase = { ok: false, erreur: String(e.message || e) };
   }
 
-  // ---------- 3) Appel minimal à Claude ----------
+  // ---------- 3) Appel minimal à Claude (fetch natif, comme /api/chat) ----------
   try {
     if (!process.env.ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY manquante');
-    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const r = await anthropic.messages.create({
-      model: MODEL,
-      max_tokens: 16,
-      messages: [{ role: 'user', content: 'dis bonjour' }],
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 16,
+        messages: [{ role: 'user', content: 'dis bonjour' }],
+      }),
     });
-    const txt = (r.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
-    out.etapes.anthropic = { ok: true, reponse: txt.slice(0, 40) };
+    const body = await r.text();
+    if (!r.ok) {
+      out.etapes.anthropic = { ok: false, status: r.status, erreur: body.slice(0, 300) };
+    } else {
+      const data = JSON.parse(body);
+      const txt = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
+      out.etapes.anthropic = { ok: true, reponse: txt.slice(0, 40) };
+    }
   } catch (e) {
-    out.etapes.anthropic = {
-      ok: false,
-      erreur: String(e.message || e),
-      status: e.status || null,
-      type: e.error?.error?.type || e.name || null,
-    };
+    out.etapes.anthropic = { ok: false, erreur: String(e.message || e), type: e.name || null };
   }
 
   out.ok = !!(out.etapes.supabase?.ok && out.etapes.anthropic?.ok);

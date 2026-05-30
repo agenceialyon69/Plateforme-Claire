@@ -12,11 +12,45 @@
 // - Message patient sauvegardé AVANT appel Claude (jamais perdu)
 // ================================================================
 
-import Anthropic from '@anthropic-ai/sdk';
 import { supabaseAdmin, ok, badRequest, serverError } from './_supabase.js';
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const MODEL = 'claude-haiku-4-5-20251001';
+
+// Appel direct à l'API Anthropic via fetch natif (sans SDK).
+// Méthode identique à l'ancien chat qui fonctionnait : aucune dépendance,
+// aucun souci de connexion côté serverless.
+async function callClaude({ system, messages, max_tokens }) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 25000);
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens,
+        ...(system ? { system } : {}),
+        messages,
+      }),
+      signal: controller.signal,
+    });
+    if (!res.ok) {
+      const errText = await res.text().catch(() => '');
+      throw new Error(`Anthropic ${res.status}: ${errText.slice(0, 300)}`);
+    }
+    const data = await res.json();
+    return (data.content || [])
+      .filter(b => b.type === 'text')
+      .map(b => b.text)
+      .join('\n');
+  } finally {
+    clearTimeout(timeout);
+  }
+}
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_MESSAGES = 30;
@@ -165,16 +199,11 @@ export default async function handler(req, res) {
 
     let replyText;
     try {
-      const response = await anthropic.messages.create({
-        model: MODEL,
-        max_tokens: 600,
+      replyText = await callClaude({
         system: buildSystemPrompt(cabinet),
         messages: claudeMessages,
+        max_tokens: 600,
       });
-      replyText = response.content
-        .filter(b => b.type === 'text')
-        .map(b => b.text)
-        .join('\n');
     } catch (err) {
       console.error('Anthropic API error:', err);
       return res.status(502).json({
@@ -270,12 +299,10 @@ Réponds UNIQUEMENT avec le JSON.`;
 
   let parsed;
   try {
-    const response = await anthropic.messages.create({
-      model: MODEL,
-      max_tokens: 400,
+    const text = (await callClaude({
       messages: [{ role: 'user', content: extractionPrompt }],
-    });
-    const text = response.content.filter(b => b.type === 'text').map(b => b.text).join('').trim();
+      max_tokens: 400,
+    })).trim();
     const cleaned = text.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```\s*$/, '').trim();
     parsed = JSON.parse(cleaned);
   } catch (e) {
