@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Inviter un cabinet — Claire Platform</title>
+<meta name="robots" content="noindex,nofollow" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#1f3d35">
+<link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Claire">
+<link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <a href="/cabinet.html" class="sidebar-logo">
+      <span class="sidebar-logo-mark">C</span>
+      <span>Claire</span>
+    </a>
+    <nav class="sidebar-nav">
+      <div class="sidebar-nav-section">Pilotage</div>
+      <a href="/cabinet.html" class="sidebar-link" data-page="cabinet">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg> Accueil
+      </a>
+      <a href="/demandes.html" class="sidebar-link" data-page="demandes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg> Demandes
+      </a>
+      <a href="/conversations.html" class="sidebar-link" data-page="conversations">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> Conversations
+      </a>
+      <div class="sidebar-nav-section" style="margin-top:16px;">Cabinet</div>
+      <a href="/parametres.html" class="sidebar-link" data-page="parametres">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg> Paramètres
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <span class="sidebar-user-avatar" data-sidebar-avatar>C</span>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" data-sidebar-name>…</div>
+          <div class="sidebar-user-mail" data-sidebar-mail></div>
+        </div>
+      </div>
+      <button class="sidebar-logout" data-logout>Se déconnecter</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title">Inviter un cabinet</h1>
+        <p class="page-subtitle">Envoyez une invitation : le cabinet définira lui-même son mot de passe.</p>
+      </div>
+    </header>
+
+    <!-- État : accès refusé (non-admin) -->
+    <section id="forbiddenSlot" style="display:none;">
+      <div class="alert alert-error">
+        Cet espace est réservé à l'administrateur de la plateforme.
+      </div>
+    </section>
+
+    <!-- Formulaire d'invitation -->
+    <section class="list-card" id="inviteCard" style="display:none; max-width: 560px; padding: 28px;">
+      <div id="alertSlot"></div>
+
+      <form id="inviteForm" novalidate>
+        <div class="field">
+          <label for="nom">Nom du cabinet</label>
+          <input type="text" id="nom" name="nom" required placeholder="Cabinet Dentaire des Brotteaux" />
+        </div>
+        <div class="field">
+          <label for="email">Email du cabinet</label>
+          <input type="email" id="email" name="email" required autocomplete="off" placeholder="contact@cabinet-exemple.fr" />
+        </div>
+        <div class="field">
+          <label for="telephone">Téléphone <span style="color:var(--slate-soft); font-weight:400;">(optionnel)</span></label>
+          <input type="tel" id="telephone" name="telephone" autocomplete="off" placeholder="+33 4 ..." />
+        </div>
+        <div class="field">
+          <label for="ville">Ville <span style="color:var(--slate-soft); font-weight:400;">(optionnel)</span></label>
+          <input type="text" id="ville" name="ville" autocomplete="off" placeholder="Lyon" />
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
+          <span id="submitLabel">Envoyer l'invitation</span>
+        </button>
+      </form>
+
+      <p style="margin-top:18px; font-size:13px; color:var(--slate); line-height:1.5;">
+        Le cabinet recevra un email avec un lien sécurisé pour créer son mot de passe.
+        Aucun mot de passe ne transite par vous.
+      </p>
+    </section>
+  </main>
+</div>
+
+<script type="module" src="/js/admin.js"></script>
+
+<script src="/js/pwa.js?v=8"></script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bienvenue — Claire Platform</title>
+<meta name="description" content="Activez votre espace cabinet Claire." />
+<meta name="robots" content="noindex,nofollow" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#1f3d35">
+
+<style>
+  body {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 24px;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(196,148,90,0.10), transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(31,61,53,0.06), transparent 40%),
+      var(--cream);
+  }
+  .login-wrap { max-width: 440px; width: 100%; }
+  .login-logo {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    font-family: var(--serif); font-size: 26px; font-weight: 600;
+    color: var(--forest); margin-bottom: 32px;
+  }
+  .login-logo-mark {
+    width: 36px; height: 36px; background: var(--forest); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cream); font-family: var(--serif); font-style: italic;
+    font-weight: 500; font-size: 18px;
+  }
+  .login-card {
+    background: #fff; border: 1px solid var(--line);
+    border-radius: var(--radius-lg); padding: 36px 32px; box-shadow: var(--shadow-lg);
+  }
+  .login-title {
+    font-family: var(--serif); font-size: 28px; font-weight: 500;
+    color: var(--forest); line-height: 1.15; margin-bottom: 6px; text-align: center;
+  }
+  .login-subtitle {
+    text-align: center; color: var(--slate); font-size: 15px; margin-bottom: 28px;
+  }
+  .login-footer {
+    text-align: center; margin-top: 24px; font-size: 13px; color: var(--slate-soft);
+  }
+  .login-footer a { color: var(--gold); font-weight: 500; }
+</style>
+</head>
+<body>
+
+<main class="login-wrap">
+  <a href="/" class="login-logo" aria-label="Accueil">
+    <span class="login-logo-mark">C</span>
+    <span>Claire</span>
+  </a>
+
+  <div class="login-card">
+    <h1 class="login-title">Bienvenue 👋</h1>
+    <p class="login-subtitle">Choisissez votre mot de passe pour activer votre espace.</p>
+
+    <div id="alertSlot"></div>
+
+    <!-- Pendant la vérification du lien -->
+    <div id="loadingState" style="text-align:center; padding:12px 0;">
+      <span class="loader"></span>
+      <p style="margin-top:12px; color:var(--slate); font-size:14px;">Vérification du lien…</p>
+    </div>
+
+    <!-- Formulaire de définition du mot de passe -->
+    <form id="pwForm" novalidate style="display:none;">
+      <div class="field">
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" name="password" required autocomplete="new-password"
+               minlength="8" placeholder="Au moins 8 caractères" />
+      </div>
+      <div class="field">
+        <label for="password2">Confirmez le mot de passe</label>
+        <input type="password" id="password2" name="password2" required autocomplete="new-password"
+               minlength="8" placeholder="••••••••" />
+      </div>
+      <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
+        <span id="submitLabel">Activer mon espace</span>
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <p>Déjà activé ? <a href="/login.html">Connectez-vous</a></p>
+    </div>
+  </div>
+</main>
+
+<script type="module">
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+  import { SUPABASE_URL, SUPABASE_ANON_KEY } from '/js/supabase-client.js';
+
+  // Client dédié : detectSessionInUrl=true pour lire le jeton d'invitation
+  // présent dans l'URL (envoyé par l'email Supabase).
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+  });
+
+  const loadingState = document.getElementById('loadingState');
+  const pwForm = document.getElementById('pwForm');
+  const alertSlot = document.getElementById('alertSlot');
+  const btn = document.getElementById('submitBtn');
+  const btnLabel = document.getElementById('submitLabel');
+
+  const showError = (msg) => { alertSlot.innerHTML = `<div class="alert alert-error">${msg}</div>`; };
+  const showSuccess = (msg) => { alertSlot.innerHTML = `<div class="alert alert-success">${msg}</div>`; };
+
+  // Erreur renvoyée directement dans l'URL (lien expiré, etc.)
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+  if (hashParams.get('error')) {
+    loadingState.style.display = 'none';
+    showError('Ce lien d’invitation a expiré ou n’est plus valide. Demandez une nouvelle invitation.');
+  } else {
+    // Laisse à Supabase le temps d'établir la session depuis l'URL
+    let session = null;
+    for (let i = 0; i < 10 && !session; i++) {
+      const { data } = await supabase.auth.getSession();
+      session = data.session;
+      if (!session) await new Promise((r) => setTimeout(r, 200));
+    }
+
+    loadingState.style.display = 'none';
+
+    if (!session) {
+      showError('Lien invalide. Ouvrez le lien depuis l’email d’invitation, ou <a href="/login.html">connectez-vous</a>.');
+    } else {
+      pwForm.style.display = '';
+
+      pwForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        alertSlot.innerHTML = '';
+        const pw = document.getElementById('password').value;
+        const pw2 = document.getElementById('password2').value;
+
+        if (pw.length < 8) { showError('Le mot de passe doit faire au moins 8 caractères.'); return; }
+        if (pw !== pw2) { showError('Les deux mots de passe ne correspondent pas.'); return; }
+
+        btn.disabled = true;
+        btnLabel.innerHTML = '<span class="loader"></span>';
+
+        const { error } = await supabase.auth.updateUser({ password: pw });
+        if (error) {
+          showError('Impossible d’enregistrer le mot de passe. Réessayez.');
+          btn.disabled = false;
+          btnLabel.textContent = 'Activer mon espace';
+        } else {
+          showSuccess('Espace activé ! Redirection en cours…');
+          setTimeout(() => { window.location.href = '/cabinet.html'; }, 1200);
+        }
+      });
+    }
+  }
+</script>
+
+</body>
+</html>

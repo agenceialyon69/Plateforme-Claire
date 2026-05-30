@@ -45,6 +45,20 @@ export async function authenticateRequest(req) {
 }
 
 // ----------------------------------------------------------------
+// isAdminUser(user) → true si l'email fait partie de ADMIN_EMAILS
+// ADMIN_EMAILS = liste d'emails séparés par des virgules (variable env).
+// Sert à autoriser l'invitation de nouveaux cabinets.
+// ----------------------------------------------------------------
+export function isAdminUser(user) {
+  if (!user?.email) return false;
+  const list = (process.env.ADMIN_EMAILS || '')
+    .split(',')
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+  return list.includes(user.email.toLowerCase());
+}
+
+// ----------------------------------------------------------------
 // Helpers de réponse JSON standardisés
 // ----------------------------------------------------------------
 export function json(res, status, body) {
@@ -55,6 +69,7 @@ export const ok = (res, body) => json(res, 200, body);
 export const created = (res, body) => json(res, 201, body);
 export const badRequest = (res, msg = 'Bad request') => json(res, 400, { error: msg });
 export const unauthorized = (res) => json(res, 401, { error: 'Unauthorized' });
+export const forbidden = (res, msg = 'Forbidden') => json(res, 403, { error: msg });
 export const notFound = (res, msg = 'Not found') => json(res, 404, { error: msg });
 export const serverError = (res, err) => {
   console.error('Server error:', err);

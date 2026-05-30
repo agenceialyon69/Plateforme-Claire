@@ -9,7 +9,9 @@
     { "source": "/conversation", "destination": "/conversation.html" },
     { "source": "/demandes", "destination": "/demandes.html" },
     { "source": "/parametres", "destination": "/parametres.html" },
-    { "source": "/login", "destination": "/login.html" }
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/bienvenue", "destination": "/bienvenue.html" }
   ],
   "headers": [
     {

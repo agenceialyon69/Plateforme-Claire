@@ -89,6 +89,44 @@ export function initSidebar(cabinet, activePage) {
       logout();
     });
   }
+
+  // Ajoute le lien "Inviter un cabinet" si l'utilisateur est administrateur
+  maybeAddAdminLink(activePage);
+}
+
+// ----------------------------------------------------------------
+// maybeAddAdminLink — révèle l'outil d'invitation dans la sidebar
+// uniquement si l'utilisateur connecté est administrateur (ADMIN_EMAILS).
+// La vérification fait autorité côté serveur ; ici on se contente d'afficher.
+// ----------------------------------------------------------------
+async function maybeAddAdminLink(activePage) {
+  try {
+    const res = await apiFetch('/api/invite-cabinet', { method: 'GET' });
+    const { admin } = await res.json();
+    if (!admin) return;
+
+    const nav = document.querySelector('.sidebar-nav');
+    if (!nav || nav.querySelector('[data-page="admin"]')) return;
+
+    const section = document.createElement('div');
+    section.className = 'sidebar-nav-section';
+    section.style.marginTop = '16px';
+    section.textContent = 'Administration';
+
+    const link = document.createElement('a');
+    link.href = '/admin.html';
+    link.className = 'sidebar-link' + (activePage === 'admin' ? ' active' : '');
+    link.dataset.page = 'admin';
+    link.innerHTML =
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+      '<path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>' +
+      '<path d="M19 8v6M22 11h-6"/></svg> Inviter un cabinet';
+
+    nav.appendChild(section);
+    nav.appendChild(link);
+  } catch (_) {
+    /* silencieux : si l'appel échoue, on n'affiche simplement rien */
+  }
 }
 
 // ----------------------------------------------------------------

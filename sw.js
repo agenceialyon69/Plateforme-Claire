@@ -10,7 +10,7 @@
 //  - images / icônes  → cache d'abord (rarement modifiées)
 // ================================================================
 
-const CACHE = 'claire-v4';
+const CACHE = 'claire-v5';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -20,6 +20,8 @@ const APP_SHELL = [
   '/conversation.html',
   '/demandes.html',
   '/parametres.html',
+  '/admin.html',
+  '/bienvenue.html',
   '/etude-de-cas.html',
   '/mentions-legales.html',
   '/confidentialite.html',
