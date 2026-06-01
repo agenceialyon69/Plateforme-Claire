@@ -22,6 +22,9 @@ Lis ce fichier au démarrage de chaque session et applique-le par défaut.
   fichier) plutôt qu'une réponse vague — « montre, ne raconte pas » ; (2) garde une **trace
   durable** des décisions et procédures importantes (`docs/`, runbooks) pour qu'elles soient
   réutilisables plus tard.
+- **Vérification avant affirmation** : ne jamais qualifier quelque chose de *fiable, sécurisé,
+  terminé* ou *optimal* sans **preuve exécutable** (test lancé, commande, sortie observée). À
+  défaut, le marquer « **à vérifier** » et fournir le **test exact** à lancer pour le prouver.
 
 ## Positionnement produit (RÈGLE FERME)
 - **Ne JAMAIS écrire « IA », « intelligence artificielle », « chatbot », « LLM », « Claude »,
@@ -33,6 +36,10 @@ Lis ce fichier au démarrage de chaque session et applique-le par défaut.
   sans le mot « IA ».
 - Garde-fou patient : Claire est une **« assistante »** (persona de marque) ; ne jamais
   affirmer faussement qu'un humain répond personnellement.
+- **Claire est une « assistante numérique »** : ne jamais la présenter comme un être humain
+  (site, prompt, emails). Si on lui demande si elle est une personne ou une machine, répondre
+  honnêtement qu'elle est l'assistante numérique du cabinet, **sans employer le mot « IA »**.
+  En contexte santé, c'est une exigence éthique et juridique, pas une option.
 
 ## Workflow Git
 - **Développer sur la branche `claude/project-assistance-f3guY`.**
@@ -47,6 +54,14 @@ Lis ce fichier au démarrage de chaque session et applique-le par défaut.
 - Moteur conversationnel : **conversation sur `claude-sonnet-4-6`**, **extraction du résumé
   sur `claude-haiku-4-5-20251001`** (`api/chat.js`).
 - Modèle de données : `cabinets.id = auth.users.id` = **vérité unique partout**.
+
+## Faits établis du projet (mémoire — ne pas re-deviner)
+- `app.claireassistante.fr` = **vitrine + plateforme** (ce dépôt, déployé par Vercel).
+  `claireassistante.fr` = **ancien site séparé**, sans lien avec ce code.
+- Canaux de contact : Calendly, WhatsApp (`+33 6 05 80 05 94`), `contact@claireassistante.fr`.
+- Cabinet de démo : `fb235b55-e53c-469b-bc12-64ab845a765f` *(à confirmer : existe bien en prod ?)*.
+- Sécurité : *design* RLS **prouvé** ; *déploiement* à **re-tester** (`sql/audit-rls.sql` +
+  `npm run redteam`) après tout changement de schéma.
 
 ## Sécurité (modèle de menace)
 - Le **navigateur lit Supabase en direct** (clé anon publique) → **les RLS sont l'unique
