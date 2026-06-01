@@ -111,7 +111,6 @@ professionnel sécurisé**, avec **notification automatique**.
 
 - **Français** : courant
 - **Italien** : B1
-- **Anglais** : 〔à compléter — même un niveau scolaire/A2 se mentionne ; c'est un vrai plus pour les postes tech/IA〕
 
 ---
 
@@ -125,7 +124,6 @@ professionnel sécurisé**, avec **notification automatique**.
   RESTE À COMPLÉTER (puis supprimer ce bloc) :
   [ ] Lien LinkedIn
   [ ] Lien GitHub (rends le dépôt présentable : README clair + lien étude de cas)
-  [ ] Niveau d'anglais réel (ne pas laisser vide sur la version finale)
   NOTE HONNÊTE : ce CV reste un CV de TECHNICIEN qui sait aussi coder/automatiser.
   L'expérience PAYÉE en automatisation = 0 pour l'instant (Claire = projet perso).
   En entretien, assume-le : "j'ai prouvé ma capacité sur un projet réel, je cherche
