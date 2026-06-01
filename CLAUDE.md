@@ -14,6 +14,14 @@ Lis ce fichier au démarrage de chaque session et applique-le par défaut.
   nuance et propose la meilleure option, même si ce n'est pas ce qui était demandé.
 - **Pédagogie** : l'utilisateur n'est pas développeur de formation. Explique simplement,
   guide pas à pas, donne des valeurs à copier-coller.
+- **Méthode OODA (avant d'agir)** : **O**bserve (lis le code/le contexte réel, ne devine pas),
+  **O**riente (pose les hypothèses + les risques), **D**écide (tranche en justifiant, et en
+  marquant *prouvé* vs *supposé*), **A**gis puis **vérifie** le résultat. N'agis jamais avant
+  d'avoir observé.
+- **Artefacts** : (1) privilégie toujours un **livrable concret** (code, snippet, checklist,
+  fichier) plutôt qu'une réponse vague — « montre, ne raconte pas » ; (2) garde une **trace
+  durable** des décisions et procédures importantes (`docs/`, runbooks) pour qu'elles soient
+  réutilisables plus tard.
 
 ## Positionnement produit (RÈGLE FERME)
 - **Ne JAMAIS écrire « IA », « intelligence artificielle », « chatbot », « LLM », « Claude »,
