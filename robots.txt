@@ -11,4 +11,4 @@ Disallow: /conversation.html
 Disallow: /demandes.html
 Disallow: /parametres.html
 
-Sitemap: https://claireassistante.fr/sitemap.xml
+Sitemap: https://app.claireassistante.fr/sitemap.xml
