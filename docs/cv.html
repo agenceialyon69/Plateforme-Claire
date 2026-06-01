@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<!--
+  CV imprimable — Mamadou Tafsir BAH.
+  USAGE : ouvrir ce fichier dans un navigateur → Imprimer (Ctrl/Cmd+P) → "Enregistrer au format PDF" → format A4, marges par défaut.
+  À COMPLÉTER avant impression : LinkedIn, GitHub, Anglais (cherche le mot "à compléter").
+-->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>CV — Mamadou Tafsir BAH</title>
+<style>
+  :root{
+    --ink:#1a2230; --muted:#5b6678; --line:#d9dee7; --accent:#1f5fa6; --soft:#f4f7fb;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink); font-size:10.3pt; line-height:1.42; background:#e9edf2;
+  }
+  .page{
+    width:210mm; min-height:297mm; margin:14px auto; background:#fff; padding:14mm 15mm;
+    box-shadow:0 2px 14px rgba(0,0,0,.12);
+  }
+  header{border-bottom:2.5px solid var(--accent); padding-bottom:10px; margin-bottom:14px;}
+  h1{font-size:21pt; margin:0 0 2px; letter-spacing:.3px;}
+  .role{font-size:11pt; color:var(--accent); font-weight:600; margin:0 0 7px;}
+  .tagline{font-size:9.2pt; color:var(--muted); margin:0 0 9px;}
+  .contact{font-size:8.9pt; color:var(--ink); display:flex; flex-wrap:wrap; gap:4px 14px;}
+  .contact a{color:var(--ink); text-decoration:none;}
+  .contact .lbl{color:var(--muted);}
+  h2{
+    font-size:10.5pt; text-transform:uppercase; letter-spacing:1.1px; color:var(--accent);
+    border-bottom:1px solid var(--line); padding-bottom:3px; margin:16px 0 8px;
+  }
+  .grid{display:flex; gap:18px;}
+  .col-main{flex:1 1 63%;}
+  .col-side{flex:1 1 37%;}
+  .job{margin-bottom:10px;}
+  .job .top{display:flex; justify-content:space-between; gap:10px; align-items:baseline;}
+  .job .title{font-weight:700;}
+  .job .date{font-size:8.6pt; color:var(--muted); white-space:nowrap;}
+  .job .org{font-size:8.8pt; color:var(--muted); font-style:italic; margin:1px 0 3px;}
+  ul{margin:3px 0 0; padding-left:15px;}
+  li{margin-bottom:2px;}
+  .chips{display:flex; flex-wrap:wrap; gap:5px; margin-top:4px;}
+  .chip{background:var(--soft); border:1px solid var(--line); border-radius:5px; padding:2px 7px; font-size:8.4pt;}
+  .skillblock{margin-bottom:11px;}
+  .skillblock .h{font-weight:700; font-size:9.4pt; margin-bottom:4px;}
+  .hab{background:#eef4fb; border-left:3px solid var(--accent); padding:5px 8px; font-size:8.7pt; border-radius:0 5px 5px 0;}
+  .project{background:var(--soft); border:1px solid var(--line); border-radius:7px; padding:9px 11px;}
+  .project .pname{font-weight:700; color:var(--accent);}
+  .project .pmeta{font-size:8.5pt; color:var(--muted); font-style:italic; margin:1px 0 5px;}
+  .stack{font-size:8.4pt; color:var(--muted); margin-top:5px;}
+  .lang{display:flex; justify-content:space-between; font-size:9pt; margin-bottom:3px;}
+  .lang .lvl{color:var(--muted);}
+  .todo{color:#b4690e; font-weight:600;}
+  @media print{
+    body{background:#fff;}
+    .page{margin:0; box-shadow:none; width:auto; min-height:auto; padding:11mm 12mm;}
+    @page{size:A4; margin:0;}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <h1>Mamadou Tafsir BAH</h1>
+    <p class="role">Technicien électrotechnicien &amp; concepteur d'outils numériques automatisés</p>
+    <p class="tagline">Équipements médicaux &amp; industriels · Automatisation · Intégration IA</p>
+    <div class="contact">
+      <span><span class="lbl">📍</span> Vénissieux (69200), Lyon</span>
+      <span><span class="lbl">🚗</span> Permis B + véhicule · 24 ans</span>
+      <span><span class="lbl">📧</span> mdoutafsirbah11@gmail.com</span>
+      <span><span class="lbl">📱</span> 06 05 80 05 94</span>
+      <span><span class="lbl">🔗</span> LinkedIn : <span class="todo">à compléter</span></span>
+      <span><span class="lbl">💻</span> GitHub : <span class="todo">à compléter</span></span>
+      <span><span class="lbl">🌐</span> <a href="https://app.claireassistante.fr">app.claireassistante.fr</a></span>
+    </div>
+  </header>
+
+  <section>
+    <h2>Profil</h2>
+    <p>Technicien électrotechnicien (3 ans d'expérience) en câblage et maintenance d'équipements
+    <strong>industriels et médicaux</strong> — centrales d'air médical, machines à vide, générateurs
+    d'oxygène. Polyvalent fibre optique, CVC et électricité, formé aux exigences qualité strictes du
+    secteur médical (<strong>ISO 13485</strong>). En parallèle, j'ai <strong>conçu, développé et
+    déployé seul, de bout en bout, une plateforme web automatisée</strong> (projet Claire). Ce
+    <strong>double profil — terrain industriel + conception d'outils numériques</strong> — me permet
+    de faire le pont entre l'équipement physique et l'automatisation logicielle.</p>
+  </section>
+
+  <div class="grid">
+    <div class="col-main">
+
+      <section>
+        <h2>Expériences professionnelles</h2>
+
+        <div class="job">
+          <div class="top"><span class="title">Monteur Câbleur Industriel — MIL'S</span><span class="date">2025 – Présent</span></div>
+          <div class="org">Genas (69) · CDD · Centrales d'air médical, pompes à vide — ISO 9001/13485/14001</div>
+          <ul>
+            <li>Montage et câblage de <strong>centrales d'air médical</strong> pour hôpitaux et cliniques</li>
+            <li>Câblage de machines à vide industrielles et générateurs d'oxygène</li>
+            <li>Lecture et application de schémas électriques industriels (DAO / AutoCAD)</li>
+            <li>Tests de continuité et contrôles qualité avant mise en service</li>
+          </ul>
+        </div>
+
+        <div class="job">
+          <div class="top"><span class="title">Technicien de Maintenance CVC — SPIE</span><span class="date">2024 – 2025</span></div>
+          <div class="org">Lyon (69) · CDD · Groupe SPIE (45 000+ collaborateurs)</div>
+          <ul>
+            <li>Installation et mise en service de systèmes chauffage, ventilation, climatisation</li>
+            <li>Diagnostic de pannes et réparations sur sites clients</li>
+            <li>Interventions sous habilitations électriques B1V / B2V / BC / BR</li>
+          </ul>
+        </div>
+
+        <div class="job">
+          <div class="top"><span class="title">Technicien Câbleur Fibre Optique — STERLAN</span><span class="date">2022 – 2024</span></div>
+          <div class="org">Lyon (69) · CDI · Sous-traitant Orange, SFR, Free, Bouygues</div>
+          <ul>
+            <li>Tirage et raccordement fibre <strong>FTTH</strong> (abonnés) et <strong>FTTO</strong> (entreprises)</li>
+            <li>Tests <strong>OTDR</strong> (réflectométrie) et validation des liaisons</li>
+            <li>SAV et rétablissement de connexions sur incidents réseau</li>
+          </ul>
+        </div>
+
+        <div class="job">
+          <div class="top"><span class="title">Technicien Câbleur — SPIE</span><span class="date">2022</span></div>
+          <div class="org">Gare Part-Dieu, Lyon (69) · Mission</div>
+          <ul>
+            <li>Câblage de caméras de vidéosurveillance et d'écrans d'information ferroviaire</li>
+          </ul>
+        </div>
+
+        <div class="job">
+          <div class="top"><span class="title">Stages &amp; formations en alternance</span><span class="date">2017 – 2022</span></div>
+          <div class="org">Plusieurs entreprises, région Lyon</div>
+          <ul>
+            <li>Armoires électriques, AutoCAD / DAO, raccordement fibre, câblage cuivre, domotique</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2>Projet personnel</h2>
+        <div class="project">
+          <div class="pname">Claire — Plateforme web automatisée de réception &amp; de suivi des demandes</div>
+          <div class="pmeta">Conçu, développé et déployé de bout en bout · Démo : app.claireassistante.fr</div>
+          <ul>
+            <li><strong>Conçu et déployé de A à Z</strong> : interface, API serverless, base de données, sécurité, mise en production</li>
+            <li><strong>Intégré l'API Anthropic (IA)</strong> : génération de réponses + extraction structurée (JSON), avec validation des sorties</li>
+            <li><strong>Architecture multi-tenant cloisonnée</strong> par Row Level Security (Supabase / PostgreSQL)</li>
+            <li><strong>Sécurisé les points d'entrée publics</strong> : CORS liste blanche, rate-limiting, validation stricte, anti-injection, secrets côté serveur</li>
+            <li><strong>Automatisé les notifications</strong> par webhook signé (Make / n8n / Zapier)</li>
+            <li>PWA installable, CI (GitHub Actions) et test de sécurité automatisé (accès croisé entre comptes)</li>
+          </ul>
+          <div class="stack"><strong>Stack :</strong> JavaScript · PWA · Node.js · Serverless (Vercel) · Supabase (PostgreSQL + Auth + RLS) · API Anthropic · Webhook</div>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="col-side">
+
+      <section>
+        <h2>Compétences</h2>
+        <div class="skillblock">
+          <div class="h">Électrotechnique &amp; terrain</div>
+          <div class="chips">
+            <span class="chip">Câblage industriel &amp; médical</span>
+            <span class="chip">Schémas électriques (DAO/AutoCAD)</span>
+            <span class="chip">Fibre FTTH / FTTO</span>
+            <span class="chip">Mesures OTDR</span>
+            <span class="chip">Systèmes CVC</span>
+            <span class="chip">Diagnostic de pannes</span>
+            <span class="chip">Contrôle qualité ISO 13485</span>
+          </div>
+        </div>
+        <div class="skillblock">
+          <div class="h">Numérique &amp; automatisation</div>
+          <div class="chips">
+            <span class="chip">Webhook (Make/n8n/Zapier)</span>
+            <span class="chip">API / IA (Anthropic)</span>
+            <span class="chip">Node.js</span>
+            <span class="chip">Serverless (Vercel)</span>
+            <span class="chip">Supabase (PostgreSQL)</span>
+            <span class="chip">Row Level Security</span>
+            <span class="chip">PWA</span>
+            <span class="chip">Git / GitHub · CI</span>
+            <span class="chip">SQL</span>
+          </div>
+        </div>
+        <div class="hab"><strong>Habilitations électriques :</strong> B1V · B2V · BC · BR <em>(en cours de validité)</em></div>
+      </section>
+
+      <section>
+        <h2>Formation</h2>
+        <div class="job">
+          <div class="top"><span class="title">Niveau BTS Électrotechnique</span><span class="date">2020–2022</span></div>
+        </div>
+        <div class="job">
+          <div class="top"><span class="title">Bac Pro Électrotechnique</span><span class="date">2020</span></div>
+          <div class="org">Obtenu</div>
+        </div>
+        <div class="job">
+          <div class="top"><span class="title">BEP Électrotechnique</span><span class="date">2017–2018</span></div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Langues</h2>
+        <div class="lang"><span>Français</span><span class="lvl">Courant</span></div>
+        <div class="lang"><span>Italien</span><span class="lvl">B1</span></div>
+        <div class="lang"><span>Anglais</span><span class="lvl todo">à compléter</span></div>
+      </section>
+
+      <section>
+        <h2>Qualités &amp; intérêts</h2>
+        <div class="chips">
+          <span class="chip">Rigueur</span>
+          <span class="chip">Autonomie</span>
+          <span class="chip">Diagnostic méthodique</span>
+          <span class="chip">Adaptabilité</span>
+          <span class="chip">Esprit d'équipe</span>
+        </div>
+        <div class="chips" style="margin-top:6px;">
+          <span class="chip">⚽ Football</span>
+          <span class="chip">🥊 Boxe</span>
+          <span class="chip">🏋 Musculation</span>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
