@@ -161,7 +161,8 @@ create policy "cabinet_select_self"
 drop policy if exists "cabinet_update_self" on public.cabinets;
 create policy "cabinet_update_self"
   on public.cabinets for update
-  using (auth.uid() = id);
+  using (auth.uid() = id)
+  with check (auth.uid() = id);
 
 -- conversations
 alter table public.conversations enable row level security;
@@ -196,7 +197,8 @@ create policy "dem_select_own"
 drop policy if exists "dem_update_own" on public.demandes;
 create policy "dem_update_own"
   on public.demandes for update
-  using (cabinet_id = auth.uid());
+  using (cabinet_id = auth.uid())
+  with check (cabinet_id = auth.uid());
 
 -- contact_leads : seul le service role peut lire (pas accessible côté client)
 alter table public.contact_leads enable row level security;
