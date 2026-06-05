@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <!--
-  CV imprimable — Mamadou Tafsir BAH.
-  USAGE : ouvrir ce fichier dans un navigateur → Imprimer (Ctrl/Cmd+P) → "Enregistrer au format PDF" → format A4, marges par défaut.
-  À COMPLÉTER avant impression : LinkedIn, GitHub (cherche le mot "à compléter").
+  CV premium — Mamadou Tafsir BAH (design sombre + accents orange, 2 colonnes).
+  USAGE : ouvrir dans un navigateur → Imprimer (Ctrl/Cmd+P) → "Enregistrer au format PDF".
+          IMPORTANT : activer "Graphiques d'arrière-plan", format A4, marges "Aucune".
+  NB : lien projet corrigé en app.claireassistante.fr (claireassistante.fr = ancien site sans lien).
 -->
 <html lang="fr">
 <head>
@@ -10,231 +11,245 @@
 <title>CV — Mamadou Tafsir BAH</title>
 <style>
   :root{
-    --ink:#1a2230; --muted:#5b6678; --line:#d9dee7; --accent:#1f5fa6; --soft:#f4f7fb;
+    --navy:#16243d; --navy2:#1f3457; --orange:#f6a623; --orange2:#f8b84e;
+    --ink:#16243d; --muted:#5b6678; --soft:#8a94a3; --line:#e2e6ec;
+    --side-text:#dfe5ee; --side-muted:#9fb0c6; --track:rgba(255,255,255,.12);
   }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    color:var(--ink); font-size:10.3pt; line-height:1.42; background:#e9edf2;
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+    font-family:"Helvetica Neue",Arial,"Segoe UI",sans-serif; color:var(--ink);
   }
-  .page{
-    width:210mm; min-height:297mm; margin:14px auto; background:#fff; padding:14mm 15mm;
-    box-shadow:0 2px 14px rgba(0,0,0,.12);
+  body{background:#cfd6df; padding:18px;}
+  .wrap{
+    width:210mm; min-height:297mm; margin:0 auto; background:#fff; display:flex;
+    box-shadow:0 4px 22px rgba(0,0,0,.22); overflow:hidden;
   }
-  header{border-bottom:2.5px solid var(--accent); padding-bottom:10px; margin-bottom:14px;}
-  h1{font-size:21pt; margin:0 0 2px; letter-spacing:.3px;}
-  .role{font-size:11pt; color:var(--accent); font-weight:600; margin:0 0 7px;}
-  .tagline{font-size:9.2pt; color:var(--muted); margin:0 0 9px;}
-  .contact{font-size:8.9pt; color:var(--ink); display:flex; flex-wrap:wrap; gap:4px 14px;}
-  .contact a{color:var(--ink); text-decoration:none;}
-  .contact .lbl{color:var(--muted);}
-  h2{
-    font-size:10.5pt; text-transform:uppercase; letter-spacing:1.1px; color:var(--accent);
-    border-bottom:1px solid var(--line); padding-bottom:3px; margin:16px 0 8px;
+
+  /* ---------- COLONNE GAUCHE ---------- */
+  .side{
+    width:34%; background:var(--navy); color:var(--side-text);
+    padding:24px 20px 28px; display:flex; flex-direction:column;
   }
-  .grid{display:flex; gap:18px;}
-  .col-main{flex:1 1 63%;}
-  .col-side{flex:1 1 37%;}
-  .job{margin-bottom:10px;}
-  .job .top{display:flex; justify-content:space-between; gap:10px; align-items:baseline;}
-  .job .title{font-weight:700;}
-  .job .date{font-size:8.6pt; color:var(--muted); white-space:nowrap;}
-  .job .org{font-size:8.8pt; color:var(--muted); font-style:italic; margin:1px 0 3px;}
-  ul{margin:3px 0 0; padding-left:15px;}
-  li{margin-bottom:2px;}
-  .chips{display:flex; flex-wrap:wrap; gap:5px; margin-top:4px;}
-  .chip{background:var(--soft); border:1px solid var(--line); border-radius:5px; padding:2px 7px; font-size:8.4pt;}
-  .skillblock{margin-bottom:11px;}
-  .skillblock .h{font-weight:700; font-size:9.4pt; margin-bottom:4px;}
-  .hab{background:#eef4fb; border-left:3px solid var(--accent); padding:5px 8px; font-size:8.7pt; border-radius:0 5px 5px 0;}
-  .project{background:var(--soft); border:1px solid var(--line); border-radius:7px; padding:9px 11px;}
-  .project .pname{font-weight:700; color:var(--accent);}
-  .project .pmeta{font-size:8.5pt; color:var(--muted); font-style:italic; margin:1px 0 5px;}
-  .stack{font-size:8.4pt; color:var(--muted); margin-top:5px;}
-  .lang{display:flex; justify-content:space-between; font-size:9pt; margin-bottom:3px;}
-  .lang .lvl{color:var(--muted);}
-  .todo{color:#b4690e; font-weight:600;}
+  .avatar{
+    width:112px; height:112px; border-radius:50%; background:var(--navy2);
+    border:4px solid var(--orange); margin:4px auto 14px; display:flex;
+    align-items:center; justify-content:center;
+  }
+  .avatar span{font-size:30pt; font-weight:800; color:var(--orange); letter-spacing:1px;}
+  .name{text-align:center; font-size:18pt; font-weight:800; line-height:1.12; color:#fff;}
+  .subname{
+    text-align:center; font-size:8.4pt; letter-spacing:2px; color:var(--side-muted);
+    margin-top:9px; padding-top:9px; position:relative;
+  }
+  .subname::before{
+    content:""; position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width:42px; height:2px; background:var(--orange);
+  }
+  .side h2{
+    font-size:10.5pt; letter-spacing:1.5px; color:var(--orange); margin:20px 0 11px;
+    padding-bottom:5px; border-bottom:1px solid rgba(255,255,255,.16); position:relative;
+  }
+  .side h2::after{content:""; position:absolute; left:0; bottom:-1px; width:38px; height:2px; background:var(--orange);}
+
+  .contact-item{margin-bottom:9px;}
+  .contact-item .k{font-size:7.6pt; letter-spacing:1px; color:var(--side-muted);}
+  .contact-item .v{font-size:9pt; color:#fff; margin-top:1px;}
+
+  .skill .row{display:flex; justify-content:space-between; font-size:8.8pt; color:var(--side-text); margin-bottom:4px;}
+  .skill .pct{color:var(--orange); font-weight:700;}
+  .bar{height:5px; background:var(--track); border-radius:3px; overflow:hidden; margin-bottom:10px;}
+  .bar>i{display:block; height:100%; background:linear-gradient(90deg,var(--orange),var(--orange2)); border-radius:3px;}
+
+  .habs{display:flex; gap:7px;}
+  .hab{
+    flex:1; text-align:center; border:1.5px solid var(--orange); color:var(--orange);
+    border-radius:7px; padding:6px 0; font-size:9pt; font-weight:700;
+  }
+  .hab-note{font-size:7.8pt; font-style:italic; color:var(--side-muted); margin-top:8px;}
+
+  .chips{display:flex; flex-wrap:wrap; gap:6px;}
+  .chip-o{border:1px solid rgba(255,255,255,.32); border-radius:13px; padding:3px 11px; font-size:8pt; color:var(--side-text);}
+
+  /* ---------- COLONNE DROITE ---------- */
+  .main{flex:1; padding:26px 26px 0; display:flex; flex-direction:column;}
+  .role-title{font-size:23pt; font-weight:800; color:var(--ink); line-height:1.04; letter-spacing:.3px;}
+  .role-sub{font-size:11.5pt; font-weight:600; color:var(--orange); margin-top:3px;}
+
+  .main h2{
+    font-size:11.5pt; font-weight:800; letter-spacing:.6px; color:var(--ink); text-transform:uppercase;
+    margin:18px 0 9px; padding-bottom:4px; border-bottom:1px solid var(--line); position:relative;
+  }
+  .main h2::after{content:""; position:absolute; left:0; bottom:-1px; width:38px; height:2px; background:var(--orange);}
+
+  .profil{font-size:9.3pt; line-height:1.5; color:#33404f;}
+
+  .job{margin-bottom:11px;}
+  .job-head{display:flex; justify-content:space-between; align-items:baseline; gap:10px;}
+  .job-title{color:var(--ink); font-weight:800; font-size:11pt;}
+  .job-date{color:var(--orange); font-weight:700; font-size:8.8pt; white-space:nowrap; text-align:right;}
+  .job-sub{display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-top:1px;}
+  .job-org{color:var(--muted); font-size:9pt;}
+  .job-contract{color:var(--soft); font-style:italic; font-size:8.6pt; white-space:nowrap;}
+  .job-desc{color:var(--muted); font-style:italic; font-size:8.7pt; line-height:1.4; margin:4px 0 4px;}
+  .job ul{list-style:none; margin:3px 0 0;}
+  .job li{font-size:9pt; color:#2b3340; line-height:1.45; padding-left:13px; position:relative;}
+  .job li::before{content:"•"; color:var(--orange); position:absolute; left:0;}
+  .chips-g{display:flex; flex-wrap:wrap; gap:5px; margin-top:6px;}
+  .chip-g{border:1px solid #d7dce3; border-radius:4px; padding:2px 8px; font-size:7.8pt; color:var(--muted);}
+
+  .two{display:flex; gap:24px;}
+  .two .col{flex:1;}
+  .edu-item{margin-bottom:7px;}
+  .edu-item .t{font-weight:700; color:var(--ink); font-size:9.4pt;}
+  .edu-item .d{font-style:italic; color:var(--soft); font-size:8.5pt;}
+  .proj .pname{font-weight:700; color:var(--ink); font-size:10pt;}
+  .proj .plink{font-style:italic; color:var(--orange); font-size:8.6pt; margin:1px 0 4px;}
+  .proj .ptext{font-size:8.9pt; color:#33404f; line-height:1.45;}
+
+  .footer{
+    margin-top:auto; border-top:1px solid var(--line); padding:11px 0 16px; font-size:8.8pt; color:var(--muted);
+  }
+  .footer b{color:var(--orange); letter-spacing:.6px; margin-right:8px;}
+
   @media print{
-    body{background:#fff;}
-    .page{margin:0; box-shadow:none; width:auto; min-height:auto; padding:11mm 12mm;}
+    body{background:#fff; padding:0;}
+    .wrap{box-shadow:none; width:auto; min-height:auto;}
     @page{size:A4; margin:0;}
   }
 </style>
 </head>
 <body>
-<div class="page">
+<div class="wrap">
 
-  <header>
-    <h1>Mamadou Tafsir BAH</h1>
-    <p class="role">Technicien électrotechnicien &amp; concepteur d'outils numériques automatisés</p>
-    <p class="tagline">Équipements médicaux &amp; industriels · Automatisation · Intégration IA</p>
-    <div class="contact">
-      <span><span class="lbl">📍</span> Vénissieux (69200), Lyon</span>
-      <span><span class="lbl">🚗</span> Permis B + véhicule · 24 ans</span>
-      <span><span class="lbl">📧</span> mdoutafsirbah11@gmail.com</span>
-      <span><span class="lbl">📱</span> 06 05 80 05 94</span>
-      <span><span class="lbl">🔗</span> LinkedIn : <span class="todo">à compléter</span></span>
-      <span><span class="lbl">💻</span> GitHub : <span class="todo">à compléter</span></span>
-      <span><span class="lbl">🌐</span> <a href="https://app.claireassistante.fr">app.claireassistante.fr</a></span>
+  <!-- ============ GAUCHE ============ -->
+  <aside class="side">
+    <div class="avatar"><span>MTB</span></div>
+    <div class="name">MAMADOU<br>TAFSIR BAH</div>
+    <div class="subname">TECHNICIEN ÉLECTROTECHNICIEN</div>
+
+    <h2>CONTACT</h2>
+    <div class="contact-item"><div class="k">EMAIL</div><div class="v">mdoutafsirbah11@gmail.com</div></div>
+    <div class="contact-item"><div class="k">TÉLÉPHONE</div><div class="v">06 05 80 05 94</div></div>
+    <div class="contact-item"><div class="k">LOCALISATION</div><div class="v">Vénissieux (69200) · Lyon</div></div>
+    <div class="contact-item"><div class="k">MOBILITÉ</div><div class="v">Permis B + véhicule · 24 ans</div></div>
+
+    <h2>COMPÉTENCES</h2>
+    <div class="skill">
+      <div class="row"><span>Câblage industriel &amp; médical</span><span class="pct">95%</span></div><div class="bar"><i style="width:95%"></i></div>
+      <div class="row"><span>Lecture schémas électriques</span><span class="pct">90%</span></div><div class="bar"><i style="width:90%"></i></div>
+      <div class="row"><span>Fibre optique FTTH/FTTO</span><span class="pct">88%</span></div><div class="bar"><i style="width:88%"></i></div>
+      <div class="row"><span>OTDR / réflectométrie</span><span class="pct">85%</span></div><div class="bar"><i style="width:85%"></i></div>
+      <div class="row"><span>Systèmes CVC</span><span class="pct">82%</span></div><div class="bar"><i style="width:82%"></i></div>
+      <div class="row"><span>AutoCAD / DAO</span><span class="pct">75%</span></div><div class="bar"><i style="width:75%"></i></div>
+      <div class="row"><span>Diagnostic de pannes</span><span class="pct">90%</span></div><div class="bar"><i style="width:90%"></i></div>
     </div>
-  </header>
 
-  <section>
+    <h2>HABILITATIONS</h2>
+    <div class="habs">
+      <div class="hab">B1V</div><div class="hab">B2V</div><div class="hab">BC</div><div class="hab">BR</div>
+    </div>
+    <div class="hab-note">En cours de validité</div>
+
+    <h2>LANGUES</h2>
+    <div class="skill">
+      <div class="row"><span>Français</span><span class="pct">Courant</span></div><div class="bar"><i style="width:100%"></i></div>
+      <div class="row"><span>Italien</span><span class="pct">B1</span></div><div class="bar"><i style="width:55%"></i></div>
+    </div>
+
+    <h2>INTÉRÊTS</h2>
+    <div class="chips">
+      <span class="chip-o">Football</span><span class="chip-o">Boxe</span><span class="chip-o">Musculation</span>
+    </div>
+  </aside>
+
+  <!-- ============ DROITE ============ -->
+  <main class="main">
+    <div class="role-title">MONTEUR CÂBLEUR INDUSTRIEL</div>
+    <div class="role-sub">Équipements Médicaux &amp; Industriels</div>
+
     <h2>Profil</h2>
-    <p>Technicien électrotechnicien (3 ans d'expérience) en câblage et maintenance d'équipements
-    <strong>industriels et médicaux</strong> — centrales d'air médical, machines à vide, générateurs
-    d'oxygène. Polyvalent fibre optique, CVC et électricité, formé aux exigences qualité strictes du
-    secteur médical (<strong>ISO 13485</strong>). En parallèle, j'ai <strong>conçu, développé et
-    déployé seul, de bout en bout, une plateforme web automatisée</strong> (projet Claire). Ce
-    <strong>double profil — terrain industriel + conception d'outils numériques</strong> — me permet
-    de faire le pont entre l'équipement physique et l'automatisation logicielle.</p>
-  </section>
+    <p class="profil"><strong>Technicien électrotechnicien</strong> de 24 ans avec 3 ans d'expérience
+    professionnelle en câblage et maintenance d'équipements industriels et médicaux. Spécialisé dans le
+    montage de <strong>centrales d'air médical</strong>, <strong>machines à vide</strong> et
+    <strong>générateurs d'oxygène</strong>. Polyvalent fibre optique, CVC et électricité. Rigoureux,
+    autonome, formé aux exigences qualité strictes du secteur médical (ISO 13485).</p>
 
-  <div class="grid">
-    <div class="col-main">
+    <h2>Expériences professionnelles</h2>
 
-      <section>
-        <h2>Expériences professionnelles</h2>
-
-        <div class="job">
-          <div class="top"><span class="title">Monteur Câbleur Industriel — MIL'S</span><span class="date">2025 – Présent</span></div>
-          <div class="org">Genas (69) · CDD · Centrales d'air médical, pompes à vide — ISO 9001/13485/14001</div>
-          <ul>
-            <li>Montage et câblage de <strong>centrales d'air médical</strong> pour hôpitaux et cliniques</li>
-            <li>Câblage de machines à vide industrielles et générateurs d'oxygène</li>
-            <li>Lecture et application de schémas électriques industriels (DAO / AutoCAD)</li>
-            <li>Tests de continuité et contrôles qualité avant mise en service</li>
-          </ul>
-        </div>
-
-        <div class="job">
-          <div class="top"><span class="title">Technicien de Maintenance CVC — SPIE</span><span class="date">2024 – 2025</span></div>
-          <div class="org">Lyon (69) · CDD · Groupe SPIE (45 000+ collaborateurs)</div>
-          <ul>
-            <li>Installation et mise en service de systèmes chauffage, ventilation, climatisation</li>
-            <li>Diagnostic de pannes et réparations sur sites clients</li>
-            <li>Interventions sous habilitations électriques B1V / B2V / BC / BR</li>
-          </ul>
-        </div>
-
-        <div class="job">
-          <div class="top"><span class="title">Technicien Câbleur Fibre Optique — STERLAN</span><span class="date">2022 – 2024</span></div>
-          <div class="org">Lyon (69) · CDI · Sous-traitant Orange, SFR, Free, Bouygues</div>
-          <ul>
-            <li>Tirage et raccordement fibre <strong>FTTH</strong> (abonnés) et <strong>FTTO</strong> (entreprises)</li>
-            <li>Tests <strong>OTDR</strong> (réflectométrie) et validation des liaisons</li>
-            <li>SAV et rétablissement de connexions sur incidents réseau</li>
-          </ul>
-        </div>
-
-        <div class="job">
-          <div class="top"><span class="title">Technicien Câbleur — SPIE</span><span class="date">2022</span></div>
-          <div class="org">Gare Part-Dieu, Lyon (69) · Mission</div>
-          <ul>
-            <li>Câblage de caméras de vidéosurveillance et d'écrans d'information ferroviaire</li>
-          </ul>
-        </div>
-
-        <div class="job">
-          <div class="top"><span class="title">Stages &amp; formations en alternance</span><span class="date">2017 – 2022</span></div>
-          <div class="org">Plusieurs entreprises, région Lyon</div>
-          <ul>
-            <li>Armoires électriques, AutoCAD / DAO, raccordement fibre, câblage cuivre, domotique</li>
-          </ul>
-        </div>
-      </section>
-
-      <section>
-        <h2>Projet personnel</h2>
-        <div class="project">
-          <div class="pname">Claire — Plateforme web automatisée de réception &amp; de suivi des demandes</div>
-          <div class="pmeta">Conçu, développé et déployé de bout en bout · Démo : app.claireassistante.fr</div>
-          <ul>
-            <li><strong>Conçu et déployé de A à Z</strong> : interface, API serverless, base de données, sécurité, mise en production</li>
-            <li><strong>Intégré l'API Anthropic (IA)</strong> : génération de réponses + extraction structurée (JSON), avec validation des sorties</li>
-            <li><strong>Architecture multi-tenant cloisonnée</strong> par Row Level Security (Supabase / PostgreSQL)</li>
-            <li><strong>Sécurisé les points d'entrée publics</strong> : CORS liste blanche, rate-limiting, validation stricte, anti-injection, secrets côté serveur</li>
-            <li><strong>Automatisé les notifications</strong> par webhook signé (Make / n8n / Zapier)</li>
-            <li>PWA installable, CI (GitHub Actions) et test de sécurité automatisé (accès croisé entre comptes)</li>
-          </ul>
-          <div class="stack"><strong>Stack :</strong> JavaScript · PWA · Node.js · Serverless (Vercel) · Supabase (PostgreSQL + Auth + RLS) · API Anthropic · Webhook</div>
-        </div>
-      </section>
-
+    <div class="job">
+      <div class="job-head"><span class="job-title">Monteur Câbleur Industriel</span><span class="job-date">2025 - PRÉSENT</span></div>
+      <div class="job-sub"><span class="job-org">MIL'S — Genas (69)</span><span class="job-contract">CDD</span></div>
+      <div class="job-desc">Fabricant français centenaire (1926). Compresseurs, pompes à vide, centrales d'air médical. Certifié ISO 9001/13485/14001.</div>
+      <ul>
+        <li>Montage et câblage de <strong>centrales d'air médical</strong> pour hôpitaux et cliniques</li>
+        <li>Câblage de <strong>machines à vide industrielles</strong> et <strong>générateurs d'oxygène</strong></li>
+        <li>Lecture et application de schémas électriques industriels (DAO/AutoCAD)</li>
+        <li>Tests de continuité et contrôles qualité avant mise en service</li>
+      </ul>
+      <div class="chips-g"><span class="chip-g">Câblage médical</span><span class="chip-g">ISO 13485</span><span class="chip-g">Schémas DAO</span><span class="chip-g">Tests qualité</span></div>
     </div>
 
-    <div class="col-side">
+    <div class="job">
+      <div class="job-head"><span class="job-title">Technicien de Maintenance CVC</span><span class="job-date">2024 - 2025</span></div>
+      <div class="job-sub"><span class="job-org">SPIE — Lyon (69)</span><span class="job-contract">CDD</span></div>
+      <div class="job-desc">Groupe SPIE (45 000+ collaborateurs, leader européen des services multitechniques).</div>
+      <ul>
+        <li>Installation et mise en service de systèmes <strong>chauffage, ventilation, climatisation</strong></li>
+        <li>Diagnostic de pannes et réparations sur sites clients</li>
+        <li>Interventions sous habilitations électriques B1V/B2V/BC/BR</li>
+      </ul>
+      <div class="chips-g"><span class="chip-g">CVC</span><span class="chip-g">Diagnostic</span><span class="chip-g">Habilitations électriques</span></div>
+    </div>
 
-      <section>
-        <h2>Compétences</h2>
-        <div class="skillblock">
-          <div class="h">Électrotechnique &amp; terrain</div>
-          <div class="chips">
-            <span class="chip">Câblage industriel &amp; médical</span>
-            <span class="chip">Schémas électriques (DAO/AutoCAD)</span>
-            <span class="chip">Fibre FTTH / FTTO</span>
-            <span class="chip">Mesures OTDR</span>
-            <span class="chip">Systèmes CVC</span>
-            <span class="chip">Diagnostic de pannes</span>
-            <span class="chip">Contrôle qualité ISO 13485</span>
-          </div>
-        </div>
-        <div class="skillblock">
-          <div class="h">Numérique &amp; automatisation</div>
-          <div class="chips">
-            <span class="chip">Webhook (Make/n8n/Zapier)</span>
-            <span class="chip">API / IA (Anthropic)</span>
-            <span class="chip">Node.js</span>
-            <span class="chip">Serverless (Vercel)</span>
-            <span class="chip">Supabase (PostgreSQL)</span>
-            <span class="chip">Row Level Security</span>
-            <span class="chip">PWA</span>
-            <span class="chip">Git / GitHub · CI</span>
-            <span class="chip">SQL</span>
-          </div>
-        </div>
-        <div class="hab"><strong>Habilitations électriques :</strong> B1V · B2V · BC · BR <em>(en cours de validité)</em></div>
-      </section>
+    <div class="job">
+      <div class="job-head"><span class="job-title">Technicien Câbleur Fibre Optique</span><span class="job-date">2022 - 2024</span></div>
+      <div class="job-sub"><span class="job-org">STERLAN — Lyon (69)</span><span class="job-contract">CDI</span></div>
+      <div class="job-desc">Sous-traitant Orange, SFR, Free, Bouygues.</div>
+      <ul>
+        <li>Tirage et raccordement fibre optique <strong>FTTH (abonnés)</strong> et <strong>FTTO (entreprises)</strong></li>
+        <li>Tests <strong>OTDR</strong> (réflectométrie) et validation des liaisons</li>
+        <li>SAV et rétablissement de connexions sur incidents réseau</li>
+      </ul>
+      <div class="chips-g"><span class="chip-g">FTTH/FTTO</span><span class="chip-g">OTDR</span><span class="chip-g">SAV</span></div>
+    </div>
 
-      <section>
+    <div class="job">
+      <div class="job-head"><span class="job-title">Technicien Câbleur</span><span class="job-date">2022</span></div>
+      <div class="job-sub"><span class="job-org">SPIE — Gare Part-Dieu, Lyon (69)</span><span class="job-contract">Mission</span></div>
+      <ul>
+        <li>Câblage caméras de vidéosurveillance et écrans d'information ferroviaire</li>
+      </ul>
+    </div>
+
+    <div class="job">
+      <div class="job-head"><span class="job-title">Stages et formations en alternance</span><span class="job-date">2017 - 2022</span></div>
+      <div class="job-sub"><span class="job-org">Plusieurs entreprises — Région Lyon</span><span class="job-contract">Formation</span></div>
+      <ul>
+        <li>Armoires électriques, AutoCAD/DAO, raccordement fibre, câblage cuivre, domotique</li>
+      </ul>
+    </div>
+
+    <div class="two">
+      <div class="col">
         <h2>Formation</h2>
-        <div class="job">
-          <div class="top"><span class="title">Niveau BTS Électrotechnique</span><span class="date">2020–2022</span></div>
-        </div>
-        <div class="job">
-          <div class="top"><span class="title">Bac Pro Électrotechnique</span><span class="date">2020</span></div>
-          <div class="org">Obtenu</div>
-        </div>
-        <div class="job">
-          <div class="top"><span class="title">BEP Électrotechnique</span><span class="date">2017–2018</span></div>
-        </div>
-      </section>
-
-      <section>
-        <h2>Langues</h2>
-        <div class="lang"><span>Français</span><span class="lvl">Courant</span></div>
-        <div class="lang"><span>Italien</span><span class="lvl">B1</span></div>
-      </section>
-
-      <section>
-        <h2>Qualités &amp; intérêts</h2>
-        <div class="chips">
-          <span class="chip">Rigueur</span>
-          <span class="chip">Autonomie</span>
-          <span class="chip">Diagnostic méthodique</span>
-          <span class="chip">Adaptabilité</span>
-          <span class="chip">Esprit d'équipe</span>
-        </div>
-        <div class="chips" style="margin-top:6px;">
-          <span class="chip">⚽ Football</span>
-          <span class="chip">🥊 Boxe</span>
-          <span class="chip">🏋 Musculation</span>
-        </div>
-      </section>
-
+        <div class="edu-item"><div class="t">Niveau BTS Électrotechnique</div><div class="d">2020 - 2022</div></div>
+        <div class="edu-item"><div class="t">Bac Pro Électrotechnique</div><div class="d">Obtenu en 2020</div></div>
+        <div class="edu-item"><div class="t">BEP Électrotechnique</div><div class="d">2017 - 2018</div></div>
+      </div>
+      <div class="col proj">
+        <h2>Projet personnel</h2>
+        <div class="pname">Claire</div>
+        <div class="plink">app.claireassistante.fr</div>
+        <div class="ptext">Conception et déploiement de bout en bout d'un service web automatisé de
+        réception et de suivi des demandes. Démontre mon autonomie et mes compétences numériques.</div>
+      </div>
     </div>
-  </div>
+
+    <div class="footer">
+      <b>QUALITÉS</b> Rigueur · Autonomie · Diagnostic méthodique · Adaptabilité · Esprit d'équipe
+    </div>
+  </main>
 
 </div>
 </body>
