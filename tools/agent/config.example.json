@@ -5,7 +5,8 @@
     "site": "app.claireassistante.fr",
     "contact": "contact@claireassistante.fr",
     "produit": "CLAIRE — plateforme métier de réception et de suivi des demandes patients pour cabinets dentaires",
-    "offre": "À CONFIRMER : 5 cabinets fondateurs — 89 €/mois pendant 12 mois (puis 149 €), installation offerte, sans engagement, 14 jours d'essai gratuit",
+    "offre": "",
+    "_offre_aide": "Laisse VIDE tant que tu n'as pas d'offre arrêtée : l'agent n'inventera AUCUN prix. Quand tu décides, écris ici TES vrais termes (ex: essai gratuit, sans engagement…).",
     "cible": "cabinets dentaires (Lyon et région) — à ajuster"
   },
   "cv": "Mamadou Tafsir BAH, 24 ans, technicien électrotechnicien (Lyon). 3 ans d'expérience : câblage de centrales d'air médical/machines à vide/générateurs d'oxygène (MIL'S), maintenance CVC (SPIE), fibre optique FTTH/FTTO et OTDR (STERLAN). Habilitations B1V/B2V/BC/BR. AutoCAD/DAO, lecture de schémas, ISO 13485. Concepteur de la plateforme Claire (conception + déploiement de bout en bout). Permis B + véhicule. Italien B1.",

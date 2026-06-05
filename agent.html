@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#16243d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Atelier — Assistant de préparation</title>
+<style>
+  :root{ --navy:#16243d; --navy2:#1f3457; --orange:#f6a623; --line:#2a3b5c; --bg:#0f1a2e; }
+  *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    font-family:"Helvetica Neue",Arial,"Segoe UI",sans-serif; background:var(--bg); color:#eaf0f7;
+    display:flex; flex-direction:column; height:100dvh;
+  }
+  header{
+    background:var(--navy); border-bottom:1px solid var(--line); padding:12px 14px;
+    display:flex; align-items:center; gap:10px; padding-top:max(12px,env(safe-area-inset-top));
+  }
+  .logo{width:34px;height:34px;border-radius:50%;background:var(--navy2);border:2px solid var(--orange);
+    display:flex;align-items:center;justify-content:center;color:var(--orange);font-weight:800;font-size:12px;}
+  header h1{font-size:15px;font-weight:700;color:#fff;line-height:1.1;}
+  header .sub{font-size:11px;color:#9fb0c6;}
+  header .spacer{flex:1;}
+  .iconbtn{background:none;border:1px solid var(--line);color:#9fb0c6;border-radius:8px;padding:6px 9px;font-size:12px;cursor:pointer;}
+  .iconbtn:active{background:var(--navy2);}
+
+  /* Bandeau raccourcis */
+  .chips{display:flex;gap:8px;overflow-x:auto;padding:10px 14px;background:#13223c;border-bottom:1px solid var(--line);}
+  .chip{white-space:nowrap;border:1px solid var(--orange);color:var(--orange);background:none;border-radius:16px;
+    padding:6px 12px;font-size:12.5px;cursor:pointer;}
+  .chip:active{background:rgba(246,166,35,.14);}
+
+  /* Fil de discussion */
+  #log{flex:1;overflow-y:auto;padding:16px 14px 8px;display:flex;flex-direction:column;gap:10px;}
+  .msg{max-width:86%;padding:10px 13px;border-radius:14px;font-size:14.5px;line-height:1.5;white-space:pre-wrap;word-wrap:break-word;}
+  .me{align-self:flex-end;background:var(--orange);color:#1a1205;border-bottom-right-radius:5px;}
+  .ai{align-self:flex-start;background:#1b2c49;color:#eaf0f7;border:1px solid var(--line);border-bottom-left-radius:5px;}
+  .hint{align-self:center;color:#7d8ba3;font-size:12px;text-align:center;max-width:90%;}
+  .typing{align-self:flex-start;color:#9fb0c6;font-size:13px;font-style:italic;padding:4px 6px;}
+
+  /* Barre de saisie */
+  form{display:flex;gap:8px;padding:10px 12px;background:var(--navy);border-top:1px solid var(--line);
+    padding-bottom:max(10px,env(safe-area-inset-bottom));}
+  textarea{flex:1;resize:none;background:#13223c;color:#fff;border:1px solid var(--line);border-radius:12px;
+    padding:11px 12px;font-size:15px;font-family:inherit;max-height:120px;}
+  textarea:focus{outline:none;border-color:var(--orange);}
+  .send{background:var(--orange);color:#1a1205;border:none;border-radius:12px;padding:0 16px;font-weight:700;font-size:15px;cursor:pointer;}
+  .send:disabled{opacity:.5;}
+  .toolbar{display:flex;align-items:center;gap:8px;padding:0 14px 8px;background:var(--navy);font-size:12px;color:#9fb0c6;}
+  .toolbar label{display:flex;align-items:center;gap:6px;cursor:pointer;}
+
+  /* Porte d'accès */
+  #gate{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px;z-index:10;}
+  #gate .card{background:var(--navy);border:1px solid var(--line);border-radius:16px;padding:26px;max-width:340px;width:100%;text-align:center;}
+  #gate .logo{margin:0 auto 14px;width:54px;height:54px;font-size:18px;}
+  #gate h2{font-size:17px;color:#fff;margin-bottom:6px;}
+  #gate p{font-size:13px;color:#9fb0c6;margin-bottom:16px;}
+  #gate input{width:100%;background:#13223c;color:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;font-size:15px;text-align:center;}
+  #gate button{width:100%;margin-top:12px;background:var(--orange);color:#1a1205;border:none;border-radius:10px;padding:12px;font-weight:700;font-size:15px;cursor:pointer;}
+  #gate .err{color:#ff8f6b;font-size:12.5px;margin-top:10px;min-height:16px;}
+</style>
+</head>
+<body>
+
+  <!-- Porte d'accès (code privé) -->
+  <div id="gate">
+    <div class="card">
+      <div class="logo">MTB</div>
+      <h2>Atelier privé</h2>
+      <p>Entre ton code d'accès pour ouvrir ton assistant de préparation.</p>
+      <input id="gateCode" type="password" inputmode="text" autocomplete="off" placeholder="Code d'accès" />
+      <button id="gateBtn">Entrer</button>
+      <div class="err" id="gateErr"></div>
+    </div>
+  </div>
+
+  <header>
+    <div class="logo">MTB</div>
+    <div>
+      <h1>Atelier de préparation</h1>
+      <div class="sub">Prospection · LinkedIn · Entretiens</div>
+    </div>
+    <div class="spacer"></div>
+    <button class="iconbtn" id="clearBtn" title="Effacer">Effacer</button>
+  </header>
+
+  <div class="chips" id="chips">
+    <button class="chip" data-p="Aide-moi à préparer un email de prospection pour un cabinet dentaire. Pose-moi d'abord les questions dont tu as besoin (nom du cabinet, ville, contexte).">✍️ Prospection</button>
+    <button class="chip" data-p="Aide-moi à écrire un post LinkedIn. Demande-moi d'abord le sujet et l'audience (prospect ou recruteur).">💼 Post LinkedIn</button>
+    <button class="chip" data-p="Fais-moi passer un entretien d'embauche blanc pour un poste de monteur câbleur / technicien électrotechnicien. Pose une question à la fois, puis critique ma réponse en red team.">🎯 Entretien embauche</button>
+    <button class="chip" data-p="Entraîne-moi à un entretien client (démo cabinet). Joue le dentiste sceptique et confronte-moi à ses objections, une à la fois.">🤝 Entretien client</button>
+  </div>
+
+  <div id="log"></div>
+
+  <div class="toolbar">
+    <label><input type="checkbox" id="affuter"> Mode affûté 🔁 <span style="color:#6b7a93">(double passe red team, plus lent)</span></label>
+  </div>
+
+  <form id="form">
+    <textarea id="input" rows="1" placeholder="Écris ton message…" autocomplete="off"></textarea>
+    <button class="send" id="send" type="submit">➤</button>
+  </form>
+
+<script>
+(function(){
+  const $ = (s)=>document.querySelector(s);
+  const log = $('#log'), input = $('#input'), form = $('#form'), sendBtn = $('#send');
+  const gate = $('#gate'), gateCode = $('#gateCode'), gateBtn = $('#gateBtn'), gateErr = $('#gateErr');
+  const KEY_CODE='agent_code', KEY_HIST='agent_hist';
+  let code = localStorage.getItem(KEY_CODE) || '';
+  let history = [];
+  try { history = JSON.parse(localStorage.getItem(KEY_HIST)||'[]'); } catch(e){ history=[]; }
+
+  function save(){ localStorage.setItem(KEY_HIST, JSON.stringify(history.slice(-40))); }
+  function bubble(role, text){
+    const d=document.createElement('div');
+    d.className='msg '+(role==='user'?'me':'ai');
+    d.textContent=text;
+    log.appendChild(d); log.scrollTop=log.scrollHeight; return d;
+  }
+  function render(){
+    log.innerHTML='';
+    if(!history.length){
+      const h=document.createElement('div'); h.className='hint';
+      h.textContent='Ton bras droit red team. Choisis un raccourci ci-dessus ou écris directement. Il ne stocke rien en ligne ; cet historique reste sur ce téléphone.';
+      log.appendChild(h);
+    }
+    history.forEach(m=>bubble(m.role, m.content));
+  }
+
+  // --- Porte d'accès ---
+  function openApp(){ gate.style.display='none'; render(); input.focus(); }
+  if(code) openApp();
+  gateBtn.onclick=()=>{
+    const v=gateCode.value.trim();
+    if(!v){ gateErr.textContent='Entre ton code.'; return; }
+    code=v; localStorage.setItem(KEY_CODE, code); gateErr.textContent=''; openApp();
+  };
+  gateCode.addEventListener('keydown', e=>{ if(e.key==='Enter') gateBtn.click(); });
+
+  // --- Raccourcis ---
+  document.querySelectorAll('.chip').forEach(c=>{
+    c.onclick=()=>{ input.value=c.dataset.p; input.focus(); autoGrow(); };
+  });
+
+  $('#clearBtn').onclick=()=>{
+    if(confirm('Effacer toute la conversation de ce téléphone ?')){ history=[]; save(); render(); }
+  };
+
+  // --- Auto-grow du textarea ---
+  function autoGrow(){ input.style.height='auto'; input.style.height=Math.min(input.scrollHeight,120)+'px'; }
+  input.addEventListener('input', autoGrow);
+  input.addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); form.requestSubmit(); } });
+
+  // --- Envoi ---
+  let busy=false;
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const text=input.value.trim();
+    if(!text || busy) return;
+    history.push({role:'user', content:text}); save();
+    bubble('user', text);
+    input.value=''; autoGrow();
+    busy=true; sendBtn.disabled=true;
+    const typing=document.createElement('div'); typing.className='typing'; typing.textContent='réflexion…';
+    log.appendChild(typing); log.scrollTop=log.scrollHeight;
+
+    try{
+      const res=await fetch('/api/agent', {
+        method:'POST',
+        headers:{'content-type':'application/json','x-agent-code':code},
+        body:JSON.stringify({ messages:history.slice(-24), affuter: $('#affuter').checked })
+      });
+      typing.remove();
+      if(res.status===401){
+        localStorage.removeItem(KEY_CODE); code='';
+        bubble('assistant','Code d’accès invalide ou expiré. Recharge la page pour le ressaisir.');
+        gate.style.display='flex'; gateErr.textContent='Code refusé.';
+        return;
+      }
+      const data=await res.json().catch(()=>({error:'Réponse illisible.'}));
+      const reply=data.reply || data.error || '…';
+      history.push({role:'assistant', content:reply}); save();
+      bubble('assistant', reply);
+    }catch(err){
+      typing.remove();
+      bubble('assistant','Connexion interrompue. Réessaie.');
+    }finally{
+      busy=false; sendBtn.disabled=false; input.focus();
+    }
+  });
+})();
+</script>
+</body>
+</html>
