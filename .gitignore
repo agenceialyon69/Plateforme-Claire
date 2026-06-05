@@ -8,3 +8,11 @@ node_modules/
 
 # Exports / bundles d'audit générés localement (non versionnés)
 audit/
+
+# Agent de préparation (données perso + sorties — non versionnées, RGPD)
+tools/agent/config.json
+tools/agent/out/
+tools/agent/data/*.json
+tools/agent/data/*.txt
+!tools/agent/data/*.example.json
+!tools/agent/data/*.example.txt

@@ -10,7 +10,10 @@
     "lint": "node scripts/check.mjs",
     "test": "node scripts/check.mjs",
     "create-admin": "node scripts/create-admin.mjs",
-    "redteam": "node scripts/redteam-cross-cabinet.mjs"
+    "redteam": "node scripts/redteam-cross-cabinet.mjs",
+    "agent:prospection": "node tools/agent/prospection.mjs",
+    "agent:linkedin": "node tools/agent/linkedin.mjs",
+    "agent:emploi": "node tools/agent/emploi.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",

@@ -1,0 +1,12 @@
+Collez ici le TEXTE de l'offre d'emploi à laquelle vous voulez candidater.
+
+Exemple (à remplacer par la vraie offre) :
+
+Intitulé : Monteur Câbleur Industriel (H/F)
+Entreprise : (nom)
+Lieu : Genas (69)
+Missions : montage et câblage d'équipements industriels à partir de schémas électriques,
+tests de continuité, contrôle qualité, respect des normes.
+Profil recherché : CAP/Bac Pro électrotechnique, lecture de schémas, habilitations
+électriques, rigueur, autonomie. Débutant accepté.
+Contrat : CDI, temps plein.
