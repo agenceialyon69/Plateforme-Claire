@@ -134,6 +134,13 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(204).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
+  // Cloisonnement sous-domaine (défense en profondeur, en plus du middleware) :
+  // l'API ne répond que sur l'hôte privé AGENT_HOST. Sur la vitrine → 404.
+  const agentHost = (process.env.AGENT_HOST || '').toLowerCase();
+  if (agentHost && String(req.headers.host || '').toLowerCase() !== agentHost) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+
   const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || 'unknown';
   if (hitLimit(rateLimitIp, ip, RATE_LIMIT_IP_MAX)) {
     logAbuse('ip_rate_limit', { ip });
