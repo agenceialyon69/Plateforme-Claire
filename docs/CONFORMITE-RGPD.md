@@ -17,12 +17,29 @@ responsable de traitement — voir `docs/HDS.md`.
 À faire (humain) : signer/collecter les **DPA** de chaque sous-traitant et tenir
 ce registre à jour.
 
+## Minimisation (posture "prise de contact") — ON par défaut
+
+`MINIMIZE_HEALTH_DATA=true` (défaut) : la plateforme **ne persiste pas** le
+contenu médical. Concrètement :
+
+| En mode minimisation | Stocké en base | Transmis au cabinet (webhook) |
+|---|---|---|
+| Contenu des messages du chat | ❌ non stocké | ✅ (détail dans le fil, transitoire) |
+| Motif médical détaillé / souhait | ❌ (remplacé par « Demande de rappel ») | ✅ dans `demande` du webhook |
+| Nom, téléphone, urgence, demande de rappel | ✅ | ✅ |
+
+→ La base ne contient alors que de la **donnée de contact ordinaire**, pas de la
+donnée de santé détaillée. Le détail vit chez le cabinet (responsable de
+traitement, déjà habilité). **Nécessite un webhook configuré** (`NOTIFY_WEBHOOK_URL`)
+pour délivrer le détail. Le cabinet de démo est exempté (démonstration).
+Repasser à `false` uniquement après validation avocat/DPO.
+
 ## Cartographie & durées de conservation
 
 | Donnée | Table | Rétention |
 |---|---|---|
-| Conversations, messages | `conversations`, `messages` | Purge auto > `RETENTION_DAYS` (défaut 24 mois) |
-| Demandes qualifiées | `demandes` | Idem (cascade) |
+| Conversations (messages non stockés si minimisation) | `conversations`, `messages` | Purge auto > `RETENTION_DAYS` (défaut 24 mois) |
+| Demandes (minimales si minimisation) | `demandes` | Idem (cascade) |
 | Journal d'appels | `appels` | Purge auto > `RETENTION_DAYS` |
 | Leads de contact | `contact_leads` | Purge auto > `RETENTION_DAYS` |
 | Opt-out SMS | `sms_optout` | **Conservé** (obligation de ne plus recontacter) |

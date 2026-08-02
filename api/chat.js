@@ -122,6 +122,21 @@ function logAbuse(kind, detail) {
 }
 
 // ----------------------------------------------------------------
+// MODE MINIMISATION (RGPD / posture "prise de contact") — ON par défaut.
+// Objectif : ne PAS persister de contenu médical dans la base (messages
+// détaillés, motif, souhait). On ne garde que le contact + « rappel souhaité »
+// + un niveau d'urgence. Le détail complet est transmis AU CABINET via le
+// webhook (pass-through), hors de notre base. Réduit fortement l'exposition
+// "hébergement de données de santé". Se désactive avec MINIMIZE_HEALTH_DATA=false.
+// Le cabinet de DÉMO est exempté (aucun patient réel → on montre la valeur).
+// ----------------------------------------------------------------
+function minimizeFor(cabinetId) {
+  return process.env.MINIMIZE_HEALTH_DATA !== 'false'
+    && cabinetId !== process.env.DEMO_CABINET_ID;
+}
+const MOTIF_MINIMISE = 'Demande de rappel';
+
+// ----------------------------------------------------------------
 // Cloudflare Turnstile — anti-abus/anti-bot du chat public.
 // OPT-IN : ne s'active QUE si TURNSTILE_SECRET_KEY est défini côté serveur.
 // Tant qu'il ne l'est pas, le comportement est inchangé (rien ne casse).
@@ -307,6 +322,7 @@ export default async function handler(req, res) {
 
     const lastUserMessage = messages[messages.length - 1];
     const lastUserContent = lastUserMessage.content || lastUserMessage.contenu || '';
+    const minimize = minimizeFor(cabinetId); // ne pas persister le contenu médical
 
     // ---------- CRÉATION CONVERSATION SI BESOIN ----------
     let conversationId = existingConvoId;
@@ -345,7 +361,7 @@ export default async function handler(req, res) {
         .eq('conversation_id', conversationId);
       if ((count || 0) >= MAX_CONVO_MESSAGES) {
         logAbuse('convo_too_long', { cabinetId, conversationId, count });
-        if (lastUserMessage.role === 'user') {
+        if (!minimize && lastUserMessage.role === 'user') {
           await supabaseAdmin.from('messages').insert({
             conversation_id: conversationId, role: 'user', contenu: lastUserContent,
           });
@@ -359,7 +375,8 @@ export default async function handler(req, res) {
 
     // ---------- SAUVEGARDE DU MESSAGE PATIENT EN PREMIER ----------
     // (avant l'appel Claude pour ne jamais perdre le message du patient)
-    if (lastUserMessage.role === 'user') {
+    // En mode minimisation : on NE persiste PAS le contenu du message (santé).
+    if (!minimize && lastUserMessage.role === 'user') {
       await supabaseAdmin.from('messages').insert({
         conversation_id: conversationId,
         role: 'user',
@@ -395,11 +412,14 @@ export default async function handler(req, res) {
     }
 
     // ---------- SAUVEGARDE DE LA RÉPONSE ----------
-    await supabaseAdmin.from('messages').insert({
-      conversation_id: conversationId,
-      role: 'assistant',
-      contenu: replyText,
-    });
+    // Idem : pas de persistance du fil en mode minimisation.
+    if (!minimize) {
+      await supabaseAdmin.from('messages').insert({
+        conversation_id: conversationId,
+        role: 'assistant',
+        contenu: replyText,
+      });
+    }
 
     // ---------- EXTRACTION DE RÉSUMÉ ----------
     // On ATTEND l'extraction avant de répondre. En serverless (Vercel), une
@@ -530,14 +550,29 @@ Réponds UNIQUEMENT avec le JSON.`;
     souhait: typeof parsed.souhait === 'string' ? parsed.souhait.slice(0, 500) : null,
     urgence,
   };
-  if (!safe.motif) return; // motif obligatoire
+  const minimize = minimizeFor(cabinetId);
+  // Condition de création de la demande :
+  //  - mode normal : il faut un motif.
+  //  - mode minimisation : il faut au moins un contact (nom ou téléphone) pour
+  //    rappeler ; le motif médical n'est PAS requis ni stocké.
+  const hasContact = !!(safe.patient_nom || safe.patient_telephone);
+  if (minimize ? !hasContact : !safe.motif) return;
+
+  // Ce qui est RÉELLEMENT écrit en base. En minimisation : contact + urgence +
+  // motif générique, jamais le détail médical (motif/souhait réels).
+  const dbDemande = minimize
+    ? {
+        patient_nom: safe.patient_nom, patient_telephone: safe.patient_telephone,
+        motif: MOTIF_MINIMISE, souhait: null, urgence: safe.urgence,
+      }
+    : { ...safe };
 
   const { error: errDemande } = await supabaseAdmin
     .from('demandes')
     .insert({
       conversation_id: conversationId,
       cabinet_id: cabinetId,
-      ...safe,
+      ...dbDemande,
       statut: 'en_attente',
     });
   if (errDemande) {
@@ -550,7 +585,7 @@ Réponds UNIQUEMENT avec le JSON.`;
     .update({
       patient_nom: safe.patient_nom,
       patient_telephone: safe.patient_telephone,
-      motif_resume: safe.motif,
+      motif_resume: minimize ? MOTIF_MINIMISE : safe.motif,
       urgence: safe.urgence,
     })
     .eq('id', conversationId);
