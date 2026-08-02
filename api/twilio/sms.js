@@ -20,10 +20,8 @@
 import {
   guardWebhook, findCabinetByTwilioNumber, sendTwiml, escapeXml, publicBaseUrl,
 } from './_twilio.js';
+import { classifyInboundSms } from './_logic.js';
 import { supabaseAdmin } from '../_supabase.js';
-
-const STOP_WORDS = new Set(['STOP', 'STOPP', 'ARRET', 'ARRÊT', 'ARRETER', 'UNSUB', 'UNSUBSCRIBE', 'DESABONNER']);
-const START_WORDS = new Set(['START', 'DEBUT', 'DÉBUT', 'OUI', 'YES', 'REABONNER']);
 
 const reply = (res, msg) =>
   sendTwiml(res, `<Response><Message>${escapeXml(msg)}</Message></Response>`);
@@ -36,17 +34,17 @@ export default async function handler(req, res) {
   if (!cabinet) return sendTwiml(res, `<Response/>`);
 
   const text = String(Body || '').trim();
-  const word = text.toUpperCase().replace(/[^A-ZÀ-Ÿ]/g, '');
+  const kind = classifyInboundSms(text);
 
   // --- Opt-out ---
-  if (STOP_WORDS.has(word)) {
+  if (kind === 'stop') {
     await supabaseAdmin.from('sms_optout')
       .upsert({ cabinet_id: cabinet.id, numero: From }, { onConflict: 'cabinet_id,numero' });
     return reply(res, "C'est note : vous ne recevrez plus de SMS. Repondez START pour reactiver.");
   }
 
   // --- Ré-abonnement ---
-  if (START_WORDS.has(word)) {
+  if (kind === 'start') {
     await supabaseAdmin.from('sms_optout')
       .delete().eq('cabinet_id', cabinet.id).eq('numero', From);
     return reply(res, 'Vous etes de nouveau abonne. Comment pouvons-nous vous aider ?');

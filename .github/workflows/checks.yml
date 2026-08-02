@@ -13,8 +13,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      # Contrôles légers sans dépendances (syntaxe JS, JSON, JSON-LD, fichiers).
-      - run: npm run check
+      # Suite hors-ligne (sans dépendances ni secrets) : syntaxe/JSON + logique
+      # et signature du débordement Twilio. Échoue au moindre problème.
+      - run: npm test
 
       # Test d'intrusion RLS (accès croisé entre cabinets + attaquant anonyme).
       # Ne s'exécute QUE si les secrets Supabase du dépôt sont configurés :

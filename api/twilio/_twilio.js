@@ -15,6 +15,12 @@
 
 import { supabaseAdmin } from '../_supabase.js';
 import { validateTwilioSignature as _validateSig } from './_signature.js';
+import {
+  isValidNumber, escapeXml, buildSmsBody, decideSmsAction, smsLink,
+} from './_logic.js';
+
+// Re-export pour les handlers qui importent depuis './_twilio.js'
+export { isValidNumber, escapeXml };
 
 // ----------------------------------------------------------------
 // Config / helpers de base
@@ -31,21 +37,10 @@ export function twilioConfigured() {
   return !!sid && !!token;
 }
 
-const E164_RE = /^\+[1-9]\d{6,15}$/;
-export function isValidNumber(n) {
-  return typeof n === 'string' && E164_RE.test(n.trim());
-}
-
 // Réponse TwiML (XML) standard
 export function sendTwiml(res, xml) {
   res.status(200).setHeader('Content-Type', 'text/xml; charset=utf-8');
   res.send(`<?xml version="1.0" encoding="UTF-8"?>${xml}`);
-}
-
-export function escapeXml(s) {
-  return String(s == null ? '' : s)
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 }
 
 // Validation de la signature Twilio — logique pure isolée dans _signature.js
@@ -129,17 +124,6 @@ export function publicBaseUrl(req) {
   return `${proto}://${host}`;
 }
 
-// Construit le corps du SMS à partir du gabarit du cabinet (ou d'un défaut sobre).
-function buildSmsBody(cabinet, lien) {
-  const nom = cabinet.nom || 'le cabinet';
-  const modele = (cabinet.sms_modele && cabinet.sms_modele.trim())
-    || "Bonjour, ici {cabinet}. Desolee d'avoir manque votre appel. Dites-nous en quelques mots ce dont vous avez besoin, on vous rappelle vite : {lien}";
-  let body = modele.replace(/\{cabinet\}/g, nom).replace(/\{lien\}/g, lien);
-  // Mention d'opt-out (bonne pratique + conformité) si pas déjà présente.
-  if (!/stop/i.test(body)) body += ' STOP pour ne plus etre contacte.';
-  return body.slice(0, 500);
-}
-
 // ----------------------------------------------------------------
 // handleMissedCall — cœur métier : un appel non pris → un SMS de relance.
 // Idempotent et prudent : anti-opt-out, anti-doublon (cooldown), journalisé.
@@ -167,29 +151,28 @@ export async function handleMissedCall({ cabinet, from, to, callSid, appelId, ba
   const setSms = (sms_statut, extra = {}) =>
     rowId ? supabaseAdmin.from('appels').update({ sms_statut, ...extra }).eq('id', rowId) : Promise.resolve();
 
-  // Relance désactivée par le cabinet
+  // Gates bon marché AVANT toute requête (évite des lectures inutiles).
   if (cabinet.sms_relance_actif === false) { await setSms('desactive'); return; }
-  // Numéro appelant inutilisable (masqué, fixe non SMS…)
-  if (!isValidNumber(from)) { await setSms('echoue', {}); return; }
-  // Il faut un expéditeur (le numéro Twilio du cabinet)
-  if (!isValidNumber(cabinet.numero_twilio)) { await setSms('echoue'); return; }
+  if (!isValidNumber(from) || !isValidNumber(cabinet.numero_twilio)) { await setSms('echoue'); return; }
 
-  // Opt-out (le patient a déjà répondu STOP)
+  // État nécessaire à la décision : opt-out + relance récente (anti-doublon).
   const { data: opt } = await supabaseAdmin.from('sms_optout')
     .select('numero').eq('cabinet_id', cabinet.id).eq('numero', from).limit(1);
-  if (opt && opt.length) { await setSms('opt_out'); return; }
-
-  // Anti-doublon : un SMS déjà parti à ce numéro il y a moins de 10 min
   const since = new Date(Date.now() - SMS_COOLDOWN_MS).toISOString();
   const { data: recent } = await supabaseAdmin.from('appels')
     .select('id').eq('cabinet_id', cabinet.id).eq('from_number', from)
     .in('sms_statut', ['envoye', 'livre']).gte('created_at', since).limit(1);
-  if (recent && recent.length) { await setSms('doublon'); return; }
 
-  // Envoi — le lien porte l'id de l'appel (?a=) pour mesurer la récupération
-  // (appel manqué → conversation créée) côté /api/chat.
-  const refParam = rowId ? `&a=${encodeURIComponent(rowId)}` : '';
-  const lien = `${(baseUrl || '').replace(/\/+$/, '')}/chat?c=${cabinet.id}${refParam}`;
+  // Décision centralisée (fonction pure testée : decideSmsAction).
+  const action = decideSmsAction({
+    smsRelanceActif: true, fromValid: true, cabinetNumberValid: true,
+    optedOut: !!(opt && opt.length),
+    recentSmsSent: !!(recent && recent.length),
+  });
+  if (action !== 'send') { await setSms(action); return; }
+
+  // Envoi — le lien porte l'id de l'appel (?a=) pour mesurer la récupération.
+  const lien = smsLink(baseUrl, cabinet.id, rowId);
   const body = buildSmsBody(cabinet, lien);
   const statusCb = baseUrl ? `${baseUrl.replace(/\/+$/, '')}/api/twilio/sms-status` : undefined;
   const r = await sendSms({ to: from, from: cabinet.numero_twilio, body, statusCallback: statusCb });
