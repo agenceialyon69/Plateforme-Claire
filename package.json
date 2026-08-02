@@ -10,6 +10,7 @@
     "lint": "node scripts/check.mjs",
     "test": "node scripts/check.mjs && node scripts/test-twilio-signature.mjs && node scripts/test-twilio-logic.mjs",
     "create-admin": "node scripts/create-admin.mjs",
+    "preflight": "node scripts/preflight.mjs",
     "redteam": "node scripts/redteam-cross-cabinet.mjs",
     "test:twilio": "node scripts/test-twilio-signature.mjs",
     "test:twilio-logic": "node scripts/test-twilio-logic.mjs",

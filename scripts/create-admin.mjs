@@ -56,6 +56,7 @@ const password = arg('password') || process.env.ADMIN_PASSWORD || '';
 const nom = arg('nom') || process.env.ADMIN_NOM || 'Cabinet';
 const ville = arg('ville') || process.env.ADMIN_VILLE || 'Lyon';
 const telephone = arg('tel') || process.env.ADMIN_TEL || null;
+const numeroTwilio = arg('twilio') || process.env.ADMIN_TWILIO || null;
 
 // ---- Validations ------------------------------------------------
 const die = (msg) => { console.error(`\n❌ ${msg}\n`); process.exit(1); };
@@ -68,6 +69,9 @@ if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
 }
 if (!password || password.length < 8) {
   die('Mot de passe trop court (8 caractères minimum). Utilise --password "..."');
+}
+if (numeroTwilio && !/^\+[1-9]\d{6,15}$/.test(numeroTwilio)) {
+  die('Numéro Twilio invalide. Format international, ex. --twilio "+33757000000"');
 }
 
 const supabase = createClient(SUPABASE_URL, SERVICE_KEY, {
@@ -118,11 +122,14 @@ async function findUserByEmail(targetEmail) {
   }
 
   // 2) Fiche cabinet
+  const fiche = { id: userId, nom, email, ville, telephone };
+  if (numeroTwilio) fiche.numero_twilio = numeroTwilio;
   const { error: cabErr } = await supabase
     .from('cabinets')
-    .upsert({ id: userId, nom, email, ville, telephone }, { onConflict: 'id' });
+    .upsert(fiche, { onConflict: 'id' });
   if (cabErr) die(`Échec création de la fiche cabinet : ${cabErr.message}`);
   console.log('   ✓ Fiche cabinet enregistrée.');
+  if (numeroTwilio) console.log(`   ✓ Numéro Twilio rattaché : ${numeroTwilio}`);
 
   console.log('\n✅ Terminé ! Vous pouvez vous connecter sur /login.html');
   console.log(`   Identifiant : ${email}`);

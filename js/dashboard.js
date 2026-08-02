@@ -19,6 +19,9 @@ initSidebar(cabinet, 'cabinet');
 document.querySelector('[data-cabinet-name]').textContent = cabinet.nom;
 document.getElementById('todayLine').textContent = formatToday();
 
+// Checklist de configuration (onboarding) — calculée depuis la fiche cabinet.
+renderSetupChecklist();
+
 // Chargement en parallèle des données
 await Promise.all([
   loadKpis(),
@@ -54,6 +57,39 @@ async function loadKpis() {
     badge.textContent = stats.en_attente;
     badge.classList.remove('hidden');
   }
+}
+
+// ----------------------------------------------------------------
+// Checklist de configuration : dit au cabinet ce qu'il reste à régler pour
+// être 100% opérationnel (canal téléphone + chat hébergé). Masquée si complet.
+// ----------------------------------------------------------------
+function renderSetupChecklist() {
+  const section = document.getElementById('setupSection');
+  const list = document.getElementById('setupList');
+  if (!section || !list) return;
+
+  const hasHoraires = !!cabinet.horaires && Object.values(cabinet.horaires).some(d => d && d.ouvert);
+  const items = [
+    { ok: !!(cabinet.nom && cabinet.nom.trim() && cabinet.nom.trim().toLowerCase() !== 'cabinet'),
+      label: 'Nom du cabinet renseigné', href: '/parametres.html' },
+    { ok: hasHoraires, label: 'Horaires d\'ouverture définis', href: '/parametres.html' },
+    { ok: !!(cabinet.notif_email && cabinet.notif_email.trim()),
+      label: 'Email de notification configuré', href: '/parametres.html' },
+    { ok: !!(cabinet.numero_reel && cabinet.numero_reel.trim()),
+      label: 'Ligne à faire sonner (débordement) renseignée', href: '/parametres.html' },
+    { ok: !!(cabinet.numero_twilio && cabinet.numero_twilio.trim()),
+      label: 'Numéro Claire attribué (contactez l\'équipe si absent)', href: '/parametres.html' },
+  ];
+
+  if (items.every(i => i.ok)) return; // tout est prêt → on n'affiche rien
+
+  list.innerHTML = items.map(i => `
+    <a href="${i.href}" class="list-row" style="grid-template-columns: 28px 1fr; align-items:center; text-decoration:none;">
+      <div style="font-size:18px; color:${i.ok ? 'var(--forest,#1f3d35)' : '#c9a227'};">${i.ok ? '✓' : '○'}</div>
+      <div class="list-row-name" style="${i.ok ? 'color:#6b7280; text-decoration:line-through;' : ''}">${i.label}</div>
+    </a>
+  `).join('');
+  section.style.display = '';
 }
 
 // ----------------------------------------------------------------
