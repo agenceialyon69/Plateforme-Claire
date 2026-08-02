@@ -49,6 +49,13 @@ export default async function handler(req, res) {
     if (!nom || typeof nom !== 'string' || !email || typeof email !== 'string') {
       return badRequest(res, 'nom et email sont requis');
     }
+    // Les champs optionnels doivent être des chaînes si présents : un client
+    // hostile pouvait envoyer un objet/tableau → .length levait un TypeError → 500.
+    for (const [k, v] of [['cabinet', cabinet], ['telephone', telephone], ['message', message]]) {
+      if (v !== undefined && v !== null && typeof v !== 'string') {
+        return badRequest(res, `Champ ${k} invalide`);
+      }
+    }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return badRequest(res, 'Email invalide');
     }

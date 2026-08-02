@@ -121,6 +121,42 @@ function logAbuse(kind, detail) {
   try { console.warn(`[abuse] ${kind}`, JSON.stringify(detail).slice(0, 300)); } catch { /* noop */ }
 }
 
+// ----------------------------------------------------------------
+// Cloudflare Turnstile — anti-abus/anti-bot du chat public.
+// OPT-IN : ne s'active QUE si TURNSTILE_SECRET_KEY est défini côté serveur.
+// Tant qu'il ne l'est pas, le comportement est inchangé (rien ne casse).
+// Une fois activé, le chat du cabinet de DÉMO (UUID public, embarqué dans le
+// dépôt = la cible de DoS la plus facile) exige un jeton Turnstile valide.
+// Câblage client : voir le commentaire en tête de js/demo-chat.js.
+// ----------------------------------------------------------------
+function turnstileEnabled() {
+  return !!process.env.TURNSTILE_SECRET_KEY;
+}
+
+async function verifyTurnstile(token, ip) {
+  if (!token || typeof token !== 'string') return false;
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), 8000);
+  try {
+    const params = new URLSearchParams();
+    params.set('secret', process.env.TURNSTILE_SECRET_KEY);
+    params.set('response', token);
+    if (ip && ip !== 'unknown') params.set('remoteip', ip);
+    const r = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: params.toString(),
+      signal: controller.signal,
+    });
+    const data = await r.json().catch(() => ({}));
+    return data.success === true;
+  } catch {
+    return false; // fail closed : en cas de doute, on refuse.
+  } finally {
+    clearTimeout(t);
+  }
+}
+
 function applyCors(req, res) {
   const allowed = (process.env.ALLOWED_ORIGINS || '')
     .split(',').map(s => s.trim()).filter(Boolean);
@@ -251,6 +287,18 @@ export default async function handler(req, res) {
       .single();
     if (!cabinet) return badRequest(res, 'Cabinet introuvable');
 
+    // ---------- ANTI-BOT TURNSTILE (démo publique) ----------
+    // Si Turnstile est configuré, le cabinet de démo (UUID public) exige un
+    // jeton valide. Ferme le vecteur de DoS financier le plus simple sans
+    // gêner les vrais cabinets (qui embarquent leur propre flux).
+    if (turnstileEnabled() && process.env.DEMO_CABINET_ID && cabinetId === process.env.DEMO_CABINET_ID) {
+      const okTs = await verifyTurnstile(req.body?.turnstileToken, ip);
+      if (!okTs) {
+        logAbuse('turnstile_failed', { ip, cabinetId });
+        return res.status(403).json({ error: 'Vérification anti-robot requise. Rechargez la page et réessayez.' });
+      }
+    }
+
     // ---------- RATE-LIMIT PAR CABINET ----------
     if (hitLimit(rateLimitCabinet, cabinetId, RATE_LIMIT_CABINET_MAX)) {
       logAbuse('cabinet_rate_limit', { cabinetId });
@@ -344,11 +392,21 @@ export default async function handler(req, res) {
       contenu: replyText,
     });
 
-    // ---------- EXTRACTION DE RÉSUMÉ (async, ne bloque pas la réponse) ----------
+    // ---------- EXTRACTION DE RÉSUMÉ ----------
+    // On ATTEND l'extraction avant de répondre. En serverless (Vercel), une
+    // promesse non attendue peut être gelée dès la réponse envoyée : la demande
+    // qualifiée et le webhook ne partiraient jamais, sans la moindre erreur
+    // visible. La demande qualifiée EST le produit — on ne la laisse pas filer.
+    // Coût : ~1 à 3 s de latence sur les messages qui déclenchent l'extraction.
+    // Elle est bornée par le timeout de 25 s de callClaude et ne bloque jamais
+    // la réponse patient (échec avalé proprement).
     if (claudeMessages.length >= 4) {
       const allMessages = [...claudeMessages, { role: 'assistant', content: replyText }];
-      tryExtractSummary(conversationId, cabinetId, allMessages)
-        .catch(e => console.error('extractSummary failed:', e));
+      try {
+        await tryExtractSummary(conversationId, cabinetId, allMessages);
+      } catch (e) {
+        console.error('extractSummary failed:', e);
+      }
     }
 
     return ok(res, { reply: replyText, conversationId });
@@ -366,17 +424,25 @@ function buildSystemPrompt(cabinet) {
   if (cabinet.adresse) prompt += `\n- Adresse : ${cabinet.adresse}`;
   if (cabinet.telephone) prompt += `\n- Téléphone : ${cabinet.telephone}`;
 
-  if (cabinet.horaires) {
+  if (cabinet.horaires && typeof cabinet.horaires === 'object') {
+    // Défense : `horaires` (jsonb) est modifiable en écriture directe depuis le
+    // navigateur (parametres.js écrit dans Supabase avec la clé anon). Ses
+    // valeurs ne sont donc PAS fiables ici. On borne chaque créneau à un format
+    // horaire court pour empêcher toute injection de prompt ou gonflement de coût.
+    const hhmm = (v) => {
+      const s = String(v == null ? '' : v).slice(0, 5);
+      return /^[0-9:hHmM.\- ]{0,5}$/.test(s) ? s : '';
+    };
     prompt += `\n\nHORAIRES :`;
     const jours = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
     jours.forEach(j => {
       const d = cabinet.horaires[j];
-      if (!d) return;
+      if (!d || typeof d !== 'object') return;
       if (!d.ouvert) {
         prompt += `\n- ${j} : fermé`;
       } else {
-        const m = d.matin?.length ? `${d.matin[0]}–${d.matin[1]}` : '';
-        const a = d.aprem?.length ? `${d.aprem[0]}–${d.aprem[1]}` : '';
+        const m = Array.isArray(d.matin) && d.matin.length ? `${hhmm(d.matin[0])}–${hhmm(d.matin[1])}` : '';
+        const a = Array.isArray(d.aprem) && d.aprem.length ? `${hhmm(d.aprem[0])}–${hhmm(d.aprem[1])}` : '';
         prompt += `\n- ${j} : ${[m, a].filter(Boolean).join(' / ')}`;
       }
     });
@@ -490,18 +556,30 @@ Réponds UNIQUEMENT avec le JSON.`;
       .select('nom, notif_email, notif_telephone')
       .eq('id', cabinetId)
       .single();
-    fetch(webhookUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(webhookSecret ? { 'X-Claire-Secret': webhookSecret } : {}),
-      },
-      body: JSON.stringify({
-        event: 'nouvelle_demande',
-        cabinet,
-        demande: safe,
-        conversation_id: conversationId,
-      }),
-    }).catch(e => console.error('Webhook notif failed:', e));
+    // Awaited + borné : en serverless, un fetch non attendu peut être gelé
+    // (le cabinet ne serait jamais notifié). AbortController pour ne pas
+    // bloquer au-delà de 8 s si le webhook ne répond pas.
+    const whController = new AbortController();
+    const whTimeout = setTimeout(() => whController.abort(), 8000);
+    try {
+      await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(webhookSecret ? { 'X-Claire-Secret': webhookSecret } : {}),
+        },
+        body: JSON.stringify({
+          event: 'nouvelle_demande',
+          cabinet,
+          demande: safe,
+          conversation_id: conversationId,
+        }),
+        signal: whController.signal,
+      });
+    } catch (e) {
+      console.error('Webhook notif failed:', e);
+    } finally {
+      clearTimeout(whTimeout);
+    }
   }
 }

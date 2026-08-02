@@ -15,3 +15,21 @@ jobs:
           node-version: '22'
       # Contrôles légers sans dépendances (syntaxe JS, JSON, JSON-LD, fichiers).
       - run: npm run check
+
+      # Test d'intrusion RLS (accès croisé entre cabinets + attaquant anonyme).
+      # Ne s'exécute QUE si les secrets Supabase du dépôt sont configurés :
+      # Settings → Secrets and variables → Actions →
+      #   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, SUPABASE_ANON_KEY.
+      # Sans eux, le job affiche un avertissement mais ne casse pas la CI.
+      - name: Red team RLS (accès croisé + anonyme)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "::warning::Secrets Supabase absents — test red team ignoré. Configure-les pour prouver l'étanchéité RLS à chaque push."
+            exit 0
+          fi
+          npm install --no-audit --no-fund
+          npm run redteam

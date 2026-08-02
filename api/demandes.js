@@ -5,6 +5,8 @@
 import { supabaseAdmin, authenticateRequest, ok, unauthorized, badRequest, notFound, serverError } from './_supabase.js';
 
 const STATUTS_VALIDES = ['en_attente', 'a_rappeler', 'traite', 'ignore'];
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const MAX_NOTE_LEN = 2000;
 
 export default async function handler(req, res) {
   const auth = await authenticateRequest(req);
@@ -30,9 +32,16 @@ export default async function handler(req, res) {
 
     if (req.method === 'PATCH') {
       const { id, statut, note_cabinet } = req.body || {};
-      if (!id) return badRequest(res, 'id requis');
+      if (!id || typeof id !== 'string' || !UUID_RE.test(id)) {
+        return badRequest(res, 'id invalide');
+      }
       if (statut && !STATUTS_VALIDES.includes(statut)) {
         return badRequest(res, 'Statut invalide');
+      }
+      if (note_cabinet !== undefined && note_cabinet !== null) {
+        if (typeof note_cabinet !== 'string' || note_cabinet.length > MAX_NOTE_LEN) {
+          return badRequest(res, `Note invalide (max ${MAX_NOTE_LEN} caractères)`);
+        }
       }
 
       const patch = {};

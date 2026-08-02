@@ -2,7 +2,7 @@
 // conversation.js — Détail d'une conversation
 // ================================================================
 
-import { requireAuth, initSidebar } from '/js/auth.js';
+import { requireAuth, initSidebar, apiFetch } from '/js/auth.js';
 import { supabase } from '/js/supabase-client.js';
 import { escapeHtml, labelUrgence, labelStatut, formatDate, formatTime } from '/js/format.js';
 
@@ -90,6 +90,11 @@ async function loadConversation() {
     </div>
   `;
 
+  // Droit à l'effacement (RGPD art. 17) : le cabinet peut supprimer
+  // définitivement cette conversation (messages + demande liés effacés en
+  // cascade). Action irréversible → double confirmation.
+  renderEraseButton();
+
   // 4) Demande liée (résumé qualifié)
   const { data: demandes } = await supabase
     .from('demandes')
@@ -145,6 +150,41 @@ async function loadConversation() {
       actionBar.appendChild(btnIgnore);
     }
   }
+}
+
+// ----------------------------------------------------------------
+// Bouton "Supprimer (RGPD)" — appelé dans loadConversation.
+function renderEraseButton() {
+  const box = document.getElementById('contactBox');
+  if (!box || document.getElementById('eraseConvoBtn')) return;
+
+  const btn = document.createElement('button');
+  btn.id = 'eraseConvoBtn';
+  btn.className = 'btn btn-danger btn-sm';
+  btn.style.marginTop = '16px';
+  btn.textContent = 'Supprimer définitivement (RGPD)';
+  btn.addEventListener('click', async () => {
+    const sure = window.confirm(
+      "Supprimer DÉFINITIVEMENT cette conversation, ses messages et la demande liée ?\n\nCette action est irréversible (droit à l'effacement RGPD)."
+    );
+    if (!sure) return;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loader"></span>';
+    try {
+      const res = await apiFetch('/api/erase', {
+        method: 'DELETE',
+        body: JSON.stringify({ conversationId }),
+      });
+      if (!res.ok) throw new Error('erase failed');
+      window.location.href = '/conversations.html';
+    } catch (e) {
+      console.error(e);
+      alert('La suppression a échoué. Réessayez.');
+      btn.disabled = false;
+      btn.textContent = 'Supprimer définitivement (RGPD)';
+    }
+  });
+  box.appendChild(btn);
 }
 
 // ----------------------------------------------------------------

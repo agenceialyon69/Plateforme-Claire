@@ -214,6 +214,39 @@ async function seedCabinet(tag) {
       }).select()));
 
     await attacker.auth.signOut();
+
+    // ============================================================
+    // ATTAQUANT ANONYME (jamais connecté) — le rôle `anon` pur.
+    // C'est le scénario d'un curl brut avec la seule clé publique, sans
+    // aucune session. RIEN ne doit fuiter. Un GRANT trop large ou une
+    // policy `to public` passerait inaperçu du test d'accès croisé.
+    // ============================================================
+    console.log(`\n${C.bold}Scénario : attaquant ANONYME (clé anon, aucune session).${C.reset}\n`);
+    const anon = createClient(SUPABASE_URL, ANON_KEY, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+
+    expectBlocked('[anon] Lister les cabinets',
+      await q(anon.from('cabinets').select('*')));
+    expectBlocked('[anon] Lister les conversations',
+      await q(anon.from('conversations').select('*')));
+    expectBlocked('[anon] Lister les messages',
+      await q(anon.from('messages').select('*')));
+    expectBlocked('[anon] Lister les demandes',
+      await q(anon.from('demandes').select('*')));
+    expectBlocked('[anon] Lister les contact_leads',
+      await q(anon.from('contact_leads').select('*')));
+    expectBlocked('[anon] Lire la demande précise de B par id',
+      await q(anon.from('demandes').select('*').eq('id', B.demandeId)));
+
+    // Écritures anonymes : toutes refusées (aucune policy INSERT/UPDATE/DELETE).
+    expectWriteBlocked('[anon] Injecter une demande',
+      await qd(anon.from('demandes').insert({
+        conversation_id: B.conversationId, cabinet_id: B.userId,
+        motif: 'ANON-INJECT', urgence: 'elevee', statut: 'en_attente',
+      }).select()));
+    expectWriteBlocked('[anon] Modifier un cabinet',
+      await qd(anon.from('cabinets').update({ nom: 'ANON-HACK' }).eq('id', B.userId).select()));
   } catch (err) {
     console.error(`\n❌ Erreur durant le test : ${err.message}\n`);
     failed++;

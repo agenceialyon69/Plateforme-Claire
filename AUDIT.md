@@ -123,6 +123,37 @@ sans paiement, démo solide). Aucune donnée personnelle ni promesse non fondée
   anglais assumé) et `docs/PITCH-CABINETS.md` (scripts d'approche, questions de feedback, lettre
   d'intention).
 
+## Correctifs red team (2026-08-02)
+
+Audit red team fichier par fichier + durcissement. Correctifs appliqués :
+
+| Trouvaille | Correctif |
+|---|---|
+| **CSP absente + SDK via CDN** | `Content-Security-Policy` stricte ajoutée dans `vercel.json` (`connect-src` limite l'exfiltration de jetons même si un script tiers est compromis). |
+| **Résumé qualifié perdu en serverless** | `tryExtractSummary` et le webhook sont désormais **attendus** (`await`) avant la réponse, avec timeout borné : la demande et la notification ne peuvent plus être gelées silencieusement. |
+| **Droit à l'effacement inexistant** | Policies RLS `DELETE` (`schema.sql`) + endpoint `/api/erase` + bouton « Supprimer (RGPD) » dans la fiche conversation. |
+| **DoS financier sur `/api/chat`** | Vérification Cloudflare Turnstile côté serveur (opt-in via `TURNSTILE_SECRET_KEY`), câblage front documenté. |
+| **Transfert hors-UE non déclaré** | Clause « Transfert hors UE » (Anthropic/USA + CCT) ajoutée à `confidentialite.html`. |
+| **`horaires` injecté sans validation** | Troncature/validation défensive des créneaux dans `buildSystemPrompt`. |
+| **`redirectTo` d'invitation forgeable** | En production, `PUBLIC_SITE_URL` obligatoire ; plus aucun repli sur les en-têtes client. |
+| **CI ne testait rien** | `checks.yml` lance `npm run redteam` dès que les secrets Supabase du dépôt sont configurés. |
+| **Test red team incomplet** | Ajout du scénario attaquant **anonyme** (rôle `anon` pur, non connecté). |
+| **Points faibles** | Validation UUID (`conversation.js`, `demandes.js`), plafond `note_cabinet`, contrôles de type (`contact.js`), dépendance morte `@anthropic-ai/sdk` retirée. |
+
+**Correction d'une affirmation de l'audit précédent** : la note « policies RLS d'écriture
+inutiles : aucune écriture directe depuis le navigateur » était **fausse**. `js/parametres.js`
+et `js/conversation.js` écrivent bel et bien directement dans Supabase avec la clé anon (via RLS
+`UPDATE`). C'est pourquoi la validation serveur de `api/cabinet.js` ne s'exécute jamais : le vrai
+chemin d'écriture la contourne. La défense a donc été replacée là où les données transitent
+réellement (validation à la lecture du prompt + policies DB).
+
+**Non corrigé — décision hors code (bloqueur) :** hébergement **HDS**. `motif`, `urgence`,
+nom et téléphone collectés pour un professionnel de santé relèvent probablement de la donnée de
+santé (RGPD art. 9 ; CSP art. L1111-8 → hébergeur certifié HDS). Supabase/Vercel ne sont pas
+certifiés HDS. À trancher avec un avocat santé/numérique **avant tout pilote** : la réponse peut
+imposer une migration d'hébergeur. Identité légale de `confidentialite.html` (`[À COMPLÉTER]`)
+également à renseigner par le responsable de traitement.
+
 ## Recommandations pour la suite (non réalisées)
 
 1. Ajouter un `package-lock.json` pour figer les versions.

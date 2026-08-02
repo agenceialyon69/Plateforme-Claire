@@ -200,6 +200,26 @@ create policy "dem_update_own"
   using (cabinet_id = auth.uid())
   with check (cabinet_id = auth.uid());
 
+-- =================================================================
+-- DROIT À L'EFFACEMENT (RGPD art. 17)
+-- La politique de confidentialité promet la suppression sur demande.
+-- On donne au cabinet le pouvoir d'effacer SES propres données, scopé par
+-- cabinet_id = auth.uid(). Supprimer une conversation efface en cascade ses
+-- messages ET sa demande (ON DELETE CASCADE défini plus haut).
+-- L'endpoint serveur /api/erase s'appuie sur ces policies (ou le service_role
+-- pour le cabinet de démo). Aucune policy INSERT n'est ajoutée : les écritures
+-- restent réservées au service_role.
+-- =================================================================
+drop policy if exists "conv_delete_own" on public.conversations;
+create policy "conv_delete_own"
+  on public.conversations for delete
+  using (cabinet_id = auth.uid());
+
+drop policy if exists "dem_delete_own" on public.demandes;
+create policy "dem_delete_own"
+  on public.demandes for delete
+  using (cabinet_id = auth.uid());
+
 -- contact_leads : seul le service role peut lire (pas accessible côté client)
 alter table public.contact_leads enable row level security;
 -- (aucune policy = aucun accès via anon/auth, seul service_role bypasses RLS)

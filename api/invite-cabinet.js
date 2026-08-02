@@ -24,10 +24,21 @@ import {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Détermine l'URL publique du site pour construire le lien de retour
+// Détermine l'URL publique du site pour construire le lien de retour.
+// SÉCURITÉ : le lien de retour arrive dans un email d'invitation avec un token
+// magique. S'il était bâti sur des en-têtes contrôlables par le client
+// (Origin, X-Forwarded-Host, Host), un attaquant pourrait forger un lien
+// pointant vers son propre domaine. On exige donc PUBLIC_SITE_URL comme
+// source de vérité. Les en-têtes ne servent QUE de repli hors production.
 function siteBaseUrl(req) {
   const fromEnv = process.env.PUBLIC_SITE_URL;
   if (fromEnv) return fromEnv.replace(/\/+$/, '');
+
+  // En production, refuser tout repli sur les en-têtes (voir ci-dessus).
+  if (process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production') {
+    return null;
+  }
+
   const origin = req.headers.origin;
   if (origin) return origin.replace(/\/+$/, '');
   const host = req.headers['x-forwarded-host'] || req.headers.host;
@@ -59,7 +70,11 @@ export default async function handler(req, res) {
   if (!nom || !String(nom).trim()) return badRequest(res, 'Nom du cabinet requis');
 
   const emailNorm = String(email).trim().toLowerCase();
-  const redirectTo = `${siteBaseUrl(req)}/bienvenue.html`;
+  const base = siteBaseUrl(req);
+  if (!base) {
+    return serverError(res, new Error('PUBLIC_SITE_URL non configurée : invitation refusée en production'));
+  }
+  const redirectTo = `${base}/bienvenue.html`;
 
   try {
     // 1) Envoie l'email d'invitation (crée aussi l'utilisateur Auth, sans mot de passe)

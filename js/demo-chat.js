@@ -11,6 +11,18 @@
 //  - colle son UUID dans DEMO_CABINET_ID
 // Tant que ce n'est pas fait, le champ reste utilisable mais Claire
 // invite à réserver une démo (aucune erreur technique visible).
+//
+// ANTI-BOT TURNSTILE (optionnel, recommandé contre le DoS financier) :
+//  1. Crée un widget Turnstile (dashboard Cloudflare) → récupère la site key.
+//  2. Dans index.html, ajoute avant </body> :
+//       <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+//     et, près du formulaire de démo :
+//       <div class="cf-turnstile" data-sitekey="TA_SITE_KEY"
+//            data-callback="onTurnstile"></div>
+//       <input type="hidden" id="cf-turnstile-token" />
+//       <script>function onTurnstile(t){document.getElementById('cf-turnstile-token').value=t;}</script>
+//  3. Définis TURNSTILE_SECRET_KEY côté Vercel → le serveur exigera le jeton.
+// Ce fichier envoie déjà le jeton s'il est présent (sinon : aucun effet).
 // ================================================================
 
 import { escapeHtml, labelUrgence } from '/js/format.js';
@@ -66,10 +78,12 @@ form?.addEventListener('submit', async (e) => {
   const typing = addTyping();
 
   try {
+    // Jeton anti-bot Turnstile s'il est présent sur la page (sinon : rien).
+    const turnstileToken = document.getElementById('cf-turnstile-token')?.value || undefined;
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages, cabinetId: DEMO_CABINET_ID, conversationId }),
+      body: JSON.stringify({ messages, cabinetId: DEMO_CABINET_ID, conversationId, turnstileToken }),
     });
 
     typing.remove();
