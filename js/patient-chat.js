@@ -16,7 +16,9 @@ const form = document.getElementById('pcForm');
 const input = document.getElementById('pcInput');
 const sendBtn = document.getElementById('pcSend');
 
-const cabinetId = new URLSearchParams(window.location.search).get('c');
+const _params = new URLSearchParams(window.location.search);
+const cabinetId = _params.get('c');
+const appelRef = _params.get('a') || null; // id de l'appel manqué (traçabilité récupération)
 const messages = [];
 let conversationId = null;
 let busy = false;
@@ -46,7 +48,7 @@ form?.addEventListener('submit', async (e) => {
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages, cabinetId, conversationId }),
+      body: JSON.stringify({ messages, cabinetId, conversationId, appelRef }),
     });
     typing.remove();
 

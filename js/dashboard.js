@@ -24,6 +24,7 @@ await Promise.all([
   loadKpis(),
   loadPriorities(),
   loadLastConversations(),
+  loadDebordement(),
 ]);
 
 // ----------------------------------------------------------------
@@ -52,6 +53,39 @@ async function loadKpis() {
   if (badge && (stats.en_attente ?? 0) > 0) {
     badge.textContent = stats.en_attente;
     badge.classList.remove('hidden');
+  }
+}
+
+// ----------------------------------------------------------------
+// Débordement téléphonique : appels manqués → demandes récupérées (30 j)
+// Lecture directe via la vue stats_debordement (RLS security_invoker).
+// Tolérant : si la vue n'existe pas encore (migration non jouée) ou tout est
+// à zéro, on masque simplement la section — jamais d'erreur affichée.
+// ----------------------------------------------------------------
+async function loadDebordement() {
+  const section = document.getElementById('debordSection');
+  if (!section) return;
+  try {
+    const { data, error } = await supabase
+      .from('stats_debordement')
+      .select('appels_manques_30j, sms_envoyes_30j, demandes_recuperees_30j')
+      .eq('cabinet_id', cabinet.id)
+      .single();
+    if (error || !data) return; // vue absente ou pas de droits → on n'affiche rien
+
+    const manques = data.appels_manques_30j ?? 0;
+    const sms = data.sms_envoyes_30j ?? 0;
+    const recup = data.demandes_recuperees_30j ?? 0;
+
+    // Rien à montrer tant qu'aucun appel manqué n'a été enregistré.
+    if (manques === 0 && sms === 0 && recup === 0) return;
+
+    section.querySelector('[data-debord="appels_manques_30j"]').textContent = manques;
+    section.querySelector('[data-debord="sms_envoyes_30j"]').textContent = sms;
+    section.querySelector('[data-debord="demandes_recuperees_30j"]').textContent = recup;
+    section.style.display = '';
+  } catch (_) {
+    /* silencieux : la section reste masquée */
   }
 }
 

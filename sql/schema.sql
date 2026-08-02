@@ -310,5 +310,42 @@ alter table public.sms_optout enable row level security;
 -- (aucune policy = aucun accès via anon/auth, seul service_role bypasse RLS)
 
 -- =================================================================
+-- LIEN appel → conversation (mesure honnête de la récupération)
+-- Un appel manqué est "récupéré" quand le patient revient via le lien SMS et
+-- qu'une conversation naît. On stampe l'id de l'appel sur la conversation créée
+-- (fait par /api/chat, après vérification que l'appel appartient au cabinet).
+-- =================================================================
+alter table public.conversations
+  add column if not exists appel_id uuid references public.appels(id) on delete set null;
+create index if not exists conversations_appel_id_idx
+  on public.conversations(appel_id) where appel_id is not null;
+
+-- =================================================================
+-- VUE : stats_debordement — KPI du débordement téléphonique (30 j)
+-- Sous-requêtes scalaires (PAS de jointure) pour éviter toute inflation de
+-- comptage par produit cartésien. security_invoker = respecte les RLS du caller.
+-- =================================================================
+create or replace view public.stats_debordement
+with (security_invoker = true) as
+select
+  c.id as cabinet_id,
+  (select count(*) from public.appels a
+     where a.cabinet_id = c.id and a.statut = 'manque'
+       and a.created_at >= now() - interval '30 days') as appels_manques_30j,
+  (select count(*) from public.appels a
+     where a.cabinet_id = c.id and a.sms_statut in ('envoye','livre')
+       and a.created_at >= now() - interval '30 days') as sms_envoyes_30j,
+  (select count(distinct conv.id) from public.conversations conv
+     where conv.cabinet_id = c.id and conv.appel_id is not null
+       and conv.created_at >= now() - interval '30 days') as conversations_recuperees_30j,
+  (select count(distinct d.conversation_id) from public.demandes d
+     join public.conversations conv2 on conv2.id = d.conversation_id
+     where d.cabinet_id = c.id and conv2.appel_id is not null
+       and d.created_at >= now() - interval '30 days') as demandes_recuperees_30j
+from public.cabinets c;
+
+grant select on public.stats_debordement to authenticated;
+
+-- =================================================================
 -- FIN DU SCHÉMA
 -- =================================================================

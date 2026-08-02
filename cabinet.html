@@ -99,6 +99,28 @@
       </div>
     </section>
 
+    <!-- Débordement téléphonique (masqué tant qu'il n'y a pas de données) -->
+    <section class="list-card mb-6" id="debordSection" style="display:none;">
+      <div class="list-card-header">
+        <h2 class="list-card-title">Appels rattrapés (30 jours)</h2>
+        <a href="/parametres.html" class="text-sm text-gold font-semibold">Réglages →</a>
+      </div>
+      <div class="kpi-grid" style="padding:16px;">
+        <div class="kpi-card danger">
+          <div class="kpi-label">Appels manqués</div>
+          <div class="kpi-value" data-debord="appels_manques_30j">–</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">SMS de relance envoyés</div>
+          <div class="kpi-value" data-debord="sms_envoyes_30j">–</div>
+        </div>
+        <div class="kpi-card accent">
+          <div class="kpi-label">Demandes récupérées</div>
+          <div class="kpi-value" data-debord="demandes_recuperees_30j">–</div>
+        </div>
+      </div>
+    </section>
+
     <!-- Demandes prioritaires -->
     <section class="list-card mb-6">
       <div class="list-card-header">

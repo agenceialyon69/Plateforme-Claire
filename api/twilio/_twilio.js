@@ -221,8 +221,10 @@ export async function handleMissedCall({ cabinet, from, to, callSid, appelId, ba
     .in('sms_statut', ['envoye', 'livre']).gte('created_at', since).limit(1);
   if (recent && recent.length) { await setSms('doublon'); return; }
 
-  // Envoi
-  const lien = `${(baseUrl || '').replace(/\/+$/, '')}/chat?c=${cabinet.id}`;
+  // Envoi — le lien porte l'id de l'appel (?a=) pour mesurer la récupération
+  // (appel manqué → conversation créée) côté /api/chat.
+  const refParam = rowId ? `&a=${encodeURIComponent(rowId)}` : '';
+  const lien = `${(baseUrl || '').replace(/\/+$/, '')}/chat?c=${cabinet.id}${refParam}`;
   const body = buildSmsBody(cabinet, lien);
   const statusCb = baseUrl ? `${baseUrl.replace(/\/+$/, '')}/api/twilio/sms-status` : undefined;
   const r = await sendSms({ to: from, from: cabinet.numero_twilio, body, statusCallback: statusCb });

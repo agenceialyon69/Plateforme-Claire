@@ -244,7 +244,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { messages, cabinetId, conversationId: existingConvoId } = req.body || {};
+    const { messages, cabinetId, conversationId: existingConvoId, appelRef } = req.body || {};
 
     // ---------- VALIDATIONS STRICTES ----------
     if (!cabinetId || typeof cabinetId !== 'string' || !UUID_RE.test(cabinetId)) {
@@ -311,9 +311,18 @@ export default async function handler(req, res) {
     // ---------- CRÉATION CONVERSATION SI BESOIN ----------
     let conversationId = existingConvoId;
     if (!conversationId) {
+      // Traçabilité récupération : si l'appel manqué (appelRef) est fourni ET
+      // qu'il appartient bien à CE cabinet, on le relie à la conversation créée.
+      // Vérif stricte : sinon un appelRef forgé pollue la mesure d'un autre cabinet.
+      let appelId = null;
+      if (appelRef && typeof appelRef === 'string' && UUID_RE.test(appelRef)) {
+        const { data: appel } = await supabaseAdmin
+          .from('appels').select('id, cabinet_id').eq('id', appelRef).single();
+        if (appel && appel.cabinet_id === cabinetId) appelId = appel.id;
+      }
       const { data: newConvo, error: errConvo } = await supabaseAdmin
         .from('conversations')
-        .insert({ cabinet_id: cabinetId, statut: 'active', urgence: 'normale' })
+        .insert({ cabinet_id: cabinetId, statut: 'active', urgence: 'normale', ...(appelId ? { appel_id: appelId } : {}) })
         .select('id')
         .single();
       if (errConvo) return serverError(res, errConvo);
