@@ -385,6 +385,12 @@ revoke all on function public.purge_old_data(integer) from public;
 revoke all on function public.purge_old_data(integer) from anon;
 revoke all on function public.purge_old_data(integer) from authenticated;
 
+-- Durcissement : les fonctions SECURITY DEFINER de trigger ne doivent pas être
+-- appelables en RPC par des rôles publics (advisor Supabase 0028/0029).
+-- Les triggers continuent de fonctionner ; service_role conserve l'accès.
+revoke all on function public.set_updated_at() from public, anon, authenticated;
+revoke all on function public.bump_conversation_activity() from public, anon, authenticated;
+
 -- =================================================================
 -- FIN DU SCHÉMA
 -- =================================================================
