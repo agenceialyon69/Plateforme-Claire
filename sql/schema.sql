@@ -247,5 +247,68 @@ group by c.id;
 grant select on public.stats_cabinet to authenticated;
 
 -- =================================================================
+-- DÉBORDEMENT TÉLÉPHONIQUE (appel manqué → SMS → chat Claire)
+-- Ajouté de façon idempotente : peut être ré-exécuté sans risque.
+-- =================================================================
+
+-- Colonnes cabinet nécessaires au débordement
+alter table public.cabinets add column if not exists numero_twilio text;      -- numéro Twilio du cabinet (reçoit appels/SMS, expéditeur SMS)
+alter table public.cabinets add column if not exists numero_reel text;        -- vrai numéro à appeler (secrétariat) — vide = mode "seulement appels manqués"
+alter table public.cabinets add column if not exists sms_relance_actif boolean not null default true;
+alter table public.cabinets add column if not exists sms_modele text;         -- gabarit SMS perso ({cabinet} et {lien} remplacés)
+
+-- Lookup rapide du cabinet par son numéro Twilio (utilisé à chaque appel entrant)
+create unique index if not exists cabinets_numero_twilio_idx
+  on public.cabinets(numero_twilio) where numero_twilio is not null;
+
+-- =================================================================
+-- TABLE : appels — journal des appels entrants (répondus ET manqués)
+-- Rend visible ce que le débordement rattrape, même si le patient
+-- ne va jamais jusqu'au chat. C'est la preuve de valeur du produit.
+-- =================================================================
+create table if not exists public.appels (
+  id uuid primary key default uuid_generate_v4(),
+  cabinet_id uuid not null references public.cabinets(id) on delete cascade,
+  call_sid text,
+  from_number text,
+  to_number text,
+  statut text not null default 'recu' check (statut in ('recu','repondu','manque')),
+  sms_statut text not null default 'non_envoye'
+    check (sms_statut in ('non_envoye','envoye','livre','echoue','opt_out','doublon','desactive')),
+  sms_sid text,
+  created_at timestamptz default now()
+);
+
+create index if not exists appels_cabinet_id_idx on public.appels(cabinet_id, created_at desc);
+-- Sert au garde-fou anti-spam (un seul SMS par appelant sur une fenêtre courte)
+create index if not exists appels_cooldown_idx on public.appels(cabinet_id, from_number, created_at desc);
+
+-- =================================================================
+-- TABLE : sms_optout — numéros ayant répondu STOP (conformité)
+-- Verrouillée côté client (service_role uniquement), comme contact_leads.
+-- =================================================================
+create table if not exists public.sms_optout (
+  cabinet_id uuid not null references public.cabinets(id) on delete cascade,
+  numero text not null,
+  created_at timestamptz default now(),
+  primary key (cabinet_id, numero)
+);
+
+-- RLS : le cabinet lit SON journal d'appels ; sms_optout reste privé (service_role).
+alter table public.appels enable row level security;
+drop policy if exists "appels_select_own" on public.appels;
+create policy "appels_select_own"
+  on public.appels for select
+  using (cabinet_id = auth.uid());
+
+drop policy if exists "appels_delete_own" on public.appels;
+create policy "appels_delete_own"
+  on public.appels for delete
+  using (cabinet_id = auth.uid());
+
+alter table public.sms_optout enable row level security;
+-- (aucune policy = aucun accès via anon/auth, seul service_role bypasse RLS)
+
+-- =================================================================
 -- FIN DU SCHÉMA
 -- =================================================================

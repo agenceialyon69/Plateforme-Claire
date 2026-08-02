@@ -66,6 +66,29 @@ document.getElementById('reglesForm').addEventListener('submit', async (e) => {
   await saveCabinet({ regles_reponse: val || null }, 'Règles enregistrées.', e.submitter);
 });
 
+// ----- DÉBORDEMENT TÉLÉPHONIQUE -----
+document.getElementById('debordForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const numeroReel = document.getElementById('numero_reel').value.trim();
+  // Validation E.164 souple : + suivi de 7 à 15 chiffres (espaces tolérés à la saisie).
+  const compact = numeroReel.replace(/[\s.]/g, '');
+  if (compact && !/^\+[1-9]\d{6,15}$/.test(compact)) {
+    showAlert('Le numéro doit être au format international, ex. +33478000000.', 'error');
+    return;
+  }
+  const modele = document.getElementById('sms_modele').value.trim();
+  if (modele.length > 500) {
+    showAlert('Le texte du SMS est trop long (max 500 caractères).', 'error');
+    return;
+  }
+  const patch = {
+    numero_reel: compact || null,
+    sms_relance_actif: document.getElementById('sms_relance_actif').checked,
+    sms_modele: modele || null,
+  };
+  await saveCabinet(patch, 'Débordement téléphonique enregistré.', e.submitter);
+});
+
 // ----- NOTIFICATIONS -----
 document.getElementById('notifForm').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -85,6 +108,16 @@ function fillForms() {
   document.getElementById('regles_reponse').value = cabinet.regles_reponse || '';
   document.getElementById('notif_email').value = cabinet.notif_email || cabinet.email || '';
   document.getElementById('notif_telephone').value = cabinet.notif_telephone || '';
+
+  // Débordement téléphonique
+  const numReel = document.getElementById('numero_reel');
+  if (numReel) numReel.value = cabinet.numero_reel || '';
+  const smsActif = document.getElementById('sms_relance_actif');
+  if (smsActif) smsActif.checked = cabinet.sms_relance_actif !== false; // défaut : activé
+  const smsModele = document.getElementById('sms_modele');
+  if (smsModele) smsModele.value = cabinet.sms_modele || '';
+  const numTwilio = document.getElementById('numero_twilio_ro');
+  if (numTwilio) numTwilio.value = cabinet.numero_twilio || '';
 }
 
 function renderHoraires() {

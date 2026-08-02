@@ -163,6 +163,36 @@
         </form>
       </section>
 
+      <!-- Débordement téléphonique -->
+      <section class="settings-card">
+        <h2>Débordement téléphonique</h2>
+        <p class="sub">Quand un appel n'est pas décroché, Claire envoie automatiquement un SMS au patient avec un lien pour laisser sa demande. Plus aucun appel manqué perdu.</p>
+        <form id="debordForm" novalidate>
+          <div class="field">
+            <label for="numero_reel">Votre ligne à faire sonner (secrétariat)</label>
+            <input type="tel" id="numero_reel" name="numero_reel" placeholder="+33 4 78 00 00 00" />
+            <div class="help">Format international (+33…). Laissez vide si vous renvoyez vous-même vos appels non répondus vers le numéro Claire.</div>
+          </div>
+          <div class="field">
+            <label style="display:flex; align-items:center; gap:8px; font-weight:500;">
+              <input type="checkbox" id="sms_relance_actif" name="sms_relance_actif" />
+              <span>Envoyer le SMS de relance sur appel manqué</span>
+            </label>
+          </div>
+          <div class="field">
+            <label for="sms_modele">Texte du SMS (optionnel)</label>
+            <textarea id="sms_modele" name="sms_modele" rows="3" placeholder="Bonjour, ici {cabinet}. Désolés d'avoir manqué votre appel. Dites-nous ce dont vous avez besoin : {lien}"></textarea>
+            <div class="help">Utilisez <strong>{cabinet}</strong> et <strong>{lien}</strong> : ils seront remplacés automatiquement. Une mention STOP est ajoutée si absente. Max 500 caractères.</div>
+          </div>
+          <div class="field">
+            <label>Numéro Claire (expéditeur)</label>
+            <input type="text" id="numero_twilio_ro" disabled placeholder="Attribué lors de la mise en service" />
+            <div class="help">Attribué par l'équipe Claire. C'est le numéro que vos patients voient et rappellent.</div>
+          </div>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+        </form>
+      </section>
+
       <!-- Notifications -->
       <section class="settings-card">
         <h2>Notifications</h2>

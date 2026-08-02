@@ -12,7 +12,8 @@
     { "source": "/login", "destination": "/login.html" },
     { "source": "/admin", "destination": "/admin.html" },
     { "source": "/bienvenue", "destination": "/bienvenue.html" },
-    { "source": "/agent", "destination": "/agent.html" }
+    { "source": "/agent", "destination": "/agent.html" },
+    { "source": "/chat", "destination": "/chat.html" }
   ],
   "headers": [
     {

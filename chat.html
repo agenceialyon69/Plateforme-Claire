@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Votre demande — Claire</title>
+<meta name="robots" content="noindex,nofollow" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#1f3d35">
+
+<style>
+  :root { --forest:#1f3d35; --cream:#faf7f2; --line:#e7e1d8; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; background:var(--cream); font-family:'Inter Tight',system-ui,sans-serif; color:#1c1c1c; }
+  .pc-wrap { display:flex; flex-direction:column; height:100dvh; max-width:640px; margin:0 auto; background:#fff; }
+  .pc-head { display:flex; align-items:center; gap:12px; padding:16px 18px; border-bottom:1px solid var(--line); }
+  .pc-mark { width:38px; height:38px; border-radius:50%; background:var(--forest); color:var(--cream);
+             display:flex; align-items:center; justify-content:center; font-family:'Fraunces',serif; font-style:italic; }
+  .pc-head h1 { font-family:'Fraunces',serif; font-weight:500; font-size:18px; color:var(--forest); margin:0; }
+  .pc-head p { margin:2px 0 0; font-size:12.5px; color:#6b7280; }
+  .pc-stream { flex:1; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:10px; }
+  .pc-msg { display:flex; }
+  .pc-msg-user { justify-content:flex-end; }
+  .pc-bubble { max-width:80%; padding:11px 14px; border-radius:16px; font-size:15px; line-height:1.45; white-space:pre-wrap; word-wrap:break-word; }
+  .pc-msg-assistant .pc-bubble { background:#f1efe9; color:#1c1c1c; border-bottom-left-radius:5px; }
+  .pc-msg-user .pc-bubble { background:var(--forest); color:var(--cream); border-bottom-right-radius:5px; }
+  .pc-typing span { display:inline-block; width:7px; height:7px; margin:0 1px; background:#9a9a9a; border-radius:50%; animation:pcb 1s infinite; }
+  .pc-typing span:nth-child(2){ animation-delay:.15s } .pc-typing span:nth-child(3){ animation-delay:.3s }
+  @keyframes pcb { 0%,60%,100%{ transform:translateY(0); opacity:.5 } 30%{ transform:translateY(-4px); opacity:1 } }
+  .pc-foot { border-top:1px solid var(--line); padding:12px; }
+  .pc-notice { font-size:12px; color:#b4513a; min-height:16px; padding:0 4px 6px; }
+  .pc-form { display:flex; gap:8px; }
+  .pc-form input { flex:1; padding:13px 15px; font-size:16px; border:1px solid var(--line); border-radius:12px; outline:none; }
+  .pc-form input:focus { border-color:var(--forest); }
+  .pc-form button { padding:0 18px; border:none; border-radius:12px; background:var(--forest); color:var(--cream); font-weight:600; font-size:15px; cursor:pointer; }
+  .pc-form button:disabled { opacity:.5; cursor:not-allowed; }
+  .pc-legal { text-align:center; font-size:11px; color:#9ca3af; padding:8px 12px 0; }
+  .pc-legal a { color:#6b7280; }
+</style>
+</head>
+<body>
+<div class="pc-wrap">
+  <header class="pc-head">
+    <span class="pc-mark">C</span>
+    <div>
+      <h1>Claire</h1>
+      <p>Assistante du cabinet · votre demande est transmise à l'équipe</p>
+    </div>
+  </header>
+
+  <div class="pc-stream" id="pcStream"></div>
+
+  <div class="pc-foot">
+    <div class="pc-notice" id="pcNotice"></div>
+    <form class="pc-form" id="pcForm">
+      <input id="pcInput" type="text" autocomplete="off" placeholder="Écrivez votre message…" aria-label="Votre message" />
+      <button id="pcSend" type="submit">Envoyer</button>
+    </form>
+    <p class="pc-legal">Vos informations servent uniquement à traiter votre demande. <a href="/confidentialite.html">Confidentialité</a></p>
+  </div>
+</div>
+
+<script type="module" src="/js/patient-chat.js"></script>
+</body>
+</html>

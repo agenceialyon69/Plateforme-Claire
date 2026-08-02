@@ -8,6 +8,7 @@ const ALLOWED_FIELDS = [
   'nom', 'telephone', 'adresse', 'ville',
   'horaires', 'regles_reponse',
   'notif_email', 'notif_telephone',
+  'numero_reel', 'sms_relance_actif', 'sms_modele',
 ];
 
 export default async function handler(req, res) {
