@@ -41,6 +41,7 @@
   <h2>Données collectées</h2>
   <ul>
     <li><strong>Via le chat avec Claire</strong> : les informations que le patient choisit de communiquer (nom, téléphone, motif de la demande, souhait).</li>
+    <li><strong>Via le débordement téléphonique</strong> : lorsqu'un appel n'est pas décroché, le numéro de l'appelant et l'horodatage sont enregistrés, et un SMS l'invitant à laisser sa demande peut lui être envoyé. Le contenu des SMS échangés est traité pour transmettre la demande au cabinet.</li>
     <li><strong>Via le formulaire de contact</strong> : nom, nom du cabinet, email, téléphone et message.</li>
   </ul>
 
@@ -55,7 +56,8 @@
   <ul>
     <li><strong>Vercel</strong> — hébergement de l'application.</li>
     <li><strong>Anthropic</strong> — prestataire technique assurant le traitement automatisé des messages échangés dans le chat.</li>
-    <li><strong>n8n</strong> (le cas échéant) — acheminement des notifications vers le cabinet.</li>
+    <li><strong>Twilio</strong> — acheminement des appels téléphoniques et l'envoi/réception des SMS du débordement téléphonique.</li>
+    <li><strong>n8n / Make</strong> (le cas échéant) — acheminement des notifications vers le cabinet.</li>
   </ul>
   <p>Chaque cabinet est strictement cloisonné : il n'accède qu'à ses propres données (Row Level Security).</p>
 
@@ -82,7 +84,10 @@
   <p>
     Les données sont conservées le temps nécessaire au traitement de la demande, puis pour une durée
     maximale de <span class="todo">[À COMPLÉTER : ex. 24 mois]</span>, après quoi elles sont supprimées
-    ou anonymisées. Les conversations et demandes liées peuvent faire l'objet d'une purge périodique.
+    automatiquement. Une <strong>purge quotidienne automatique</strong> supprime définitivement les
+    conversations, messages, demandes, journaux d'appels et messages de contact au-delà de cette durée
+    (la liste des numéros ayant demandé à ne plus être contactés par SMS est, elle, conservée pour
+    respecter ce choix).
   </p>
   <p>
     Toute personne peut demander la <strong>suppression</strong> de ses données à

@@ -3,6 +3,9 @@
   "buildCommand": null,
   "outputDirectory": null,
   "framework": null,
+  "crons": [
+    { "path": "/api/cron/purge", "schedule": "0 3 * * *" }
+  ],
   "rewrites": [
     { "source": "/cabinet", "destination": "/cabinet.html" },
     { "source": "/conversations", "destination": "/conversations.html" },

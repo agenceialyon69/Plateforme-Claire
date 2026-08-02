@@ -13,8 +13,8 @@
 // donc vérifiée systématiquement ; en cas de doute, on REFUSE (fail-closed).
 // ================================================================
 
-import crypto from 'node:crypto';
 import { supabaseAdmin } from '../_supabase.js';
+import { validateTwilioSignature as _validateSig } from './_signature.js';
 
 // ----------------------------------------------------------------
 // Config / helpers de base
@@ -48,45 +48,10 @@ export function escapeXml(s) {
     .replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 }
 
-// ----------------------------------------------------------------
-// Validation de la signature Twilio (spec officielle, POST x-www-form-urlencoded)
-// Algo : HMAC-SHA1( URL_exacte + concat(clé+valeur trié par clé) , AUTH_TOKEN )
-// puis base64, comparé en temps constant à X-Twilio-Signature.
-// ----------------------------------------------------------------
-function requestUrl(req) {
-  // On reconstruit l'URL EXACTE que Twilio a appelée (query comprise).
-  // TWILIO_PUBLIC_URL permet de forcer l'origine si les en-têtes proxy diffèrent.
-  const base = (process.env.TWILIO_PUBLIC_URL || '').replace(/\/+$/, '');
-  if (base) return base + req.url;
-  const proto = (req.headers['x-forwarded-proto'] || 'https').split(',')[0].trim();
-  const host = req.headers['x-forwarded-host'] || req.headers.host;
-  return `${proto}://${host}${req.url}`;
-}
-
+// Validation de la signature Twilio — logique pure isolée dans _signature.js
+// (testable hors-ligne). Ici on injecte simplement l'AUTH_TOKEN courant.
 export function validateTwilioSignature(req) {
-  // Échappatoire de test UNIQUEMENT hors production (jamais en prod).
-  if (process.env.TWILIO_SKIP_SIGNATURE === 'true' && process.env.NODE_ENV !== 'production') {
-    return true;
-  }
-  const { token } = twilioConfig();
-  if (!token) return false; // pas de secret → on ne peut pas vérifier → refus
-
-  const signature = req.headers['x-twilio-signature'];
-  if (!signature || typeof signature !== 'string') return false;
-
-  const url = requestUrl(req);
-  const params = (req.body && typeof req.body === 'object') ? req.body : {};
-  let data = url;
-  for (const key of Object.keys(params).sort()) {
-    const v = params[key];
-    if (Array.isArray(v)) continue; // Twilio n'envoie pas de tableaux ici
-    data += key + (v == null ? '' : v);
-  }
-
-  const expected = crypto.createHmac('sha1', token).update(Buffer.from(data, 'utf-8')).digest('base64');
-  const a = Buffer.from(expected);
-  const b = Buffer.from(signature);
-  return a.length === b.length && crypto.timingSafeEqual(a, b);
+  return _validateSig(req, twilioConfig().token);
 }
 
 /**

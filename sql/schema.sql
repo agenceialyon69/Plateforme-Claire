@@ -347,5 +347,44 @@ from public.cabinets c;
 grant select on public.stats_debordement to authenticated;
 
 -- =================================================================
+-- PURGE / RÉTENTION (RGPD art. 5 — minimisation & durée limitée)
+-- Supprime les données au-delà de `retention_days`. Appelée quotidiennement
+-- par le cron sécurisé /api/cron/purge (voir vercel.json + CRON_SECRET).
+--   • SECURITY DEFINER + search_path figé (comme les autres fonctions).
+--   • Garde-fou : plancher à 30 jours → une mauvaise config ne peut PAS tout
+--     effacer.
+--   • sms_optout est CONSERVÉ (obligation légale de ne plus recontacter).
+--   • Droits d'exécution retirés à anon/authenticated (service_role only).
+-- =================================================================
+create or replace function public.purge_old_data(retention_days integer default 730)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  cutoff timestamptz := now() - make_interval(days => greatest(coalesce(retention_days, 730), 30));
+  n_conv int; n_leads int; n_appels int;
+begin
+  delete from public.conversations where created_at < cutoff;   -- cascade: messages + demandes
+  get diagnostics n_conv = row_count;
+  delete from public.contact_leads where created_at < cutoff;
+  get diagnostics n_leads = row_count;
+  delete from public.appels where created_at < cutoff;
+  get diagnostics n_appels = row_count;
+  return jsonb_build_object(
+    'cutoff', cutoff,
+    'conversations_supprimees', n_conv,
+    'contact_leads_supprimes', n_leads,
+    'appels_supprimes', n_appels
+  );
+end;
+$$;
+
+revoke all on function public.purge_old_data(integer) from public;
+revoke all on function public.purge_old_data(integer) from anon;
+revoke all on function public.purge_old_data(integer) from authenticated;
+
+-- =================================================================
 -- FIN DU SCHÉMA
 -- =================================================================

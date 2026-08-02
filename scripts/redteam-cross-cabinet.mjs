@@ -124,7 +124,15 @@ async function seedCabinet(tag) {
   }).select('id').single();
   if (e4) throw new Error(`demande ${tag}: ${e4.message}`);
 
-  return { email, password, userId, conversationId: convo.id, demandeId: dem.id };
+  // Journal d'appel + opt-out (tables du débordement téléphonique)
+  const numero = `+3360000000${tag === 'a' ? 1 : 2}`;
+  const { data: appel } = await admin.from('appels').insert({
+    cabinet_id: userId, from_number: numero,
+    to_number: '+33111111111', statut: 'manque', sms_statut: 'envoye',
+  }).select('id').single();
+  await admin.from('sms_optout').insert({ cabinet_id: userId, numero });
+
+  return { email, password, userId, conversationId: convo.id, demandeId: dem.id, appelId: appel?.id };
 }
 
 // ---- MAIN -------------------------------------------------------
@@ -190,6 +198,14 @@ async function seedCabinet(tag) {
     expectBlocked('Lire les contact_leads (table verrouillée)',
       await q(attacker.from('contact_leads').select('*')));
 
+    // 8b) Lire le journal d'appels de B (débordement téléphonique)
+    expectBlocked('Lire les appels du Cabinet B',
+      await q(attacker.from('appels').select('*').eq('cabinet_id', B.userId)));
+
+    // 8c) Lire les opt-out SMS de B (table verrouillée : service_role only)
+    expectBlocked('Lire les sms_optout (table verrouillée)',
+      await q(attacker.from('sms_optout').select('*')));
+
     console.log('');
 
     // 9) MODIFIER la fiche cabinet de B
@@ -236,6 +252,10 @@ async function seedCabinet(tag) {
       await q(anon.from('demandes').select('*')));
     expectBlocked('[anon] Lister les contact_leads',
       await q(anon.from('contact_leads').select('*')));
+    expectBlocked('[anon] Lister les appels',
+      await q(anon.from('appels').select('*')));
+    expectBlocked('[anon] Lister les sms_optout',
+      await q(anon.from('sms_optout').select('*')));
     expectBlocked('[anon] Lire la demande précise de B par id',
       await q(anon.from('demandes').select('*').eq('id', B.demandeId)));
 
