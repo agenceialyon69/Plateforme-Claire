@@ -13,47 +13,12 @@
 // ================================================================
 
 import { supabaseAdmin, ok, badRequest, serverError } from './_supabase.js';
+import { callLLM } from './_llm.js';
 
-// Conversation : modèle plus fin (jugement, chaleur, nuance émotionnelle).
-// Extraction : modèle rapide/économique (tâche structurée en JSON).
-const CONVERSATION_MODEL = 'claude-sonnet-4-6';
-const EXTRACTION_MODEL = 'claude-haiku-4-5-20251001';
-
-// Appel direct à l'API Anthropic via fetch natif (sans SDK).
-// Méthode identique à l'ancien chat qui fonctionnait : aucune dépendance,
-// aucun souci de connexion côté serverless.
-async function callClaude({ system, messages, max_tokens, model = CONVERSATION_MODEL }) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 25000);
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model,
-        max_tokens,
-        ...(system ? { system } : {}),
-        messages,
-      }),
-      signal: controller.signal,
-    });
-    if (!res.ok) {
-      const errText = await res.text().catch(() => '');
-      throw new Error(`Anthropic ${res.status}: ${errText.slice(0, 300)}`);
-    }
-    const data = await res.json();
-    return (data.content || [])
-      .filter(b => b.type === 'text')
-      .map(b => b.text)
-      .join('\n');
-  } finally {
-    clearTimeout(timeout);
-  }
-}
+// Le moteur conversationnel est fourni par _llm.js (multi-fournisseurs) :
+// Groq (gratuit) → Gemini (gratuit) → Anthropic (secours), selon la clé
+// présente. On garde une seule interface `callLLM({ system, messages,
+// max_tokens, json })` ; plus de dépendance à un fournisseur unique ici.
 
 // Filet de sécurité : retire tout formatage markdown éventuel (gras **, titres #,
 // puces -) pour garantir un texte propre dans la bulle de chat.
@@ -392,11 +357,10 @@ export default async function handler(req, res) {
 
     let replyText;
     try {
-      replyText = await callClaude({
+      replyText = await callLLM({
         system: buildSystemPrompt(cabinet),
         messages: claudeMessages,
         max_tokens: 350,
-        model: CONVERSATION_MODEL,
       });
       replyText = stripMarkdown(replyText);
       // Filet : jamais de bulle vide renvoyée au patient
@@ -404,7 +368,7 @@ export default async function handler(req, res) {
         replyText = "Pour que le cabinet puisse vous recontacter, puis-je avoir votre nom et un numéro où vous joindre ?";
       }
     } catch (err) {
-      console.error('Anthropic API error:', err);
+      console.error('LLM API error:', err);
       return res.status(502).json({
         error: 'Le service est momentanément indisponible. Réessayez dans un instant.',
         conversationId,
@@ -427,7 +391,7 @@ export default async function handler(req, res) {
     // qualifiée et le webhook ne partiraient jamais, sans la moindre erreur
     // visible. La demande qualifiée EST le produit — on ne la laisse pas filer.
     // Coût : ~1 à 3 s de latence sur les messages qui déclenchent l'extraction.
-    // Elle est bornée par le timeout de 25 s de callClaude et ne bloque jamais
+    // Elle est bornée par le timeout de 20 s de callLLM et ne bloque jamais
     // la réponse patient (échec avalé proprement).
     if (claudeMessages.length >= 4) {
       const allMessages = [...claudeMessages, { role: 'assistant', content: replyText }];
@@ -527,10 +491,10 @@ Réponds UNIQUEMENT avec le JSON.`;
 
   let parsed;
   try {
-    const text = (await callClaude({
+    const text = (await callLLM({
       messages: [{ role: 'user', content: extractionPrompt }],
       max_tokens: 400,
-      model: EXTRACTION_MODEL,
+      json: true,
     })).trim();
     const cleaned = text.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```\s*$/, '').trim();
     parsed = JSON.parse(cleaned);
