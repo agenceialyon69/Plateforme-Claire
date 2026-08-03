@@ -13,15 +13,17 @@
 //   json = true → demande une sortie JSON stricte (extraction).
 // ================================================================
 
-function pickProvider() {
-  if (process.env.GROQ_API_KEY) return 'groq';
-  if (process.env.GEMINI_API_KEY) return 'gemini';
-  if (process.env.ANTHROPIC_API_KEY) return 'anthropic';
-  return null;
-}
+// Ordre d'essai : Groq (gratuit, rapide) → Gemini (gratuit) → Anthropic (secours).
+// La cascade garantit que si un fournisseur échoue, est saturé (quota gratuit)
+// ou renvoie une réponse vide, on tente automatiquement le suivant.
+const PROVIDERS = [
+  { name: 'groq', key: 'GROQ_API_KEY' },
+  { name: 'gemini', key: 'GEMINI_API_KEY' },
+  { name: 'anthropic', key: 'ANTHROPIC_API_KEY' },
+];
 
 export function llmConfigured() {
-  return pickProvider() !== null;
+  return PROVIDERS.some(p => process.env[p.key]);
 }
 
 async function withTimeout(ms, fn) {
@@ -101,14 +103,25 @@ async function callAnthropic({ system, messages, max_tokens }, signal) {
   return (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n');
 }
 
+const IMPL = { groq: callGroq, gemini: callGemini, anthropic: callAnthropic };
+
 export async function callLLM({ system, messages, max_tokens = 400, json = false }) {
-  const provider = pickProvider();
-  if (!provider) {
+  const active = PROVIDERS.filter(p => process.env[p.key]);
+  if (active.length === 0) {
     throw new Error('Aucun fournisseur IA configuré (GROQ_API_KEY, GEMINI_API_KEY ou ANTHROPIC_API_KEY).');
   }
-  return withTimeout(20000, (signal) => {
-    if (provider === 'groq') return callGroq({ system, messages, max_tokens, json }, signal);
-    if (provider === 'gemini') return callGemini({ system, messages, max_tokens, json }, signal);
-    return callAnthropic({ system, messages, max_tokens }, signal);
-  });
+  const errors = [];
+  for (const p of active) {
+    try {
+      const text = await withTimeout(20000, (signal) =>
+        IMPL[p.name]({ system, messages, max_tokens, json }, signal));
+      if (text && text.trim()) return text;          // succès
+      errors.push(`${p.name}: réponse vide`);         // vide → on tente le suivant
+    } catch (e) {
+      errors.push(`${p.name}: ${e.message}`);
+      console.error(`[llm] ${p.name} a échoué, bascule sur le fournisseur suivant :`, e.message);
+    }
+  }
+  // Tous ont échoué : le message d'erreur remonte pour être journalisé (jamais exposé au patient).
+  throw new Error(`Tous les fournisseurs IA ont échoué → ${errors.join(' | ')}`);
 }
