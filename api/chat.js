@@ -556,9 +556,16 @@ Réponds UNIQUEMENT avec le JSON.`;
 
   // ---------- WEBHOOK D'AUTOMATISATION (Make, n8n, Zapier…) ----------
   // NOTIFY_* est le nom retenu ; N8N_* reste accepté pour rétrocompatibilité.
+  // Ce canal transmet TOUJOURS le détail réel (motif, souhait), même en mode
+  // MINIMIZE_HEALTH_DATA=true : la minimisation réduit ce que NOUS stockons en
+  // base, pas ce que le cabinet reçoit pour agir (c'est le but du pass-through).
+  // → HTTPS obligatoire ici : une donnée de santé ne doit jamais transiter en
+  // clair sur le réseau vers le sous-traitant d'automatisation.
   const webhookUrl = process.env.NOTIFY_WEBHOOK_URL || process.env.N8N_WEBHOOK_URL;
   const webhookSecret = process.env.NOTIFY_WEBHOOK_SECRET || process.env.N8N_WEBHOOK_SECRET;
-  if (webhookUrl) {
+  if (webhookUrl && !/^https:\/\//i.test(webhookUrl)) {
+    console.error('[rgpd] Webhook notif ignoré : NOTIFY_WEBHOOK_URL doit être en https (donnée de santé en jeu).');
+  } else if (webhookUrl) {
     const { data: cabinet } = await supabaseAdmin
       .from('cabinets')
       .select('nom, notif_email, notif_telephone')

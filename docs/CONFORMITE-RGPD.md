@@ -50,7 +50,9 @@ fonction SQL `purge_old_data()` (plancher de sécurité : 30 jours).
 ## Droits des personnes — mise en œuvre
 
 - **Effacement** : `/api/erase` + bouton « Supprimer (RGPD) » dans la fiche
-  conversation (cascade messages + demande). Policies RLS `DELETE` en place.
+  conversation (cascade messages + demande **+ appel manqué lié**, s'il existe —
+  la table `appels` n'est pas couverte par la cascade DB, elle est effacée
+  explicitement par l'endpoint). Policies RLS `DELETE` en place.
 - **Opt-out SMS** : réponse « STOP » → plus aucun SMS (table `sms_optout`) ;
   « START » réactive. Mention STOP ajoutée au SMS.
 - **Information** : `confidentialite.html` (finalités, sous-traitants, transfert
