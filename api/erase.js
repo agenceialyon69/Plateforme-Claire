@@ -3,7 +3,10 @@
 // ----------------------------------------------------------------
 // DELETE (ou POST) authentifié. Efface UNE conversation appartenant au
 // cabinet connecté, et — par cascade DB (ON DELETE CASCADE) — ses messages
-// et sa demande qualifiée associés.
+// et sa demande qualifiée associés. Efface aussi l'appel manqué lié le cas
+// échéant (table `appels`, non couverte par la cascade : la FK est portée par
+// conversations.appel_id, pas l'inverse) — sinon le numéro du patient (from_number)
+// y survivrait jusqu'à la purge automatique (jusqu'à RETENTION_DAYS).
 //
 // 🔐 SÉCURITÉ :
 // - Auth JWT obligatoire (authenticateRequest).
@@ -43,10 +46,11 @@ export default async function handler(req, res) {
       return badRequest(res, 'conversationId invalide');
     }
 
-    // 1) Vérifie que la conversation appartient bien à ce cabinet.
+    // 1) Vérifie que la conversation appartient bien à ce cabinet
+    //    (et récupère l'appel manqué lié, s'il existe, pour l'effacer aussi).
     const { data: convo, error: errLookup } = await supabaseAdmin
       .from('conversations')
-      .select('id')
+      .select('id, appel_id')
       .eq('id', conversationId)
       .eq('cabinet_id', auth.cabinet.id)
       .single();
@@ -61,6 +65,18 @@ export default async function handler(req, res) {
       .eq('cabinet_id', auth.cabinet.id);
 
     if (errDelete) return serverError(res, errDelete);
+
+    // 3) Efface l'appel manqué lié (from_number = donnée personnelle du
+    //    patient). Non bloquant : la conversation est déjà effacée, on ne fait
+    //    pas échouer toute la requête pour ce complément.
+    if (convo.appel_id) {
+      const { error: errAppel } = await supabaseAdmin
+        .from('appels')
+        .delete()
+        .eq('id', convo.appel_id)
+        .eq('cabinet_id', auth.cabinet.id);
+      if (errAppel) console.error('Erreur suppression appel lié:', errAppel);
+    }
 
     return ok(res, { erased: true, conversationId });
   } catch (err) {

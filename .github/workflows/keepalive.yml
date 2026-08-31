@@ -1,0 +1,41 @@
+name: keepalive-supabase
+
+on:
+  schedule:
+    # Toutes les 48h — largement sous le seuil de mise en pause de Supabase
+    # (7 jours d'inactivité sur le plan gratuit). Gratuit et illimité sur un
+    # dépôt public (GitHub Actions). Redondant avec le cron Vercel quotidien
+    # /api/cron/purge : si l'un des deux tombe, l'autre garde la base active.
+    - cron: '0 4 */2 * *'
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Lit l'URL et la clé publique (anon) directement depuis le client
+      # navigateur existant — pas de secret à configurer, ces valeurs sont
+      # déjà publiques (embarquées dans le code servi aux visiteurs).
+      - name: Ping Supabase (garde le projet actif + alerte si en panne)
+        run: |
+          set -e
+          URL=$(grep "SUPABASE_URL " js/supabase-client.js | sed -E "s/.*= '([^']+)'.*/\1/")
+          KEY=$(grep "SUPABASE_ANON_KEY" js/supabase-client.js | sed -E "s/.*= '([^']+)'.*/\1/")
+          if [ -z "$URL" ] || [ -z "$KEY" ]; then
+            echo "::error::Impossible d'extraire SUPABASE_URL/SUPABASE_ANON_KEY depuis js/supabase-client.js"
+            exit 1
+          fi
+
+          STATUS=$(curl -s -o /tmp/resp.json -w "%{http_code}" --max-time 20 \
+            "$URL/rest/v1/cabinets?select=id&limit=1" -H "apikey: $KEY")
+          echo "HTTP $STATUS"
+          cat /tmp/resp.json || true
+
+          if [ "$STATUS" != "200" ]; then
+            REF=$(echo "$URL" | sed -E 's#https://([^.]+)\..*#\1#')
+            echo "::error::Supabase ne répond pas normalement (HTTP $STATUS) — le projet est probablement en pause ou en panne. Relance-le sur https://supabase.com/dashboard/project/$REF"
+            exit 1
+          fi
+          echo "OK — Supabase répond normalement."
