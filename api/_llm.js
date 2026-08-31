@@ -8,6 +8,19 @@
 //   3. ANTHROPIC_API_KEY → Claude (payant, secours)
 // Modèles surchargeables via GROQ_MODEL / GEMINI_MODEL / ANTHROPIC_MODEL.
 //
+// AUTO-BASCULE DE MODÈLE : les fournisseurs retirent régulièrement d'anciens
+// modèles (ça a cassé le chat en prod le 31/08/2026 : Groq et Gemini avaient
+// tous les deux retiré leur modèle par défaut le même jour). Pour Groq et
+// Gemini, chaque appel essaie une LISTE de modèles connus (GROQ_MODEL/
+// GEMINI_MODEL en premier si défini, puis une liste de secours ci-dessous) :
+// si un modèle répond "n'existe plus / retiré" (404 model_not_found côté
+// Groq, 404 NOT_FOUND côté Gemini), on essaie le suivant AVANT d'abandonner
+// le fournisseur — pas besoin d'un déploiement pour survivre à un retrait de
+// modèle isolé. Sur toute AUTRE erreur (clé invalide, quota, réseau), on
+// n'insiste pas : changer de modèle ne résoudrait rien.
+// Listes de secours à revoir périodiquement (aucune liste ne protège d'un
+// retrait simultané de TOUS ses membres) — voir docs des fournisseurs.
+//
 // Interface unique : callLLM({ system, messages, max_tokens, json }) → texte.
 //   messages = [{ role: 'user'|'assistant', content: '...' }]
 //   json = true → demande une sortie JSON stricte (extraction).
@@ -36,53 +49,93 @@ async function withTimeout(ms, fn) {
   }
 }
 
+// Un modèle "retiré" (404 + message caractéristique) justifie d'essayer le
+// suivant. Toute autre erreur (401, 429, 5xx, réseau...) ne serait pas
+// résolue par un changement de modèle : on la laisse remonter tout de suite.
+function isModelGone(status, bodyText) {
+  return status === 404 && /model_not_found|no longer available|NOT_FOUND/i.test(bodyText || '');
+}
+
+// Modèle explicite (env) en premier s'il est défini, puis la liste de
+// secours, sans doublons.
+function candidateModels(envValue, fallbacks) {
+  return [...new Set([envValue, ...fallbacks].filter(Boolean))];
+}
+
 // ---- Groq (API compatible OpenAI) ----
+// Secours confirmés (doc Groq, migration recommandée depuis les modèles
+// llama-3.x retirés) : à défaut du modèle configuré, on descend la liste.
+const GROQ_FALLBACK_MODELS = ['openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'qwen/qwen3.6-27b'];
+
 async function callGroq({ system, messages, max_tokens, json }, signal) {
-  const model = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
-  const body = {
-    model,
-    max_tokens,
-    messages: [
-      ...(system ? [{ role: 'system', content: system }] : []),
-      ...messages.map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content })),
-    ],
-    ...(json ? { response_format: { type: 'json_object' } } : {}),
-  };
-  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', authorization: `Bearer ${process.env.GROQ_API_KEY}` },
-    body: JSON.stringify(body),
-    signal,
-  });
-  if (!res.ok) throw new Error(`Groq ${res.status}: ${(await res.text().catch(() => '')).slice(0, 300)}`);
-  const data = await res.json();
-  return data.choices?.[0]?.message?.content || '';
+  const models = candidateModels(process.env.GROQ_MODEL, GROQ_FALLBACK_MODELS);
+  let lastErr;
+  for (const model of models) {
+    const body = {
+      model,
+      max_tokens,
+      messages: [
+        ...(system ? [{ role: 'system', content: system }] : []),
+        ...messages.map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content })),
+      ],
+      ...(json ? { response_format: { type: 'json_object' } } : {}),
+    };
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${process.env.GROQ_API_KEY}` },
+      body: JSON.stringify(body),
+      signal,
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return data.choices?.[0]?.message?.content || '';
+    }
+    const errText = (await res.text().catch(() => '')).slice(0, 300);
+    lastErr = new Error(`Groq ${res.status}: ${errText}`);
+    if (!isModelGone(res.status, errText)) throw lastErr;
+    console.warn(`[llm] Groq : modèle "${model}" indisponible, essai du suivant`);
+  }
+  throw lastErr;
 }
 
 // ---- Google Gemini ----
+// Secours confirmés (doc Google) : gemini-3.6-flash est le remplacement
+// annoncé de gemini-2.0-flash (retiré) ; gemini-3.5-flash reste une
+// version stable publiée en parallèle.
+const GEMINI_FALLBACK_MODELS = ['gemini-3.6-flash', 'gemini-3.5-flash'];
+
 async function callGemini({ system, messages, max_tokens, json }, signal) {
-  const model = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
-  const body = {
-    ...(system ? { systemInstruction: { parts: [{ text: system }] } } : {}),
-    contents: messages.map(m => ({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.content }],
-    })),
-    generationConfig: {
-      maxOutputTokens: max_tokens,
-      ...(json ? { responseMimeType: 'application/json' } : {}),
-    },
-  };
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${process.env.GEMINI_API_KEY}`;
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify(body),
-    signal,
-  });
-  if (!res.ok) throw new Error(`Gemini ${res.status}: ${(await res.text().catch(() => '')).slice(0, 300)}`);
-  const data = await res.json();
-  return (data.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('') || '';
+  const models = candidateModels(process.env.GEMINI_MODEL, GEMINI_FALLBACK_MODELS);
+  let lastErr;
+  for (const model of models) {
+    const body = {
+      ...(system ? { systemInstruction: { parts: [{ text: system }] } } : {}),
+      contents: messages.map(m => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.content }],
+      })),
+      generationConfig: {
+        maxOutputTokens: max_tokens,
+        ...(json ? { responseMimeType: 'application/json' } : {}),
+      },
+    };
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+      signal,
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return (data.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('') || '';
+    }
+    const errText = (await res.text().catch(() => '')).slice(0, 300);
+    lastErr = new Error(`Gemini ${res.status}: ${errText}`);
+    if (!isModelGone(res.status, errText)) throw lastErr;
+    console.warn(`[llm] Gemini : modèle "${model}" indisponible, essai du suivant`);
+  }
+  throw lastErr;
 }
 
 // ---- Anthropic (Claude) ----
