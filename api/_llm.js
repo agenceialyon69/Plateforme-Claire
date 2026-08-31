@@ -3,8 +3,8 @@
 // ----------------------------------------------------------------
 // Permet de faire tourner Claire sur une IA GRATUITE. Le fournisseur est
 // choisi automatiquement selon la clé présente, dans cet ordre :
-//   1. GROQ_API_KEY    → Groq (gratuit, rapide, Llama 3.3 70B)      [recommandé]
-//   2. GEMINI_API_KEY  → Google Gemini (gratuit, Gemini 2.0 Flash)
+//   1. GROQ_API_KEY    → Groq (gratuit, rapide, gpt-oss-120b)       [recommandé]
+//   2. GEMINI_API_KEY  → Google Gemini (gratuit, Gemini 3.6 Flash)
 //   3. ANTHROPIC_API_KEY → Claude (payant, secours)
 // Modèles surchargeables via GROQ_MODEL / GEMINI_MODEL / ANTHROPIC_MODEL.
 //
@@ -38,7 +38,7 @@ async function withTimeout(ms, fn) {
 
 // ---- Groq (API compatible OpenAI) ----
 async function callGroq({ system, messages, max_tokens, json }, signal) {
-  const model = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+  const model = process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
   const body = {
     model,
     max_tokens,
@@ -61,7 +61,7 @@ async function callGroq({ system, messages, max_tokens, json }, signal) {
 
 // ---- Google Gemini ----
 async function callGemini({ system, messages, max_tokens, json }, signal) {
-  const model = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+  const model = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
   const body = {
     ...(system ? { systemInstruction: { parts: [{ text: system }] } } : {}),
     contents: messages.map(m => ({
