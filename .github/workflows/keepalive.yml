@@ -21,12 +21,23 @@ jobs:
       - name: Ping Supabase (garde le projet actif + alerte si en panne)
         run: |
           set -e
-          URL=$(grep "SUPABASE_URL " js/supabase-client.js | sed -E "s/.*= '([^']+)'.*/\1/")
-          KEY=$(grep "SUPABASE_ANON_KEY" js/supabase-client.js | sed -E "s/.*= '([^']+)'.*/\1/")
+          # Ancré sur "^export const" + -m1 : la ligne d'USAGE plus bas dans le
+          # fichier (createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {) contient
+          # aussi le nom de la variable sans espace après — un grep trop large
+          # matchait les deux lignes et corrompait la clé (bug réel, a fait
+          # échouer ce job silencieusement 10/10 fois depuis sa création).
+          URL=$(grep -m1 "^export const SUPABASE_URL" js/supabase-client.js | sed -E "s/.*= '([^']+)'.*/\1/")
+          KEY=$(grep -m1 "^export const SUPABASE_ANON_KEY" js/supabase-client.js | sed -E "s/.*= '([^']+)'.*/\1/")
           if [ -z "$URL" ] || [ -z "$KEY" ]; then
             echo "::error::Impossible d'extraire SUPABASE_URL/SUPABASE_ANON_KEY depuis js/supabase-client.js"
             exit 1
           fi
+          case "$URL$KEY" in
+            *[[:space:]]*)
+              echo "::error::URL ou clé invalide (contient un espace/saut de ligne) — extraction corrompue."
+              exit 1
+              ;;
+          esac
 
           STATUS=$(curl -s -o /tmp/resp.json -w "%{http_code}" --max-time 20 \
             "$URL/rest/v1/cabinets?select=id&limit=1" -H "apikey: $KEY")
