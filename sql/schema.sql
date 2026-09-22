@@ -392,5 +392,26 @@ revoke all on function public.set_updated_at() from public, anon, authenticated;
 revoke all on function public.bump_conversation_activity() from public, anon, authenticated;
 
 -- =================================================================
+-- RÉSULTAT FINAL + STATUT INTERMÉDIAIRE (preuve de valeur business)
+-- Ajouté de façon idempotente : peut être ré-exécuté sans risque.
+-- `resultat` : renseigné quand une demande est close (statut = 'traite'),
+-- donne la mesure concrète (RDV pris, rappel effectué, patient perdu...)
+-- que le cabinet et les statistiques peuvent exploiter.
+-- `en_attente_patient` : le cabinet a rappelé/relancé, en attente de la
+-- réponse du patient — distinct de "à rappeler" (pas encore agi).
+-- =================================================================
+
+alter table public.demandes add column if not exists resultat text;
+
+alter table public.demandes drop constraint if exists demandes_statut_check;
+alter table public.demandes add constraint demandes_statut_check
+  check (statut in ('en_attente','a_rappeler','en_attente_patient','traite','ignore'));
+
+alter table public.demandes drop constraint if exists demandes_resultat_check;
+alter table public.demandes add constraint demandes_resultat_check
+  check (resultat is null or resultat in
+    ('rdv_pris','rappel_effectue','patient_non_joignable','pas_de_besoin','abandonnee'));
+
+-- =================================================================
 -- FIN DU SCHÉMA
 -- =================================================================

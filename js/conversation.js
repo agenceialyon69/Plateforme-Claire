@@ -4,7 +4,10 @@
 
 import { requireAuth, initSidebar, apiFetch } from '/js/auth.js';
 import { supabase } from '/js/supabase-client.js';
-import { escapeHtml, labelUrgence, labelStatut, formatDate, formatTime } from '/js/format.js';
+import { escapeHtml, labelUrgence, labelStatut, labelResultat, formatDate, formatTime } from '/js/format.js';
+
+// Résultats de clôture proposés (preuve de valeur business — voir docs/AUDIT.md)
+const RESULTATS = ['rdv_pris', 'rappel_effectue', 'patient_non_joignable', 'pas_de_besoin', 'abandonnee'];
 
 const auth = await requireAuth();
 if (!auth) throw new Error('Auth required');
@@ -127,6 +130,11 @@ async function loadConversation() {
         <div class="summary-label">Statut</div>
         <div class="summary-value"><span class="badge badge-statut-${demande.statut}">${labelStatut(demande.statut)}</span></div>
       </div>
+      ${demande.resultat ? `
+        <div class="summary-row">
+          <div class="summary-label">Résultat</div>
+          <div class="summary-value"><span class="badge badge-resultat">${labelResultat(demande.resultat)}</span></div>
+        </div>` : ''}
       ${demande.note_cabinet ? `
         <div class="summary-row">
           <div class="summary-label">Note cabinet</div>
@@ -138,16 +146,26 @@ async function loadConversation() {
     const actionBar = document.getElementById('actionBar');
     actionBar.innerHTML = '';
     if (demande.statut !== 'traite') {
-      const btnTraite = makeActionBtn('Marquer comme traité', 'btn-primary', () => updateStatut(demande.id, 'traite'));
-      actionBar.appendChild(btnTraite);
-    }
-    if (demande.statut !== 'a_rappeler' && demande.statut !== 'traite') {
-      const btnRappel = makeActionBtn('À rappeler', 'btn-ghost', () => updateStatut(demande.id, 'a_rappeler'));
-      actionBar.appendChild(btnRappel);
-    }
-    if (demande.statut !== 'ignore' && demande.statut !== 'traite') {
-      const btnIgnore = makeActionBtn('Ignorer', 'btn-danger', () => updateStatut(demande.id, 'ignore'));
-      actionBar.appendChild(btnIgnore);
+      if (demande.statut !== 'a_rappeler') {
+        actionBar.appendChild(makeActionBtn('À rappeler', 'btn-ghost', () => updateStatut(demande.id, 'a_rappeler')));
+      }
+      if (demande.statut !== 'en_attente_patient') {
+        actionBar.appendChild(makeActionBtn('En attente du patient', 'btn-ghost', () => updateStatut(demande.id, 'en_attente_patient')));
+      }
+      if (demande.statut !== 'ignore') {
+        actionBar.appendChild(makeActionBtn('Ignorer', 'btn-danger', () => updateStatut(demande.id, 'ignore')));
+      }
+
+      // Clôturer avec un résultat final (preuve concrète de valeur pour le cabinet)
+      const clotureLabel = document.createElement('div');
+      clotureLabel.className = 'text-sm text-slate';
+      clotureLabel.style.cssText = 'width:100%; margin-top:10px;';
+      clotureLabel.textContent = 'Clôturer avec un résultat :';
+      actionBar.appendChild(clotureLabel);
+
+      RESULTATS.forEach((valeur) => {
+        actionBar.appendChild(makeActionBtn(labelResultat(valeur), 'btn-primary', () => updateStatut(demande.id, 'traite', valeur)));
+      });
     }
   }
 }
@@ -200,9 +218,12 @@ function makeActionBtn(label, klass, onClick) {
   return btn;
 }
 
-async function updateStatut(demandeId, statut) {
+async function updateStatut(demandeId, statut, resultat) {
   const patch = { statut };
-  if (statut === 'traite') patch.traite_le = new Date().toISOString();
+  if (statut === 'traite') {
+    patch.traite_le = new Date().toISOString();
+    if (resultat) patch.resultat = resultat;
+  }
 
   const { error } = await supabase
     .from('demandes')

@@ -4,7 +4,8 @@
 
 import { supabaseAdmin, authenticateRequest, ok, unauthorized, badRequest, notFound, serverError } from './_supabase.js';
 
-const STATUTS_VALIDES = ['en_attente', 'a_rappeler', 'traite', 'ignore'];
+const STATUTS_VALIDES = ['en_attente', 'a_rappeler', 'en_attente_patient', 'traite', 'ignore'];
+const RESULTATS_VALIDES = ['rdv_pris', 'rappel_effectue', 'patient_non_joignable', 'pas_de_besoin', 'abandonnee'];
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_NOTE_LEN = 2000;
 
@@ -31,12 +32,15 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'PATCH') {
-      const { id, statut, note_cabinet } = req.body || {};
+      const { id, statut, resultat, note_cabinet } = req.body || {};
       if (!id || typeof id !== 'string' || !UUID_RE.test(id)) {
         return badRequest(res, 'id invalide');
       }
       if (statut && !STATUTS_VALIDES.includes(statut)) {
         return badRequest(res, 'Statut invalide');
+      }
+      if (resultat !== undefined && resultat !== null && !RESULTATS_VALIDES.includes(resultat)) {
+        return badRequest(res, 'Résultat invalide');
       }
       if (note_cabinet !== undefined && note_cabinet !== null) {
         if (typeof note_cabinet !== 'string' || note_cabinet.length > MAX_NOTE_LEN) {
@@ -49,6 +53,7 @@ export default async function handler(req, res) {
         patch.statut = statut;
         if (statut === 'traite') patch.traite_le = new Date().toISOString();
       }
+      if (resultat !== undefined) patch.resultat = resultat;
       if (note_cabinet !== undefined) patch.note_cabinet = note_cabinet;
 
       if (Object.keys(patch).length === 0) {
