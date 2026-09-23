@@ -20,9 +20,20 @@ export function labelStatut(s) {
   return {
     en_attente: 'En attente',
     a_rappeler: 'À rappeler',
+    en_attente_patient: 'En attente du patient',
     traite: 'Traité',
     ignore: 'Ignoré',
   }[s] || s || '–';
+}
+
+export function labelResultat(r) {
+  return {
+    rdv_pris: 'RDV pris',
+    rappel_effectue: 'Rappel effectué',
+    patient_non_joignable: 'Patient non joignable',
+    pas_de_besoin: 'Pas de besoin',
+    abandonnee: 'Demande abandonnée',
+  }[r] || '';
 }
 
 // ---------- Dates ----------

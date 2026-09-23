@@ -4,7 +4,7 @@
 
 import { requireAuth, initSidebar } from '/js/auth.js';
 import { supabase } from '/js/supabase-client.js';
-import { escapeHtml, labelUrgence, labelStatut, formatRelativeTime } from '/js/format.js';
+import { escapeHtml, labelUrgence, labelStatut, labelResultat, formatRelativeTime } from '/js/format.js';
 
 const auth = await requireAuth();
 if (!auth) throw new Error('Auth required');
@@ -81,7 +81,10 @@ async function loadDemandes() {
       </div>
       <div><span class="badge badge-urgence-${d.urgence}">${labelUrgence(d.urgence)}</span></div>
       <div class="list-row-time">${formatRelativeTime(d.created_at)}</div>
-      <div><span class="badge badge-statut-${d.statut}">${labelStatut(d.statut)}</span></div>
+      <div>
+        <span class="badge badge-statut-${d.statut}">${labelStatut(d.statut)}</span>
+        ${d.resultat ? `<span class="badge badge-resultat">${labelResultat(d.resultat)}</span>` : ''}
+      </div>
     `;
     container.appendChild(row);
   });

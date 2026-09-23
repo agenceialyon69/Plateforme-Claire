@@ -151,10 +151,12 @@ img { max-width: 100%; display: block; }
 .badge-urgence-normale  { background: var(--success-soft); color: var(--success); }
 .badge-urgence-moderee  { background: var(--warning-soft); color: #8a6510; }
 .badge-urgence-elevee   { background: var(--danger-soft); color: var(--danger); }
-.badge-statut-en_attente { background: var(--gold-soft); color: var(--gold-dark); }
-.badge-statut-a_rappeler { background: var(--warning-soft); color: #8a6510; }
-.badge-statut-traite     { background: var(--success-soft); color: var(--success); }
-.badge-statut-ignore     { background: rgba(0,0,0,0.05); color: var(--slate); }
+.badge-statut-en_attente        { background: var(--gold-soft); color: var(--gold-dark); }
+.badge-statut-a_rappeler        { background: var(--warning-soft); color: #8a6510; }
+.badge-statut-en_attente_patient{ background: var(--warning-soft); color: #8a6510; }
+.badge-statut-traite            { background: var(--success-soft); color: var(--success); }
+.badge-statut-ignore            { background: rgba(0,0,0,0.05); color: var(--slate); }
+.badge-resultat                 { background: rgba(0,0,0,0.04); color: var(--slate); }
 
 /* ---------- CARTES ---------- */
 .card {
