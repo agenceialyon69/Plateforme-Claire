@@ -1,52 +1,102 @@
 name: keepalive-supabase
 
+# ================================================================
+# Maintien en vie + AUTO-RÉPARATION de Supabase (plan gratuit).
+# ----------------------------------------------------------------
+# Le plan gratuit Supabase met un projet en pause après ~7 jours
+# d'inactivité. Un simple ping en lecture ne suffit pas toujours
+# (les jobs programmés GitHub peuvent être retardés/sautés sous
+# charge). Cette version est donc AUTO-RÉPARANTE :
+#
+#   1. Toutes les 6 h (4×/jour → résiste aux runs sautés par GitHub).
+#   2. Interroge l'état réel du projet via l'API d'administration
+#      Supabase (secret SUPABASE_ACCESS_TOKEN).
+#   3. Si le projet n'est PAS actif → le RÉVEILLE automatiquement
+#      (restore). C'est ce qui manquait : avant, une fois en pause,
+#      le job ne pouvait que constater l'échec sans rien réparer.
+#   4. S'il est actif → fait une vraie lecture (génère de l'activité
+#      qui repousse la mise en pause).
+#
+# Sans le secret SUPABASE_ACCESS_TOKEN, le job bascule en mode
+# "ping best-effort" et affiche la marche à suivre (pas d'échec rouge
+# en boucle). Pour l'auto-réparation : créer un token sur
+# https://supabase.com/dashboard/account/tokens puis l'ajouter dans
+# GitHub → Settings → Secrets and variables → Actions → SUPABASE_ACCESS_TOKEN
+#
+# NB : rien ne garantit 100 % en gratuit. Le "toujours actif" sûr =
+# plan Supabase Pro (sans pause). Ceci est la meilleure approche gratuite.
+# ================================================================
+
 on:
   schedule:
-    # Toutes les 48h — largement sous le seuil de mise en pause de Supabase
-    # (7 jours d'inactivité sur le plan gratuit). Gratuit et illimité sur un
-    # dépôt public (GitHub Actions). Redondant avec le cron Vercel quotidien
-    # /api/cron/purge : si l'un des deux tombe, l'autre garde la base active.
-    - cron: '0 4 */2 * *'
+    - cron: '7 */6 * * *'   # toutes les 6 h (minute 7 pour éviter la pointe :00)
   workflow_dispatch: {}
 
 jobs:
-  ping:
+  keepalive:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      # Lit l'URL et la clé publique (anon) directement depuis le client
-      # navigateur existant — pas de secret à configurer, ces valeurs sont
-      # déjà publiques (embarquées dans le code servi aux visiteurs).
-      - name: Ping Supabase (garde le projet actif + alerte si en panne)
+      - name: Maintien en vie + auto-réparation Supabase
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         run: |
-          set -e
-          # Ancré sur "^export const" + -m1 : la ligne d'USAGE plus bas dans le
-          # fichier (createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {) contient
-          # aussi le nom de la variable sans espace après — un grep trop large
-          # matchait les deux lignes et corrompait la clé (bug réel, a fait
-          # échouer ce job silencieusement 10/10 fois depuis sa création).
+          # Pas de `set -e` : on gère chaque code retour nous-mêmes pour ne
+          # jamais mourir avant la logique d'auto-réparation.
+
+          # URL + clé publique (anon) lues dans le code client (valeurs publiques).
           URL=$(grep -m1 "^export const SUPABASE_URL" js/supabase-client.js | sed -E "s/.*= '([^']+)'.*/\1/")
           KEY=$(grep -m1 "^export const SUPABASE_ANON_KEY" js/supabase-client.js | sed -E "s/.*= '([^']+)'.*/\1/")
-          if [ -z "$URL" ] || [ -z "$KEY" ]; then
-            echo "::error::Impossible d'extraire SUPABASE_URL/SUPABASE_ANON_KEY depuis js/supabase-client.js"
+          REF=$(echo "$URL" | sed -E 's#https://([^.]+)\..*#\1#')
+          if [ -z "$URL" ] || [ -z "$KEY" ] || [ -z "$REF" ]; then
+            echo "::error::Extraction URL/clé/ref impossible depuis js/supabase-client.js"
             exit 1
           fi
-          case "$URL$KEY" in
-            *[[:space:]]*)
-              echo "::error::URL ou clé invalide (contient un espace/saut de ligne) — extraction corrompue."
-              exit 1
-              ;;
-          esac
+          echo "Projet Supabase : $REF"
 
-          STATUS=$(curl -s -o /tmp/resp.json -w "%{http_code}" --max-time 20 \
-            "$URL/rest/v1/cabinets?select=id&limit=1" -H "apikey: $KEY")
-          echo "HTTP $STATUS"
-          cat /tmp/resp.json || true
+          # ---- Lecture REST (génère de l'activité quand le projet est actif) ----
+          rest_ping() {
+            curl -s -o /dev/null -w "%{http_code}" --max-time 20 \
+              "$URL/rest/v1/cabinets?select=id&limit=1" -H "apikey: $KEY" 2>/dev/null || echo "000"
+          }
 
-          if [ "$STATUS" != "200" ]; then
-            REF=$(echo "$URL" | sed -E 's#https://([^.]+)\..*#\1#')
-            echo "::error::Supabase ne répond pas normalement (HTTP $STATUS) — le projet est probablement en pause ou en panne. Relance-le sur https://supabase.com/dashboard/project/$REF"
-            exit 1
+          # ---- Mode AUTO-RÉPARATION (si le token d'administration est présent) ----
+          if [ -n "$SUPABASE_ACCESS_TOKEN" ]; then
+            API="https://api.supabase.com/v1/projects/$REF"
+            BODY=$(curl -s --max-time 25 "$API" -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" 2>/dev/null)
+            STATUS=$(printf '%s' "$BODY" | grep -o '"status":"[^"]*"' | head -1 | sed -E 's/.*:"([^"]*)"/\1/')
+            echo "Statut projet : ${STATUS:-inconnu}"
+
+            if [ "$STATUS" = "ACTIVE_HEALTHY" ]; then
+              CODE=$(rest_ping)
+              echo "Lecture REST → HTTP $CODE"
+              echo "✅ Projet actif, activité générée."
+              exit 0
+            fi
+
+            # Projet en pause / en démarrage / état inattendu → tentative de réveil.
+            echo "::warning::Projet non actif (${STATUS:-inconnu}) → tentative de réveil automatique."
+            RESTORE_CODE=$(curl -s -o /tmp/restore.json -w "%{http_code}" --max-time 30 \
+              -X POST "$API/restore" \
+              -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+              -H "Content-Type: application/json" -d '{}' 2>/dev/null || echo "000")
+            echo "Réveil → HTTP $RESTORE_CODE"
+            cat /tmp/restore.json 2>/dev/null || true
+            case "$RESTORE_CODE" in
+              2*) echo "✅ Réveil demandé avec succès (le projet redémarre, ~1-5 min)." ; exit 0 ;;
+              *)  echo "::error::Échec du réveil automatique (HTTP $RESTORE_CODE). Vérifier le token SUPABASE_ACCESS_TOKEN et relancer-le manuellement sur https://supabase.com/dashboard/project/$REF" ; exit 1 ;;
+            esac
           fi
-          echo "OK — Supabase répond normalement."
+
+          # ---- Mode best-effort (pas de token) : ping + marche à suivre ----
+          CODE=$(rest_ping)
+          echo "Lecture REST → HTTP $CODE"
+          if [ "$CODE" = "200" ]; then
+            echo "✅ Supabase répond. (Astuce : ajoute le secret SUPABASE_ACCESS_TOKEN pour activer l'auto-réveil en cas de pause.)"
+            exit 0
+          fi
+          echo "::warning::Supabase ne répond pas (HTTP $CODE) et l'auto-réveil n'est pas configuré."
+          echo "::warning::Ajoute un token sur https://supabase.com/dashboard/account/tokens puis dans GitHub → Settings → Secrets → Actions → SUPABASE_ACCESS_TOKEN, pour que ce job réveille Supabase tout seul."
+          echo "En attendant, réveille-le manuellement : https://supabase.com/dashboard/project/$REF"
+          exit 0
