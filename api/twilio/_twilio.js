@@ -11,6 +11,14 @@
 // Internet). Sans validation de signature, n'importe qui pourrait les forger
 // pour faire envoyer des SMS à vos frais ou polluer la base. La signature est
 // donc vérifiée systématiquement ; en cas de doute, on REFUSE (fail-closed).
+//
+// 🔐 PLAFOND DE COÛT : une signature valide ne protège pas contre un VRAI appelant
+// qui bombarde un numéro (prank calls, erreur d'intégration tierce...) — chaque
+// appel/SMS coûte de l'argent (minutes Twilio, SMS) sans plafond naturel. On limite
+// donc, par numéro Twilio de cabinet, le nombre de webhooks traités par minute
+// (best-effort, mémoire locale à l'instance — même principe que le rate-limit IP de
+// api/chat.js/api/agent.js : pas garanti à 100% sur plusieurs instances Vercel, mais
+// bien mieux qu'aucun plafond).
 // ================================================================
 
 import { supabaseAdmin } from '../_supabase.js';
@@ -49,10 +57,28 @@ export function validateTwilioSignature(req) {
   return _validateSig(req, twilioConfig().token);
 }
 
+// ----------------------------------------------------------------
+// Plafond de coût : N webhooks max / minute / numéro Twilio de cabinet.
+// ----------------------------------------------------------------
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_PER_NUMBER_MAX = 30; // largement au-dessus d'un usage réel pour un cabinet
+const rateLimitByNumber = new Map();
+
+function hitRateLimit(key) {
+  const now = Date.now();
+  const recent = (rateLimitByNumber.get(key) || []).filter(t => now - t < RATE_LIMIT_WINDOW_MS);
+  recent.push(now);
+  rateLimitByNumber.set(key, recent);
+  if (rateLimitByNumber.size > 2000) {
+    for (const [k, v] of rateLimitByNumber) if (v.every(t => now - t > RATE_LIMIT_WINDOW_MS)) rateLimitByNumber.delete(k);
+  }
+  return recent.length > RATE_LIMIT_PER_NUMBER_MAX;
+}
+
 /**
- * Garde commune à tous les webhooks : POST only, Twilio configuré, signature valide.
- * Retourne true si la requête peut être traitée ; sinon répond directement (403/405/503)
- * et retourne false.
+ * Garde commune à tous les webhooks : POST only, Twilio configuré, signature valide,
+ * plafond de coût. Retourne true si la requête peut être traitée ; sinon répond
+ * directement (403/405/429/503) et retourne false.
  */
 export function guardWebhook(req, res) {
   if (req.method !== 'POST') {
@@ -67,6 +93,12 @@ export function guardWebhook(req, res) {
   if (!validateTwilioSignature(req)) {
     console.warn('[twilio] signature invalide — requête refusée');
     res.status(403).send('Signature invalide');
+    return false;
+  }
+  const toNumber = String((req.body && req.body.To) || 'unknown');
+  if (hitRateLimit(toNumber)) {
+    console.warn('[twilio] plafond de débit atteint pour', toNumber);
+    res.status(429).send('Trop de requêtes');
     return false;
   }
   return true;

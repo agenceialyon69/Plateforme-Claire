@@ -9,7 +9,8 @@ et **n'invente jamais** (ni prix, ni référence, ni chiffre).
 - `api/agent.js` — endpoint serverless **protégé par code d'accès** + **garde-fou d'hôte**, stateless.
 - `agent.html` — l'interface chat mobile (route `/agent`).
 - `middleware.js` — **cloisonnement** : l'atelier n'existe que sur le sous-domaine privé.
-- Variables d'env : `AGENT_ACCESS_CODE` (le code), `AGENT_HOST` (le sous-domaine privé).
+- Variables d'env : `AGENT_ACCESS_CODE` (le code), `AGENT_HOST` (le sous-domaine privé),
+  `AGENT_CV` (ton CV en texte libre — **jamais commité**, voir étape 3).
 
 ## Déploiement (4 étapes)
 
@@ -29,6 +30,10 @@ Choisis un sous-domaine **non deviné** et **non lié** depuis la vitrine, par e
 ### 3. Vercel → Settings → Environment Variables (Production + Preview)
 - `AGENT_ACCESS_CODE` = le code de l'étape 1.
 - `AGENT_HOST` = `atelier.claireassistante.fr` (exactement l'hôte, sans `https://`).
+- `AGENT_CV` = ton CV en texte libre (nom, âge, ville, expérience, employeurs...).
+  **Important** : ce fichier (`api/agent.js`) vit dans un repo PUBLIC — ton CV ne doit
+  JAMAIS apparaître dans le code commité, uniquement dans cette variable Vercel.
+  Si tu laisses `AGENT_CV` vide, l'assistant te le signale au lieu d'inventer un profil.
 - Vérifie que `ALLOWED_ORIGINS` contient `https://atelier.claireassistante.fr`.
 - (déjà présente : `ANTHROPIC_API_KEY`.)
 

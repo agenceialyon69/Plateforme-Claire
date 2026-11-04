@@ -9,6 +9,12 @@
 //   - n'invente JAMAIS de prix/référence/chiffre (règle dans le system prompt).
 //
 // 🔐 Sans AGENT_ACCESS_CODE défini côté serveur, l'endpoint refuse tout (503).
+//
+// 🔐 DONNÉES PERSONNELLES : le CV de Tafsir (nom, âge, ville, employeurs) n'est
+// PAS codé en dur ici — ce fichier vit dans un repo PUBLIC, et le mettre en clair
+// l'exposerait à quiconque consulte le code sur GitHub, indépendamment de la
+// protection de l'endpoint lui-même. Il est lu depuis la variable d'env AGENT_CV
+// (définie uniquement côté Vercel, jamais commitée). Voir .env.example.
 // ================================================================
 
 import crypto from 'node:crypto';
@@ -83,7 +89,8 @@ function applyCors(req, res) {
 }
 
 // ---- Profil réel de Tafsir (pour la prépa entretien) -------------
-const CV = `Mamadou Tafsir BAH, 24 ans, technicien électrotechnicien (Lyon / Vénissieux 69200). 3 ans d'expérience : montage/câblage de centrales d'air médical, machines à vide et générateurs d'oxygène (MIL'S, Genas, certifié ISO 9001/13485/14001) ; maintenance CVC (SPIE) ; fibre optique FTTH/FTTO et tests OTDR (STERLAN). Habilitations électriques B1V/B2V/BC/BR. AutoCAD/DAO, lecture de schémas industriels. Formation : niveau BTS Électrotechnique, Bac Pro et BEP Électrotechnique. Permis B + véhicule. Français courant, italien B1. A conçu et déployé SEUL la plateforme web Claire (de A à Z).`;
+// Lu depuis Vercel, jamais commis dans le repo (public) — voir note en tête de fichier.
+const CV = process.env.AGENT_CV || '';
 
 const SYSTEM = `Tu es l'assistant personnel de Mamadou Tafsir BAH ("Tafsir"), créateur de CLAIRE. Tu es son bras droit stratégique et un EXPERT « red team » : rigueur, esprit critique, honnêteté radicale, pédagogie. Tu attaques tes propres réponses avant de les livrer. Tu réponds en français.
 
@@ -107,8 +114,8 @@ EXCEPTION : quand tu COACHES Tafsir, ou pour un public RECRUTEUR/tech (entretien
 - Tu distingues toujours PROUVÉ et SUPPOSÉ. Tu peux contredire Tafsir si une idée est risquée, inutile ou malhonnête, et proposer mieux.
 
 ## Profil de Tafsir (pour la prépa entretien d'embauche)
-${CV}
-Atouts face à un recruteur : rigueur secteur médical (ISO 13485), polyvalence (câblage médical/industriel, CVC, fibre FTTH/FTTO, OTDR, AutoCAD/DAO), habilitations B1V/B2V/BC/BR, et surtout avoir conçu et déployé SEUL une plateforme web complète (autonomie, capacité à apprendre vite et à livrer).
+${CV || "(Profil non configuré : la variable d'environnement AGENT_CV est vide côté Vercel. Dis-le à Tafsir au lieu d'inventer un profil.)"}
+Atout transversal, quel que soit le profil renseigné ci-dessus : avoir conçu et déployé SEUL une plateforme web complète (autonomie, capacité à apprendre vite et à livrer).
 
 # TES MISSIONS
 1. PROSPECTION : emails d'intro, relances, scripts d'appel personnalisés (nom + ville + contexte du cabinet). Posture « avis d'expert, pas vente ». Court, humain, UN seul appel à l'action, mention de désinscription. Propose de MONTRER une démo.
