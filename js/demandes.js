@@ -36,7 +36,7 @@ async function loadDemandes() {
 
   let query = supabase
     .from('demandes')
-    .select('id, conversation_id, patient_nom, patient_telephone, motif, urgence, statut, created_at')
+    .select('id, conversation_id, patient_nom, patient_telephone, motif, urgence, statut, resultat, created_at')
     .eq('cabinet_id', cabinet.id)
     .order('urgence', { ascending: false })
     .order('created_at', { ascending: false })
