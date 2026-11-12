@@ -413,5 +413,28 @@ alter table public.demandes add constraint demandes_resultat_check
     ('rdv_pris','rappel_effectue','patient_non_joignable','pas_de_besoin','abandonnee'));
 
 -- =================================================================
+-- MIGRATION (idempotente) : suivi des prospects dans contact_leads
+-- -----------------------------------------------------------------
+-- contact_leads reçoit déjà les demandes de démo de la vitrine. On y
+-- ajoute un petit pipeline de prospection (statut + notes), piloté
+-- UNIQUEMENT via l'API admin (la table reste service_role only, aucune
+-- policy côté client). NB : purge_old_data purge aussi ces lignes
+-- au-delà de la rétention configurée.
+-- =================================================================
+
+alter table public.contact_leads add column if not exists statut text not null default 'nouveau';
+alter table public.contact_leads add column if not exists notes text;
+alter table public.contact_leads add column if not exists updated_at timestamptz default now();
+
+alter table public.contact_leads drop constraint if exists contact_leads_statut_check;
+alter table public.contact_leads add constraint contact_leads_statut_check
+  check (statut in ('nouveau','contacte','relance','demo_prevue','converti','perdu'));
+
+drop trigger if exists trg_contact_leads_updated_at on public.contact_leads;
+create trigger trg_contact_leads_updated_at
+  before update on public.contact_leads
+  for each row execute function public.set_updated_at();
+
+-- =================================================================
 -- FIN DU SCHÉMA
 -- =================================================================

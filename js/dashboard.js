@@ -4,7 +4,7 @@
 
 import { requireAuth, initSidebar } from '/js/auth.js';
 import { supabase } from '/js/supabase-client.js';
-import { escapeHtml, labelUrgence, labelStatut, formatRelativeTime, formatToday } from '/js/format.js';
+import { escapeHtml, labelUrgence, labelStatut, labelResultat, formatRelativeTime, formatToday } from '/js/format.js';
 
 // ---------- BOOT ----------
 const auth = await requireAuth();
@@ -28,6 +28,7 @@ await Promise.all([
   loadPriorities(),
   loadLastConversations(),
   loadDebordement(),
+  loadResultats(),
 ]);
 
 // ----------------------------------------------------------------
@@ -119,6 +120,43 @@ async function loadDebordement() {
     section.querySelector('[data-debord="appels_manques_30j"]').textContent = manques;
     section.querySelector('[data-debord="sms_envoyes_30j"]').textContent = sms;
     section.querySelector('[data-debord="demandes_recuperees_30j"]').textContent = recup;
+    section.style.display = '';
+  } catch (_) {
+    /* silencieux : la section reste masquée */
+  }
+}
+
+// ----------------------------------------------------------------
+// Résultats réels (30 j) : comptage des `resultat` renseignés par le
+// cabinet à la clôture des demandes. Aucun chiffre estimé : section
+// masquée tant que rien n'a été renseigné. RLS : lecture directe,
+// filtrée par cabinet_id comme le reste de la page.
+// ----------------------------------------------------------------
+async function loadResultats() {
+  const section = document.getElementById('resultatsSection');
+  const grid = document.getElementById('resultatsGrid');
+  if (!section || !grid) return;
+  try {
+    const since = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
+    const { data, error } = await supabase
+      .from('demandes')
+      .select('resultat')
+      .eq('cabinet_id', cabinet.id)
+      .not('resultat', 'is', null)
+      .gte('created_at', since)
+      .limit(1000);
+    if (error || !data || data.length === 0) return; // rien renseigné → masqué
+
+    const counts = {};
+    for (const d of data) counts[d.resultat] = (counts[d.resultat] || 0) + 1;
+
+    grid.innerHTML = Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([r, n]) => `
+        <div class="kpi-card ${r === 'rdv_pris' ? 'accent' : ''}">
+          <div class="kpi-label">${escapeHtml(labelResultat(r))}</div>
+          <div class="kpi-value">${n}</div>
+        </div>`).join('');
     section.style.display = '';
   } catch (_) {
     /* silencieux : la section reste masquée */

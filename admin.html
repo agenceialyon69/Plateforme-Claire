@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Inviter un cabinet — Claire Platform</title>
+<title>Pilotage — Claire Platform</title>
 <meta name="robots" content="noindex,nofollow" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -57,8 +57,8 @@
   <main class="main">
     <header class="page-header">
       <div>
-        <h1 class="page-title">Inviter un cabinet</h1>
-        <p class="page-subtitle">Envoyez une invitation : le cabinet définira lui-même son mot de passe.</p>
+        <h1 class="page-title">Pilotage de la plateforme</h1>
+        <p class="page-subtitle">Prospects, cabinets, invitations et santé du système — réservé à l'administrateur.</p>
       </div>
     </header>
 
@@ -69,38 +69,116 @@
       </div>
     </section>
 
-    <!-- Formulaire d'invitation -->
-    <section class="list-card" id="inviteCard" style="display:none; max-width: 560px; padding: 28px;">
-      <div id="alertSlot"></div>
+    <div id="adminArea" style="display:none;">
+      <style>
+        .admin-tabs { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+        .admin-tab { padding:8px 16px; border-radius:999px; border:1px solid var(--line,#e5e0d8);
+          background:transparent; cursor:pointer; font:inherit; font-size:14px; color:var(--slate,#4b5563); }
+        .admin-tab.active { background:var(--forest,#1f3d35); color:#fff; border-color:var(--forest,#1f3d35); }
+        .admin-note { font-size:13px; color:var(--slate,#4b5563); margin:10px 0 0; line-height:1.5; }
+        .prospect-notes { width:100%; min-height:60px; font:inherit; font-size:13px; margin-top:8px;
+          border:1px solid var(--line,#e5e0d8); border-radius:8px; padding:8px; }
+        .health-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:10px; padding:16px; }
+        .health-item { display:flex; justify-content:space-between; gap:8px; padding:10px 12px;
+          border:1px solid var(--line,#e5e0d8); border-radius:10px; font-size:14px; }
+      </style>
 
-      <form id="inviteForm" novalidate>
-        <div class="field">
-          <label for="nom">Nom du cabinet</label>
-          <input type="text" id="nom" name="nom" required placeholder="Cabinet Dentaire des Brotteaux" />
-        </div>
-        <div class="field">
-          <label for="email">Email du cabinet</label>
-          <input type="email" id="email" name="email" required autocomplete="off" placeholder="contact@cabinet-exemple.fr" />
-        </div>
-        <div class="field">
-          <label for="telephone">Téléphone <span style="color:var(--slate-soft); font-weight:400;">(optionnel)</span></label>
-          <input type="tel" id="telephone" name="telephone" autocomplete="off" placeholder="+33 4 ..." />
-        </div>
-        <div class="field">
-          <label for="ville">Ville <span style="color:var(--slate-soft); font-weight:400;">(optionnel)</span></label>
-          <input type="text" id="ville" name="ville" autocomplete="off" placeholder="Lyon" />
-        </div>
+      <nav class="admin-tabs" id="adminTabs">
+        <button class="admin-tab active" data-tab="prospects">Prospects</button>
+        <button class="admin-tab" data-tab="cabinets">Cabinets</button>
+        <button class="admin-tab" data-tab="invite">Inviter un cabinet</button>
+        <button class="admin-tab" data-tab="health">Santé du système</button>
+      </nav>
 
-        <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
-          <span id="submitLabel">Envoyer l'invitation</span>
-        </button>
-      </form>
+      <!-- ===================== Onglet Prospects ===================== -->
+      <section class="list-card" data-panel="prospects" style="padding:0;">
+        <div class="list-card-header">
+          <h2 class="list-card-title">Suivi des prospects</h2>
+        </div>
+        <div style="padding:16px 16px 0;">
+          <div id="prospectAlert"></div>
+          <details id="addProspectBox">
+            <summary style="cursor:pointer; font-size:14px; font-weight:600;">+ Ajouter un prospect (démarchage manuel)</summary>
+            <form id="prospectForm" novalidate style="margin-top:12px; max-width:560px;">
+              <div class="field"><label for="pNom">Nom du contact ou du praticien</label>
+                <input type="text" id="pNom" required placeholder="Dr Martin" /></div>
+              <div class="field"><label for="pCabinet">Cabinet</label>
+                <input type="text" id="pCabinet" placeholder="Cabinet Dentaire ..." /></div>
+              <div class="field"><label for="pEmail">Email</label>
+                <input type="email" id="pEmail" required placeholder="contact@cabinet.fr" /></div>
+              <div class="field"><label for="pTel">Téléphone (optionnel)</label>
+                <input type="tel" id="pTel" placeholder="+33 ..." /></div>
+              <div class="field"><label for="pSource">Canal</label>
+                <select id="pSource">
+                  <option value="email">Email à froid</option>
+                  <option value="telephone">Téléphone</option>
+                  <option value="linkedin">LinkedIn</option>
+                  <option value="visite">Visite</option>
+                  <option value="autre">Autre</option>
+                </select></div>
+              <div class="field"><label for="pNotes">Notes (optionnel)</label>
+                <input type="text" id="pNotes" placeholder="Version A envoyée le ..." /></div>
+              <button type="submit" class="btn btn-primary" id="prospectSubmit">Ajouter</button>
+            </form>
+          </details>
+          <p class="admin-note">Les demandes de démo envoyées depuis la vitrine arrivent ici automatiquement (source « landing »).</p>
+        </div>
+        <div id="prospectsList" style="padding:8px 0 16px;"></div>
+      </section>
 
-      <p style="margin-top:18px; font-size:13px; color:var(--slate); line-height:1.5;">
-        Le cabinet recevra un email avec un lien sécurisé pour créer son mot de passe.
-        Aucun mot de passe ne transite par vous.
-      </p>
-    </section>
+      <!-- ===================== Onglet Cabinets ===================== -->
+      <section class="list-card" data-panel="cabinets" style="display:none; padding:0;">
+        <div class="list-card-header">
+          <h2 class="list-card-title">Cabinets</h2>
+        </div>
+        <div id="cabinetsList" style="padding:8px 0 16px;"></div>
+      </section>
+
+      <!-- ===================== Onglet Invitation ===================== -->
+      <section class="list-card" data-panel="invite" id="inviteCard" style="display:none; max-width: 560px; padding: 28px;">
+        <div id="alertSlot"></div>
+
+        <form id="inviteForm" novalidate>
+          <div class="field">
+            <label for="nom">Nom du cabinet</label>
+            <input type="text" id="nom" name="nom" required placeholder="Cabinet Dentaire des Brotteaux" />
+          </div>
+          <div class="field">
+            <label for="email">Email du cabinet</label>
+            <input type="email" id="email" name="email" required autocomplete="off" placeholder="contact@cabinet-exemple.fr" />
+          </div>
+          <div class="field">
+            <label for="telephone">Téléphone <span style="color:var(--slate-soft); font-weight:400;">(optionnel)</span></label>
+            <input type="tel" id="telephone" name="telephone" autocomplete="off" placeholder="+33 4 ..." />
+          </div>
+          <div class="field">
+            <label for="ville">Ville <span style="color:var(--slate-soft); font-weight:400;">(optionnel)</span></label>
+            <input type="text" id="ville" name="ville" autocomplete="off" placeholder="Lyon" />
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
+            <span id="submitLabel">Envoyer l'invitation</span>
+          </button>
+        </form>
+
+        <p style="margin-top:18px; font-size:13px; color:var(--slate); line-height:1.5;">
+          Le cabinet recevra un email avec un lien sécurisé pour créer son mot de passe.
+          Aucun mot de passe ne transite par vous.
+        </p>
+      </section>
+
+      <!-- ===================== Onglet Santé ===================== -->
+      <section class="list-card" data-panel="health" style="display:none; padding:0;">
+        <div class="list-card-header">
+          <h2 class="list-card-title">Santé du système</h2>
+          <button class="btn" id="healthRefresh" style="font-size:13px;">Actualiser</button>
+        </div>
+        <div id="healthBody"><div class="list-empty">Chargement…</div></div>
+        <p class="admin-note" style="padding:0 16px 16px;">
+          « Configuré » signifie seulement que la variable existe côté serveur — pas que le service répond.
+        </p>
+      </section>
+    </div>
   </main>
 </div>
 
