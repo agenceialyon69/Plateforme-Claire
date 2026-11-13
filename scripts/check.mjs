@@ -69,6 +69,45 @@ for (const f of ['sitemap.xml', 'robots.txt', 'sw.js', 'manifest.webmanifest', '
   existsSync(join(root, f)) ? pass(f) : fail(`${f} manquant`);
 }
 
+// 5) Vitrine : vocabulaire interdit + affirmations non prouvées -----
+// Ces pages sont lues par des prospects : pas de vocabulaire "technologique"
+// (règle CLAUDE.md) ni d'affirmation absolue/fausse déjà identifiée en audit.
+console.log('Vitrine — vocabulaire et affirmations');
+const PUBLIC_PAGES = ['index.html', 'etude-de-cas.html', 'confidentialite.html',
+  'mentions-legales.html', 'login.html', 'bienvenue.html', 'chat.html'];
+const FORBIDDEN_WORDS = [/\bIA\b/, /\bchat-?bot\b/i, /\brobot\b/i, /\bLLM\b/, /intelligence artificielle/i, /\bClaude\b/];
+const UNPROVEN_CLAIMS = [
+  [/Aucun patient sans réponse/i, 'promesse absolue (pannes passées)'],
+  [/ne se perdent plus/i, 'promesse absolue'],
+  [/phase pilote auprès/i, "faux : aucun cabinet n'utilise Claire"],
+  [/hébergées? en Europe|Hébergement en Europe|Données en Europe|région européenne/i, 'inexact : fonctions applicatives hors UE (iad1) tant que non migrées'],
+  [/sans bandeau|aucun bandeau (requis|nécessaire)|bandeau cookies\s+n'est nécessaire/i, 'conclusion juridique non vérifiée (widget Calendly)'],
+  [/appelle souvent le cabinet d'à côté/i, 'généralité non sourcée'],
+];
+let todoCount = 0;
+for (const page of PUBLIC_PAGES) {
+  const p = join(root, page);
+  if (!existsSync(p)) continue;
+  const raw = readFileSync(p, 'utf8');
+  todoCount += (raw.match(/\[À COMPLÉTER/g) || []).length;
+  // On garde le texte visible ET le JSON-LD (lu par les moteurs de recherche)
+  const text = raw
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/<style[\s\S]*?<\/style>/g, '')
+    .replace(/<script(?![^>]*ld\+json)[\s\S]*?<\/script>/g, '');
+  let ok = true;
+  for (const re of FORBIDDEN_WORDS) {
+    const m = text.match(re);
+    if (m) { fail(`${page} : mot interdit « ${m[0]} »`); ok = false; }
+  }
+  for (const [re, why] of UNPROVEN_CLAIMS) {
+    const m = text.match(re);
+    if (m) { fail(`${page} : « ${m[0]} » — ${why}`); ok = false; }
+  }
+  if (ok) pass(page);
+}
+if (todoCount > 0) console.log(`  ⚠ ${todoCount} champ(s) « [À COMPLÉTER] » restent dans les pages légales (à renseigner par l'éditeur)`);
+
 // Bilan -----------------------------------------------------------
 console.log('');
 if (failures) {

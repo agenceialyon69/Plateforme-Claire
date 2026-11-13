@@ -55,7 +55,7 @@
   </p>
   <p class="note">
     Projet personnel conçu, développé et déployé de bout en bout (produit, front, back, base de
-    données, sécurité, déploiement). Actuellement en phase pilote auprès de cabinets dentaires.
+    données, sécurité, déploiement). En phase de lancement : je recherche des cabinets pilotes à Lyon.
   </p>
 
   <h2>Le problème</h2>
@@ -73,7 +73,7 @@
     questions (motif, nom, téléphone, souhait), oriente les urgences vitales vers le 15, puis
     <strong>extrait automatiquement un résumé qualifié</strong> de l'échange et le dépose dans
     l'espace du cabinet (et, en option, par email/WhatsApp via une automatisation). Claire ne pose
-    jamais de diagnostic : elle recueille et transmet ; c'est le cabinet qui décide.
+    jamais de diagnostic (règle imposée dans ses consignes, à valider par un jeu de tests) : elle recueille et transmet ; c'est le cabinet qui décide.
   </p>
 
   <h2>Architecture</h2>
@@ -87,7 +87,7 @@
     <div><strong>Base & Auth</strong> — Supabase (Postgres + Auth, Row Level Security)</div>
     <div><strong>Moteur conversationnel</strong> — traitement automatisé du langage : dialogue + extraction qualifiée</div>
     <div><strong>Automatisation</strong> — webhook signé → Make / n8n / Zapier</div>
-    <div><strong>Mesure</strong> — analytics sans cookie (aucun bandeau requis)</div>
+    <div><strong>Mesure</strong> — analytics sans cookie</div>
     <div><strong>Qualité</strong> — contrôles CI sans dépendance (lint/JSON/JSON-LD)</div>
   </div>
 
@@ -124,7 +124,7 @@
     </div>
     <div class="card">
       <h3>RGPD & confidentialité par défaut</h3>
-      <p>Hébergement en Europe, mesure d'audience sans cookie (donc sans bandeau), pages légales et
+      <p>Base de données hébergée dans l'UE, mesure d'audience sans cookie, politique de confidentialité et
         section rétention/effacement des données.</p>
     </div>
   </div>
