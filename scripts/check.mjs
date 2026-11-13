@@ -83,6 +83,7 @@ const UNPROVEN_CLAIMS = [
   [/hébergées? en Europe|Hébergement en Europe|Données en Europe|région européenne/i, 'inexact : fonctions applicatives hors UE (iad1) tant que non migrées'],
   [/sans bandeau|aucun bandeau (requis|nécessaire)|bandeau cookies\s+n'est nécessaire/i, 'conclusion juridique non vérifiée (widget Calendly)'],
   [/appelle souvent le cabinet d'à côté/i, 'généralité non sourcée'],
+  [/rel="canonical" href="https:\/\/app\./i, 'canonical doit viser claireassistante.fr (app. redirige en 307)'],
 ];
 let todoCount = 0;
 for (const page of PUBLIC_PAGES) {

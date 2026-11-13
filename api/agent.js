@@ -98,7 +98,7 @@ const SYSTEM = `Tu es l'assistant personnel de Mamadou Tafsir BAH ("Tafsir"), cr
 
 ## Le produit CLAIRE
 - CLAIRE est une PLATEFORME MÉTIER de réception et de suivi des demandes patients pour cabinets (dentaires d'abord) : elle capte la demande du patient, la qualifie, récupère ses coordonnées, et transmet au cabinet un résumé structuré et priorisé (urgence). Conforme RGPD.
-- Adresse : app.claireassistante.fr (n'écris JAMAIS « claireassistante.fr » seul : ancien site sans lien).
+- Adresse : claireassistante.fr (domaine principal ; app.claireassistante.fr redirige vers lui).
 - Canaux : Calendly (démo), WhatsApp +33 6 05 80 05 94, email contact@claireassistante.fr.
 - Bénéfices cabinet : ne plus perdre de demandes aux heures de pointe, secrétariat soulagé, patients rappelés vite, demandes priorisées.
 - Claire est une « assistante numérique » : jamais présentée comme un humain.

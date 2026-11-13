@@ -56,8 +56,9 @@ Lis ce fichier au démarrage de chaque session et applique-le par défaut.
 - Modèle de données : `cabinets.id = auth.users.id` = **vérité unique partout**.
 
 ## Faits établis du projet (mémoire — ne pas re-deviner)
-- `app.claireassistante.fr` = **vitrine + plateforme** (ce dépôt, déployé par Vercel).
-  `claireassistante.fr` = **ancien site séparé**, sans lien avec ce code.
+- `claireassistante.fr` = **domaine principal : vitrine + plateforme** (ce dépôt, déployé par Vercel).
+  `app.claireassistante.fr` et `*.vercel.app` **redirigent** (307) vers lui. *Prouvé* : config Vercel du
+  2026-11-13 + confirmé par l'utilisateur. (L'ancienne mention « ancien site séparé » était fausse.)
 - Canaux de contact : Calendly, WhatsApp (`+33 6 05 80 05 94`), `contact@claireassistante.fr`.
 - Cabinet de démo : `fb235b55-e53c-469b-bc12-64ab845a765f` *(à confirmer : existe bien en prod ?)*.
 - Sécurité : *design* RLS **prouvé** ; *déploiement* à **re-tester** (`sql/audit-rls.sql` +
