@@ -3,6 +3,7 @@
   "buildCommand": null,
   "outputDirectory": null,
   "framework": null,
+  "regions": ["fra1"],
   "crons": [
     { "path": "/api/cron/purge", "schedule": "0 3 * * *" }
   ],
