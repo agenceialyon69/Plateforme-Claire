@@ -436,5 +436,21 @@ create trigger trg_contact_leads_updated_at
   for each row execute function public.set_updated_at();
 
 -- =================================================================
+-- MIGRATION (idempotente) « E1 » : le navigateur n'écrit plus dans `cabinets`
+-- -----------------------------------------------------------------
+-- Constat (audit 2026-11-16, prouvé sur la base réelle) : la policy
+-- cabinet_update_self autorisait un compte cabinet à modifier TOUTES ses
+-- colonnes avec la clé publique, dont numero_reel (numéro composé par Twilio,
+-- facturé sur le compte de la plateforme), numero_twilio et sms_modele.
+-- Désormais seules les écritures serveur (/api/cabinet, clé service_role,
+-- validation dans api/_validate.js) modifient cette table.
+-- ⚠ ORDRE : à appliquer APRÈS le déploiement du code où js/parametres.js
+-- passe par /api/cabinet, sinon l'écran Paramètres ne pourrait plus enregistrer.
+-- =================================================================
+
+drop policy if exists "cabinet_update_self" on public.cabinets;
+revoke insert, update, delete, truncate on public.cabinets from anon, authenticated;
+
+-- =================================================================
 -- FIN DU SCHÉMA
 -- =================================================================

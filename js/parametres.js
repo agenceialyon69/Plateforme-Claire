@@ -2,8 +2,7 @@
 // parametres.js — Gestion des paramètres du cabinet
 // ================================================================
 
-import { requireAuth, initSidebar } from '/js/auth.js';
-import { supabase } from '/js/supabase-client.js';
+import { requireAuth, initSidebar, apiFetch } from '/js/auth.js';
 
 const auth = await requireAuth();
 if (!auth) throw new Error('Auth required');
@@ -70,10 +69,11 @@ document.getElementById('reglesForm').addEventListener('submit', async (e) => {
 document.getElementById('debordForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const numeroReel = document.getElementById('numero_reel').value.trim();
-  // Validation E.164 souple : + suivi de 7 à 15 chiffres (espaces tolérés à la saisie).
-  const compact = numeroReel.replace(/[\s.]/g, '');
-  if (compact && !/^\+[1-9]\d{6,15}$/.test(compact)) {
-    showAlert('Le numéro doit être au format international, ex. +33478000000.', 'error');
+  // Contrôle rapide côté écran ; la vraie validation est faite par le serveur (/api/cabinet) :
+  // numéro français uniquement, hors 08 (spéciaux/surtaxés).
+  const compact = numeroReel.replace(/[\s.\-()]/g, '');
+  if (compact && !/^(\+33|0033|0)\d{9}$/.test(compact)) {
+    showAlert('Le numéro doit être un numéro français, ex. 04 78 00 00 00.', 'error');
     return;
   }
   const modele = document.getElementById('sms_modele').value.trim();
@@ -175,21 +175,25 @@ async function saveCabinet(patch, successMsg, submitBtn = null) {
     submitBtn.innerHTML = '<span class="loader"></span>';
   }
 
-  const { data, error } = await supabase
-    .from('cabinets')
-    .update(patch)
-    .eq('id', cabinet.id)
-    .select()
-    .single();
+  let data = null;
+  let errorMsg = null;
+  try {
+    const res = await apiFetch('/api/cabinet', { method: 'PATCH', body: JSON.stringify(patch) });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) errorMsg = body.error || "Erreur lors de l'enregistrement.";
+    else data = body.cabinet;
+  } catch (e) {
+    console.error(e);
+    errorMsg = "Erreur lors de l'enregistrement.";
+  }
 
   if (submitBtn) {
     submitBtn.disabled = false;
     submitBtn.textContent = submitBtn.dataset.originalLabel;
   }
 
-  if (error) {
-    console.error(error);
-    showAlert('Erreur lors de l\'enregistrement.', 'error');
+  if (errorMsg) {
+    showAlert(errorMsg, 'error');
     return;
   }
   cabinet = { ...cabinet, ...data };

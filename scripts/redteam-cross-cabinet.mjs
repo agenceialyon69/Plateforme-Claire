@@ -212,6 +212,19 @@ async function seedCabinet(tag) {
     expectWriteBlocked('Modifier la fiche du Cabinet B',
       await qd(attacker.from('cabinets').update({ nom: 'HACKED' }).eq('id', B.userId).select()));
 
+    // 9b) FRAUDE TÉLÉPHONIE (correctif E1, audit 2026-11-16) : un cabinet change SES PROPRES
+    // colonnes sensibles. Numéro composé par Twilio et texte du SMS = facturés / envoyés au nom
+    // de la plateforme. Doit être refusé : seul /api/cabinet (validé, clé service) peut écrire.
+    // NB : ce scénario ÉCHOUE tant que la migration « E1 » de sql/schema.sql n'est pas appliquée.
+    for (const [label, patch] of [
+      ['numero_reel (numéro composé par Twilio)', { numero_reel: '+33899999999' }],
+      ['sms_modele (texte envoyé depuis le numéro Twilio)', { sms_modele: 'Rappelez le 0899 00 00 00' }],
+      ['numero_twilio', { numero_twilio: '+33100000000' }],
+    ]) {
+      expectWriteBlocked(`Modifier SA PROPRE colonne ${label}`,
+        await qd(attacker.from('cabinets').update(patch).eq('id', A.userId).select()));
+    }
+
     // 10) MODIFIER le statut d'une demande de B
     expectWriteBlocked('Modifier une demande du Cabinet B',
       await qd(attacker.from('demandes').update({ statut: 'traite' }).eq('id', B.demandeId).select()));

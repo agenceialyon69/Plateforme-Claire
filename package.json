@@ -8,7 +8,7 @@
     "deploy": "vercel --prod",
     "check": "node scripts/check.mjs",
     "lint": "node scripts/check.mjs",
-    "test": "node scripts/check.mjs && node scripts/test-twilio-signature.mjs && node scripts/test-twilio-logic.mjs && node scripts/test-llm-fallback.mjs && node scripts/test-admin-access.mjs && node scripts/test-middleware.mjs",
+    "test": "node scripts/check.mjs && node scripts/test-twilio-signature.mjs && node scripts/test-twilio-logic.mjs && node scripts/test-llm-fallback.mjs && node scripts/test-admin-access.mjs && node scripts/test-middleware.mjs && node scripts/test-cabinet-validation.mjs",
     "create-admin": "node scripts/create-admin.mjs",
     "benchmark": "node scripts/benchmark-claire.mjs",
     "preflight": "node scripts/preflight.mjs",
@@ -18,6 +18,7 @@
     "test:llm": "node scripts/test-llm-fallback.mjs",
     "test:admin": "node scripts/test-admin-access.mjs",
     "test:middleware": "node scripts/test-middleware.mjs",
+    "test:cabinet": "node scripts/test-cabinet-validation.mjs",
     "agent:prospection": "node tools/agent/prospection.mjs",
     "agent:linkedin": "node tools/agent/linkedin.mjs",
     "agent:emploi": "node tools/agent/emploi.mjs"

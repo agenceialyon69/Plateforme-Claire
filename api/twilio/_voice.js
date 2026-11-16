@@ -17,6 +17,7 @@ import {
   handleMissedCall, publicBaseUrl,
 } from './_twilio.js';
 import { supabaseAdmin } from '../_supabase.js';
+import { parseDialNumber } from '../_validate.js';
 
 const DIAL_TIMEOUT = 20; // secondes avant de considérer l'appel comme manqué
 
@@ -35,7 +36,13 @@ export default async function handler(req, res) {
   const baseUrl = publicBaseUrl(req);
 
   // --- Mode A : on fait sonner le secrétariat, SMS seulement si non répondu ---
-  if (cabinet.numero_reel) {
+  // Garde-fou : on ne compose JAMAIS un numéro non français ou spécial/surtaxé, même si une
+  // valeur invalide se trouvait en base (facturation sur le compte de la plateforme).
+  const dial = parseDialNumber(cabinet.numero_reel);
+  if (cabinet.numero_reel && !dial.ok) {
+    console.warn('[twilio] numero_reel refusé (format/zone) pour le cabinet', cabinet.id);
+  }
+  if (cabinet.numero_reel && dial.ok && dial.value) {
     const { data: appel } = await supabaseAdmin.from('appels').insert({
       cabinet_id: cabinet.id, call_sid: CallSid || null,
       from_number: From || null, to_number: To || null, statut: 'recu',
@@ -45,7 +52,7 @@ export default async function handler(req, res) {
     return sendTwiml(res,
       `<Response>` +
       `<Dial timeout="${DIAL_TIMEOUT}" answerOnBridge="true" callerId="${escapeXml(To)}" ` +
-      `action="${escapeXml(action)}" method="POST">${escapeXml(cabinet.numero_reel)}</Dial>` +
+      `action="${escapeXml(action)}" method="POST">${escapeXml(dial.value)}</Dial>` +
       `</Response>`);
   }
 

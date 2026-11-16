@@ -3,13 +3,11 @@
 // ================================================================
 
 import { supabaseAdmin, authenticateRequest, ok, unauthorized, badRequest, serverError } from './_supabase.js';
+import { parseCabinetPatch } from './_validate.js';
 
-const ALLOWED_FIELDS = [
-  'nom', 'telephone', 'adresse', 'ville',
-  'horaires', 'regles_reponse',
-  'notif_email', 'notif_telephone',
-  'numero_reel', 'sms_relance_actif', 'sms_modele',
-];
+// Seul point d'écriture des paramètres cabinet : la validation (liste blanche, numéro
+// français hors 08, SMS sans lien...) est dans _validate.js. Le navigateur n'a PAS le
+// droit d'écrire directement dans `cabinets` (voir sql/schema.sql, migration « E1 »).
 
 export default async function handler(req, res) {
   const auth = await authenticateRequest(req);
@@ -27,22 +25,9 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'PATCH') {
-      const body = req.body || {};
-      const patch = {};
-      for (const k of ALLOWED_FIELDS) {
-        if (body[k] !== undefined) patch[k] = body[k];
-      }
-      if (Object.keys(patch).length === 0) {
-        return badRequest(res, 'Rien à mettre à jour');
-      }
-
-      // Validations basiques
-      if (patch.nom && (typeof patch.nom !== 'string' || patch.nom.length > 200)) {
-        return badRequest(res, 'Nom invalide');
-      }
-      if (patch.regles_reponse && patch.regles_reponse.length > 2000) {
-        return badRequest(res, 'Règles trop longues');
-      }
+      const parsed = parseCabinetPatch(req.body);
+      if (!parsed.ok) return badRequest(res, parsed.error);
+      const patch = parsed.value;
 
       const { data, error } = await supabaseAdmin
         .from('cabinets')
