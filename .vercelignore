@@ -1,0 +1,13 @@
+# Fichiers du dépôt qui ne doivent JAMAIS être déployés ni servis par le site.
+# (Le dépôt est public et le site sert tout fichier statique déployé.)
+# NE PAS exclure : package.json / package-lock.json (installation des dépendances de l'API),
+# api/, js/, css/, icons/, middleware.js, sw.js, les pages .html, manifest, robots, sitemap.
+docs/
+sql/
+scripts/
+tools/
+.github/
+audit/
+audits/
+*.md
+.env.example
