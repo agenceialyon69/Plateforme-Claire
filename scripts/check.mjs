@@ -109,6 +109,26 @@ for (const page of PUBLIC_PAGES) {
 }
 if (todoCount > 0) console.log(`  ⚠ ${todoCount} champ(s) « [À COMPLÉTER] » restent dans les pages légales (à renseigner par l'éditeur)`);
 
+// 6) Données personnelles de carrière (CV) interdites dans le dépôt --
+// Le dépôt est PUBLIC et le site sert ses fichiers statiques : un CV commité est lisible
+// par tous. Le CV vit uniquement dans la variable Vercel AGENT_CV ou un config.json ignoré.
+console.log('Dépôt — aucune donnée de CV');
+const CV_PATTERNS = [/mdoutafsirbah/i, /V[ée]nissieux/i, /\bSTERLAN\b/, /MIL'S\b/];
+try {
+  const tracked = execFileSync('git', ['ls-files'], { cwd: root, encoding: 'utf8' })
+    .split('\n').filter(f => f && f !== 'scripts/check.mjs' && f !== 'package-lock.json'
+      && /\.(html|md|js|mjs|json|txt|css|sql|xml|svg|webmanifest)$/i.test(f));
+  let clean = true;
+  for (const f of tracked) {
+    if (!existsSync(join(root, f))) continue; // supprimé mais pas encore commité
+    const txt = readFileSync(join(root, f), 'utf8');
+    for (const re of CV_PATTERNS) {
+      if (re.test(txt)) { fail(`${f} : donnée de CV (${re.source})`); clean = false; }
+    }
+  }
+  if (clean) pass(`${tracked.length} fichier(s) suivis, aucune donnée de CV`);
+} catch (e) { fail(`contrôle CV impossible : ${e.message}`); }
+
 // Bilan -----------------------------------------------------------
 console.log('');
 if (failures) {
