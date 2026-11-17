@@ -9,13 +9,28 @@ responsable de traitement — voir `docs/HDS.md`.
 | Sous-traitant | Rôle | Localisation | Point d'attention |
 |---|---|---|---|
 | **Supabase** | Base de données, authentification | UE | Chiffrement au repos ; **non HDS** (voir HDS.md) |
-| **Vercel** | Hébergement application & fonctions | UE/Mondial (edge) | **Non HDS** |
-| **Anthropic** | Traitement automatisé des messages du chat | **États-Unis** | Transfert hors-UE → clauses contractuelles types |
+| **Vercel** | Hébergement application & fonctions | Fonctions en `fra1` (Francfort) via `vercel.json` ; diffusion (CDN) mondiale | **Non HDS**. À vérifier après chaque déploiement : région du déploiement = `fra1` (avant le correctif de novembre 2026, les fonctions tournaient en `iad1`, États-Unis). Offre « Hobby » = usage non commercial : passer en offre payante avant le premier client |
+| **Anthropic** | Traitement automatisé des messages du chat — **cabinets réels** | **États-Unis** | Offre **payante** : DPA à signer, vérifier l'absence d'entraînement sur les données. Transfert hors-UE → clauses contractuelles types |
+| **Groq**, **Google (Gemini)** | Traitement automatisé des messages — **cabinet de DÉMO uniquement** | **États-Unis** | Offres **gratuites** : leurs conditions peuvent autoriser la réutilisation des messages. **Jamais utilisées pour un cabinet réel** (voir ci-dessous) |
 | **Twilio** | Appels & SMS (débordement téléphonique) | UE/US selon numéro | Transfert possible hors-UE ; DPA Twilio |
 | **Make / n8n** | Acheminement des notifications (optionnel) | Selon config | Webhook signé (`X-Claire-Secret`) |
 
 À faire (humain) : signer/collecter les **DPA** de chaque sous-traitant et tenir
 ce registre à jour.
+
+## Politique des fournisseurs de modèle de langage (audit du 2026-11-16)
+
+Constat : la cascade historique Groq → Gemini → Anthropic envoyait aussi les messages
+de patients vers des offres **gratuites** dont les conditions peuvent autoriser la
+réutilisation des données. Correctif (`api/_llm.js`, `api/chat.js`, prouvé par
+`npm run test:llm` et `npm run test:chat`) :
+
+- **Cabinet de démo** (`DEMO_CABINET_ID`, aucun vrai patient) : cascade complète.
+- **Cabinets réels** : uniquement les fournisseurs listés dans `LLM_PROVIDERS_REAL`
+  (défaut : `anthropic`, offre payante). **Fail-closed** : si aucun fournisseur autorisé n'est
+  configuré, le chat échoue (le patient en urgence reçoit tout de même la consigne 15/112)
+  au lieu de basculer en silence sur une offre gratuite.
+- Si `DEMO_CABINET_ID` n'est pas défini, **tous** les cabinets sont traités comme réels.
 
 ## Minimisation (posture "prise de contact") — ON par défaut
 

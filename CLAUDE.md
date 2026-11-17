@@ -42,7 +42,8 @@ Lis ce fichier au démarrage de chaque session et applique-le par défaut.
   En contexte santé, c'est une exigence éthique et juridique, pas une option.
 
 ## Workflow Git
-- **Développer sur la branche `claude/project-assistance-f3guY`.**
+- **Développer sur la branche de travail désignée par la session** (actuellement
+  `claude/project-assistance-f5liuh` ; l'ancienne `…f3guY` n'est plus utilisée).
 - `main` = branche de **déploiement** (Vercel déploie depuis `main`).
 - **Ne JAMAIS pousser sur `main` sans accord explicite** (« fusionne »/« déploie »).
 - Identité commits : `Tafsir BAH <contact@claireassistante.fr>`.
@@ -51,8 +52,11 @@ Lis ce fichier au démarrage de chaque session et applique-le par défaut.
 ## Stack technique
 - Front : HTML/CSS/JS vanilla, PWA installable. Hébergement : Vercel (fonctions serverless Node).
 - Base & Auth : Supabase (Postgres + Auth + **Row Level Security**).
-- Moteur conversationnel : **conversation sur `claude-sonnet-4-6`**, **extraction du résumé
-  sur `claude-haiku-4-5-20251001`** (`api/chat.js`).
+- Moteur conversationnel (`api/_llm.js`) : cascade multi-fournisseurs Groq → Gemini → Anthropic.
+  **Cabinet de démo** : cascade complète (offres gratuites tolérées, aucun vrai patient).
+  **Cabinets réels** : uniquement les fournisseurs de `LLM_PROVIDERS_REAL` (défaut `anthropic`,
+  payant) — jamais d'offre gratuite ; sans fournisseur autorisé configuré, le chat échoue
+  (fail-closed). Voir `docs/CONFORMITE-RGPD.md`.
 - Modèle de données : `cabinets.id = auth.users.id` = **vérité unique partout**.
 
 ## Faits établis du projet (mémoire — ne pas re-deviner)
