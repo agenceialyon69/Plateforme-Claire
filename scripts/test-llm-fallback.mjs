@@ -121,5 +121,56 @@ const msgs = [{ role: 'user', content: 'test' }];
   ok(groqAttempts === 1, "n'essaie qu'UNE fois chez Groq sur une erreur d'authentification (pas un problème de modèle)");
 }
 
+// ---------- Cas 11 : liste blanche de fournisseurs (cabinets RÉELS) ----------
+{
+  const called = [];
+  const ALL = () => async (url) => {
+    called.push(url);
+    if (url.includes('anthropic.com')) return mockResponse({ ok: true, jsonBody: { content: [{ type: 'text', text: 'Réponse payante' }] } });
+    if (url.includes('groq.com')) return mockResponse({ ok: true, jsonBody: { choices: [{ message: { content: 'gratuit groq' } }] } });
+    return mockResponse({ ok: true, jsonBody: { candidates: [{ content: { parts: [{ text: 'gratuit gemini' }] } }] } });
+  };
+  globalThis.fetch = ALL();
+  const text = await callLLM({ messages: msgs, providers: ['anthropic'] });
+  ok(text === 'Réponse payante', 'liste blanche [anthropic] → seul le fournisseur payant répond');
+  ok(called.length === 1 && called[0].includes('anthropic.com'), "liste blanche : Groq et Gemini ne sont JAMAIS appelés (aucune donnée envoyée aux offres gratuites)");
+
+  // Fail-closed : seules les offres gratuites sont configurées → on échoue SANS rien envoyer
+  const saved = process.env.ANTHROPIC_API_KEY;
+  delete process.env.ANTHROPIC_API_KEY;
+  called.length = 0;
+  let erreur = null;
+  try { await callLLM({ messages: msgs, providers: ['anthropic'] }); } catch (e) { erreur = e; }
+  ok(erreur && /autorisé/.test(erreur.message), 'cabinet réel sans fournisseur payant configuré → erreur explicite (fail-closed)');
+  ok(called.length === 0, 'fail-closed : AUCUN appel réseau, donc aucune fuite vers Groq/Gemini');
+  // Sans liste blanche (démo), la cascade gratuite reste disponible
+  const demo = await callLLM({ messages: msgs });
+  ok(demo === 'gratuit groq', 'sans liste blanche (cabinet de démo) → cascade gratuite inchangée');
+  process.env.ANTHROPIC_API_KEY = saved;
+}
+
+// ---------- Cas 12 : borne de temps globale ----------
+{
+  let appels = 0;
+  globalThis.fetch = async () => { appels++; return mockResponse({ ok: true, jsonBody: { choices: [{ message: { content: 'x' } }] } }); };
+  let erreur = null;
+  try { await callLLM({ messages: msgs, budgetMs: 1000 }); } catch (e) { erreur = e; }
+  ok(erreur && /budget de temps/.test(erreur.message) && appels === 0, 'budget de temps épuisé → arrêt net, aucun appel inutile');
+}
+
+// ---------- Cas 13 : clé Gemini dans l'en-tête, pas dans l'URL ----------
+{
+  let vu = null;
+  globalThis.fetch = async (url, init) => {
+    if (url.includes('generativelanguage')) {
+      vu = { url, headers: init.headers };
+      return mockResponse({ ok: true, jsonBody: { candidates: [{ content: { parts: [{ text: 'ok' }] } }] } });
+    }
+    return mockResponse({ ok: false, status: 500, textBody: 'groq down' });
+  };
+  await callLLM({ messages: msgs });
+  ok(vu && !/key=/.test(vu.url) && vu.headers['x-goog-api-key'] === 'test-gemini-key', 'clé Gemini transmise par en-tête, absente de l\'URL (journaux)');
+}
+
 console.log(`\n${fail === 0 ? '✅' : '❌'} ${pass} test(s) OK, ${fail} échec(s).`);
 if (fail > 0) process.exit(1);

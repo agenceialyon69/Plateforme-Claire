@@ -452,5 +452,20 @@ drop policy if exists "cabinet_update_self" on public.cabinets;
 revoke insert, update, delete, truncate on public.cabinets from anon, authenticated;
 
 -- =================================================================
+-- MIGRATION (idempotente) : plafonds anti-abus du chat comptés EN BASE
+-- -----------------------------------------------------------------
+-- Audit 2026-11-16 : les plafonds du chat reposaient sur la mémoire d'une instance
+-- serverless (contournable) et sur le nombre de lignes de `messages`, vide en mode
+-- minimisation (le plafond ne se déclenchait donc jamais).
+--  - nb_echanges : nombre d'échanges d'une conversation (indépendant du stockage des messages).
+--  - index (cabinet_id, created_at) : compte des conversations créées dans l'heure, par cabinet.
+-- Additive et rétro-compatible : l'ancien code l'ignore.
+-- =================================================================
+
+alter table public.conversations add column if not exists nb_echanges integer not null default 0;
+create index if not exists conversations_cabinet_created_idx
+  on public.conversations(cabinet_id, created_at desc);
+
+-- =================================================================
 -- FIN DU SCHÉMA
 -- =================================================================

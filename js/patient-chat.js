@@ -9,7 +9,7 @@
 import { escapeHtml } from '/js/format.js';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const GREETING = "Bonjour, je suis Claire, l'assistante du cabinet. Dites-moi en quelques mots ce qui vous amène, je m'occupe du reste.";
+const GREETING = "Bonjour, je suis Claire, l'assistante numérique du cabinet. Dites-moi en quelques mots ce qui vous amène, je m'occupe du reste.";
 
 const stream = document.getElementById('pcStream');
 const form = document.getElementById('pcForm');

@@ -4,6 +4,7 @@
   "outputDirectory": null,
   "framework": null,
   "regions": ["fra1"],
+  "functions": { "api/chat.js": { "maxDuration": 60 } },
   "crons": [
     { "path": "/api/cron/purge", "schedule": "0 3 * * *" }
   ],

@@ -31,7 +31,7 @@ import { track } from '/js/track.js';
 const DEMO_CABINET_ID = 'fb235b55-e53c-469b-bc12-64ab845a765f';
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-const GREETING = "Bonjour, je suis Claire, l'assistante du cabinet 👋 Dites-moi ce qui vous amène et je m'occupe du reste.";
+const GREETING = "Bonjour, je suis Claire, l'assistante numérique du cabinet 👋 Dites-moi ce qui vous amène et je m'occupe du reste.";
 const NOT_CONFIGURED_REPLY = "Je suis en cours de configuration sur cette démo. Pour me voir répondre en conditions réelles, réservez une démonstration juste en dessous — j'en ai pour 10 minutes avec vous.";
 
 const stream = document.getElementById('demoStream');

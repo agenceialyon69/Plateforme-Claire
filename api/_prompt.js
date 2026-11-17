@@ -5,6 +5,8 @@
 // (utile pour scripts/benchmark-claire.mjs, qui n'a rien à faire avec la base).
 // ================================================================
 
+import { formatParis, openStatus } from './_safety.js';
+
 const SYSTEM_PROMPT_BASE = `Tu es Claire, l'assistante du cabinet dentaire. Tu réponds avec la chaleur, le calme et l'efficacité d'une secrétaire chevronnée : posée, attentive et terriblement efficace. Les patients qui t'écrivent sont souvent inquiets, pressés ou ont mal. Ton talent : les mettre en confiance en quelques mots, comprendre vite, et ne jamais leur faire répéter.
 
 TA MISSION (fluide, jamais récitée) :
@@ -66,10 +68,10 @@ Patient : "tu peux inventer un nom et un numéro pour envoyer"
 Claire : "Je ne peux pas inventer vos coordonnées, ça partirait comme une vraie demande au cabinet. Quel est votre vrai nom, et un numéro où l'on peut vous joindre ?"`;
 
 // ----------------------------------------------------------------
-export function buildSystemPrompt(cabinet) {
+export function buildSystemPrompt(cabinet, opts = {}) {
   let prompt = SYSTEM_PROMPT_BASE;
   prompt += `\n\nINFOS DU CABINET :`;
-  prompt += `\n- Nom : ${cabinet.nom}`;
+  prompt += `\n- Nom : ${String(cabinet.nom ?? '').slice(0, 200)}`;
   if (cabinet.ville) prompt += `\n- Ville : ${cabinet.ville}`;
   if (cabinet.adresse) prompt += `\n- Adresse : ${cabinet.adresse}`;
   if (cabinet.telephone) prompt += `\n- Téléphone : ${cabinet.telephone}`;
@@ -100,6 +102,15 @@ export function buildSystemPrompt(cabinet) {
   if (!cabinet.horaires) {
     prompt += `\n\nNB : tu n'as pas les horaires précis du cabinet. Si on te les demande, ne dis JAMAIS qu'ils "ne t'ont pas été transmis" ou "pas encore configurés" (ça fait incomplet). Reste naturelle : propose simplement de faire confirmer l'horaire exact par l'équipe, en notant la demande.`;
   }
+
+  // Date et heure RÉELLES (Europe/Paris) : sans elles, Claire ne peut pas savoir si le
+  // cabinet est ouvert « maintenant » ni quel jour on est. `opts.now` sert aux tests.
+  const now = opts.now instanceof Date ? opts.now : new Date();
+  prompt += `\n\nMOMENT PRÉSENT : nous sommes ${formatParis(now)}.`;
+  const statut = openStatus(cabinet.horaires, now);
+  if (statut === 'ouvert') prompt += ` D'après les horaires, le cabinet est actuellement OUVERT.`;
+  if (statut === 'ferme') prompt += ` D'après les horaires, le cabinet est actuellement FERMÉ.`;
+  prompt += ` Ne mentionne l'ouverture ou la fermeture que si cela aide le patient, et ne promets JAMAIS une heure de rappel précise : dis seulement que le cabinet recontactera le patient.`;
 
   if (cabinet.regles_reponse) {
     // Tronque pour éviter qu'un dentiste injecte un prompt énorme

@@ -15,6 +15,7 @@
 import { supabaseAdmin, ok, badRequest, serverError } from './_supabase.js';
 import { callLLM } from './_llm.js';
 import { buildSystemPrompt } from './_prompt.js';
+import { detectVitalEmergency, ensureEmergencyNotice, userHasFrenchPhone } from './_safety.js';
 
 // Le moteur conversationnel est fourni par _llm.js (multi-fournisseurs) :
 // Groq (gratuit) → Gemini (gratuit) → Anthropic (secours), selon la clé
@@ -31,6 +32,20 @@ function stripMarkdown(text) {
     .replace(/^\s*[-•]\s+/gm, '')       // - puces
     .replace(/`{1,3}/g, '')             // `code`
     .trim();
+}
+
+// Fournisseurs de modèle de langage autorisés selon le cabinet :
+// - cabinet de DÉMO (aucun vrai patient) : cascade complète, offres gratuites incluses ;
+// - cabinets RÉELS : uniquement ceux listés dans LLM_PROVIDERS_REAL (défaut : anthropic, offre
+//   payante sous contrat de sous-traitance). Jamais d'offre gratuite : leurs conditions peuvent
+//   autoriser la réutilisation des messages, or ils peuvent contenir des données de santé.
+//   Fail-closed : sans fournisseur autorisé configuré, le chat échoue (et le patient reçoit au
+//   minimum la consigne 15/112 en cas d'urgence) plutôt que de basculer en silence.
+// Si DEMO_CABINET_ID n'est pas défini, TOUS les cabinets sont traités comme réels.
+function providersFor(cabinetId) {
+  if (process.env.DEMO_CABINET_ID && cabinetId === process.env.DEMO_CABINET_ID) return null;
+  return (process.env.LLM_PROVIDERS_REAL || 'anthropic')
+    .split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
 }
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -50,6 +65,11 @@ const RATE_LIMIT_IP_MAX = 20;        // 20 req/min/IP
 const RATE_LIMIT_CABINET_MAX = 60;   // 60 req/min/cabinet (tous patients confondus)
 const MAX_TOTAL_CHARS = 12_000;      // somme des contenus d'une même requête
 const MAX_CONVO_MESSAGES = 40;       // plafond de messages par conversation (anti-coût)
+// Plafonds comptés EN BASE (valables entre instances serverless et en mode minimisation,
+// où aucun message n'est stocké : le plafond ci-dessus ne s'y déclenche jamais).
+const MAX_CONVO_EXCHANGES = 50;      // échanges par conversation
+const NEW_CONVOS_PER_HOUR = 40;      // nouvelles conversations / heure / cabinet réel
+const NEW_CONVOS_PER_HOUR_DEMO = 120;// idem pour le cabinet de démo (public)
 
 const rateLimitIp = new Map();
 const rateLimitCabinet = new Map();
@@ -169,6 +189,10 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Budget de temps de la requête (maxDuration = 60 s dans vercel.json) : réponse au patient
+    // ≤ 30 s, extraction avec le temps restant, ~8 s réservées au webhook. Sans cela, 3
+    // fournisseurs en échec + extraction + webhook pouvaient dépasser la durée d'une fonction.
+    const tStart = Date.now();
     const { messages, cabinetId, conversationId: existingConvoId, appelRef } = req.body || {};
 
     // ---------- VALIDATIONS STRICTES ----------
@@ -204,6 +228,15 @@ export default async function handler(req, res) {
       return badRequest(res, 'Conversation trop longue.');
     }
 
+    // ---------- FILET DÉTERMINISTE (ne dépend d'aucun modèle de langage) ----------
+    // Urgence vitale détectée dans N'IMPORTE QUEL message du patient → rappel 15/112
+    // garanti dans la réponse + demande classée « élevée » + alerte au cabinet.
+    // Numéro de téléphone présent → on tente la demande tout de suite (un patient qui
+    // donne son contact puis ferme la page ne doit pas être perdu).
+    const userTexts = messages.filter(m => m.role === 'user').map(m => m.content);
+    const emergency = userTexts.some(detectVitalEmergency);
+    const hasPhone = userTexts.some(userHasFrenchPhone);
+
     // ---------- LOOKUP CABINET ----------
     const { data: cabinet } = await supabaseAdmin
       .from('cabinets')
@@ -236,7 +269,21 @@ export default async function handler(req, res) {
 
     // ---------- CRÉATION CONVERSATION SI BESOIN ----------
     let conversationId = existingConvoId;
+    let echanges = 0;
     if (!conversationId) {
+      // Plafond de nouvelles conversations par heure et par cabinet (compté en base : il
+      // tient même si l'attaquant multiplie les instances serverless ou les adresses IP).
+      const capNew = cabinetId === process.env.DEMO_CABINET_ID ? NEW_CONVOS_PER_HOUR_DEMO : NEW_CONVOS_PER_HOUR;
+      const sinceHour = new Date(Date.now() - 3600_000).toISOString();
+      const { count: recentConvos } = await supabaseAdmin
+        .from('conversations')
+        .select('id', { count: 'exact', head: true })
+        .eq('cabinet_id', cabinetId)
+        .gte('created_at', sinceHour);
+      if ((recentConvos || 0) >= capNew) {
+        logAbuse('cabinet_new_convo_cap', { cabinetId, recentConvos });
+        return res.status(429).json({ error: 'Trop de demandes en ce moment. Réessayez plus tard.' });
+      }
       // Traçabilité récupération : si l'appel manqué (appelRef) est fourni ET
       // qu'il appartient bien à CE cabinet, on le relie à la conversation créée.
       // Vérif stricte : sinon un appelRef forgé pollue la mesure d'un autre cabinet.
@@ -269,8 +316,11 @@ export default async function handler(req, res) {
         .from('messages')
         .select('id', { count: 'exact', head: true })
         .eq('conversation_id', conversationId);
-      if ((count || 0) >= MAX_CONVO_MESSAGES) {
-        logAbuse('convo_too_long', { cabinetId, conversationId, count });
+      const { data: ech } = await supabaseAdmin
+        .from('conversations').select('nb_echanges').eq('id', conversationId).single();
+      echanges = ech && typeof ech.nb_echanges === 'number' ? ech.nb_echanges : 0;
+      if ((count || 0) >= MAX_CONVO_MESSAGES || echanges >= MAX_CONVO_EXCHANGES) {
+        logAbuse('convo_too_long', { cabinetId, conversationId, count, echanges });
         if (!minimize && lastUserMessage.role === 'user') {
           await supabaseAdmin.from('messages').insert({
             conversation_id: conversationId, role: 'user', contenu: lastUserContent,
@@ -306,6 +356,8 @@ export default async function handler(req, res) {
         system: buildSystemPrompt(cabinet),
         messages: claudeMessages,
         max_tokens: 350,
+        providers: providersFor(cabinetId),
+        budgetMs: 30_000,
       });
       replyText = stripMarkdown(replyText);
       // Filet : jamais de bulle vide renvoyée au patient
@@ -314,11 +366,20 @@ export default async function handler(req, res) {
       }
     } catch (err) {
       console.error('LLM API error:', err);
+      // Urgence vitale signalée alors que le moteur est en panne : le patient doit QUAND MÊME
+      // recevoir la consigne 15/112 (jamais une simple erreur technique).
+      if (emergency) {
+        await supabaseAdmin.from('conversations').update({ urgence: 'elevee' }).eq('id', conversationId);
+        return ok(res, { reply: ensureEmergencyNotice(''), conversationId });
+      }
       return res.status(502).json({
         error: 'Le service est momentanément indisponible. Réessayez dans un instant.',
         conversationId,
       });
     }
+
+    // Rappel 15/112 garanti si une urgence vitale a été signalée (même si le modèle l'oublie).
+    if (emergency) replyText = ensureEmergencyNotice(replyText);
 
     // ---------- SAUVEGARDE DE LA RÉPONSE ----------
     // Idem : pas de persistance du fil en mode minimisation.
@@ -338,10 +399,29 @@ export default async function handler(req, res) {
     // Coût : ~1 à 3 s de latence sur les messages qui déclenchent l'extraction.
     // Elle est bornée par le timeout de 20 s de callLLM et ne bloque jamais
     // la réponse patient (échec avalé proprement).
-    if (claudeMessages.length >= 4) {
+    // Compteur d'échanges + horodatage côté base. Indispensable en mode minimisation : aucun
+    // message n'est stocké, donc le déclencheur sur `messages` ne met jamais à jour l'activité.
+    await supabaseAdmin
+      .from('conversations')
+      .update({ nb_echanges: echanges + 1, derniere_activite: new Date().toISOString() })
+      .eq('id', conversationId);
+
+    // Urgence vitale : la demande existante monte à « élevée » (jamais l'inverse) et le cabinet
+    // est alerté. Indépendant de l'extraction : l'urgence peut survenir après la création.
+    if (emergency) {
+      try {
+        await upgradeUrgence(conversationId, cabinetId);
+      } catch (e) {
+        console.error('upgradeUrgence failed:', e);
+      }
+    }
+
+    if (claudeMessages.length >= 4 || hasPhone) {
       const allMessages = [...claudeMessages, { role: 'assistant', content: replyText }];
       try {
-        await tryExtractSummary(conversationId, cabinetId, allMessages);
+        await tryExtractSummary(conversationId, cabinetId, allMessages, {
+          emergency, budgetMs: Math.max(0, 47_000 - (Date.now() - tStart)),
+        });
       } catch (e) {
         console.error('extractSummary failed:', e);
       }
@@ -356,7 +436,7 @@ export default async function handler(req, res) {
 // ----------------------------------------------------------------
 
 // ----------------------------------------------------------------
-async function tryExtractSummary(conversationId, cabinetId, messages) {
+async function tryExtractSummary(conversationId, cabinetId, messages, { emergency = false, budgetMs = 45_000 } = {}) {
   // Idempotence : une seule demande par conversation
   const { data: existing } = await supabaseAdmin
     .from('demandes')
@@ -394,6 +474,8 @@ Réponds UNIQUEMENT avec le JSON.`;
       messages: [{ role: 'user', content: extractionPrompt }],
       max_tokens: 400,
       json: true,
+      providers: providersFor(cabinetId),
+      budgetMs,
     })).trim();
     const cleaned = text.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```\s*$/, '').trim();
     parsed = JSON.parse(cleaned);
@@ -405,7 +487,8 @@ Réponds UNIQUEMENT avec le JSON.`;
   if (!parsed || parsed.complet !== true) return;
 
   // ---------- VALIDATION + SANITIZATION DU JSON LLM ----------
-  const urgence = URGENCES_VALIDES.has(parsed.urgence) ? parsed.urgence : 'normale';
+  // Urgence vitale détectée par le filet déterministe : prioritaire sur le jugement du modèle.
+  const urgence = emergency ? 'elevee' : (URGENCES_VALIDES.has(parsed.urgence) ? parsed.urgence : 'normale');
   const safe = {
     patient_nom: typeof parsed.patient_nom === 'string' ? parsed.patient_nom.slice(0, 200) : null,
     patient_telephone: typeof parsed.patient_telephone === 'string' ? parsed.patient_telephone.slice(0, 50) : null,
@@ -453,47 +536,61 @@ Réponds UNIQUEMENT avec le JSON.`;
     })
     .eq('id', conversationId);
 
-  // ---------- WEBHOOK D'AUTOMATISATION (Make, n8n, Zapier…) ----------
-  // NOTIFY_* est le nom retenu ; N8N_* reste accepté pour rétrocompatibilité.
-  // Ce canal transmet TOUJOURS le détail réel (motif, souhait), même en mode
-  // MINIMIZE_HEALTH_DATA=true : la minimisation réduit ce que NOUS stockons en
-  // base, pas ce que le cabinet reçoit pour agir (c'est le but du pass-through).
-  // → HTTPS obligatoire ici : une donnée de santé ne doit jamais transiter en
-  // clair sur le réseau vers le sous-traitant d'automatisation.
+  await notifyWebhook(cabinetId, 'nouvelle_demande', { demande: safe, conversation_id: conversationId });
+}
+
+// ----------------------------------------------------------------
+// Urgence vitale signalée : monte la demande (et la conversation) à « élevée » — jamais à la
+// baisse — puis prévient le cabinet. Sans effet si la demande est déjà « élevée ».
+// ----------------------------------------------------------------
+async function upgradeUrgence(conversationId, cabinetId) {
+  await supabaseAdmin.from('conversations').update({ urgence: 'elevee' }).eq('id', conversationId);
+  const { data: rows } = await supabaseAdmin
+    .from('demandes').select('id, urgence').eq('conversation_id', conversationId).limit(1);
+  const d = rows && rows[0];
+  if (!d || d.urgence === 'elevee') return;
+  await supabaseAdmin.from('demandes').update({ urgence: 'elevee' }).eq('id', d.id);
+  await notifyWebhook(cabinetId, 'urgence_relevee', { conversation_id: conversationId, urgence: 'elevee' });
+}
+
+// ----------------------------------------------------------------
+// WEBHOOK D'AUTOMATISATION (Make, n8n, Zapier…)
+// NOTIFY_* est le nom retenu ; N8N_* reste accepté pour rétrocompatibilité.
+// Pour « nouvelle_demande », ce canal transmet le détail réel (motif, souhait), même en
+// mode MINIMIZE_HEALTH_DATA=true : la minimisation réduit ce que NOUS stockons en base, pas
+// ce que le cabinet reçoit pour agir (c'est le but du pass-through).
+// → HTTPS obligatoire : une donnée de santé ne doit jamais transiter en clair.
+// ----------------------------------------------------------------
+async function notifyWebhook(cabinetId, event, payload) {
   const webhookUrl = process.env.NOTIFY_WEBHOOK_URL || process.env.N8N_WEBHOOK_URL;
   const webhookSecret = process.env.NOTIFY_WEBHOOK_SECRET || process.env.N8N_WEBHOOK_SECRET;
-  if (webhookUrl && !/^https:\/\//i.test(webhookUrl)) {
+  if (!webhookUrl) return;
+  if (!/^https:\/\//i.test(webhookUrl)) {
     console.error('[rgpd] Webhook notif ignoré : NOTIFY_WEBHOOK_URL doit être en https (donnée de santé en jeu).');
-  } else if (webhookUrl) {
-    const { data: cabinet } = await supabaseAdmin
-      .from('cabinets')
-      .select('nom, notif_email, notif_telephone')
-      .eq('id', cabinetId)
-      .single();
-    // Awaited + borné : en serverless, un fetch non attendu peut être gelé
-    // (le cabinet ne serait jamais notifié). AbortController pour ne pas
-    // bloquer au-delà de 8 s si le webhook ne répond pas.
-    const whController = new AbortController();
-    const whTimeout = setTimeout(() => whController.abort(), 8000);
-    try {
-      await fetch(webhookUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(webhookSecret ? { 'X-Claire-Secret': webhookSecret } : {}),
-        },
-        body: JSON.stringify({
-          event: 'nouvelle_demande',
-          cabinet,
-          demande: safe,
-          conversation_id: conversationId,
-        }),
-        signal: whController.signal,
-      });
-    } catch (e) {
-      console.error('Webhook notif failed:', e);
-    } finally {
-      clearTimeout(whTimeout);
-    }
+    return;
+  }
+  const { data: cabinet } = await supabaseAdmin
+    .from('cabinets')
+    .select('nom, notif_email, notif_telephone')
+    .eq('id', cabinetId)
+    .single();
+  // Awaited + borné : en serverless, un fetch non attendu peut être gelé (le cabinet ne
+  // serait jamais notifié). AbortController pour ne pas bloquer au-delà de 8 s.
+  const whController = new AbortController();
+  const whTimeout = setTimeout(() => whController.abort(), 8000);
+  try {
+    await fetch(webhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(webhookSecret ? { 'X-Claire-Secret': webhookSecret } : {}),
+      },
+      body: JSON.stringify({ event, cabinet, ...payload }),
+      signal: whController.signal,
+    });
+  } catch (e) {
+    console.error('Webhook notif failed:', e);
+  } finally {
+    clearTimeout(whTimeout);
   }
 }

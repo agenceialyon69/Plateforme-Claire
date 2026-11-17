@@ -23,6 +23,8 @@
              display:flex; align-items:center; justify-content:center; font-family:'Fraunces',serif; font-style:italic; }
   .pc-head h1 { font-family:'Fraunces',serif; font-weight:500; font-size:18px; color:var(--forest); margin:0; }
   .pc-head p { margin:2px 0 0; font-size:12.5px; color:#6b7280; }
+  .pc-urgence { background:#fdecea; color:#8a2a1b; font-size:12.5px; line-height:1.4; padding:8px 18px; border-bottom:1px solid #f3c9c2; }
+  .pc-urgence strong { font-weight:700; }
   .pc-stream { flex:1; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:10px; }
   .pc-msg { display:flex; }
   .pc-msg-user { justify-content:flex-end; }
@@ -49,9 +51,11 @@
     <span class="pc-mark">C</span>
     <div>
       <h1>Claire</h1>
-      <p>Assistante du cabinet · votre demande est transmise à l'équipe</p>
+      <p>Assistante numérique du cabinet · votre demande est transmise à l'équipe</p>
     </div>
   </header>
+
+  <div class="pc-urgence" role="note"><strong>Urgence vitale</strong> (difficulté à respirer, saignement qui ne s'arrête pas, perte de connaissance) : appelez le <strong>15</strong> ou le <strong>112</strong>.</div>
 
   <div class="pc-stream" id="pcStream"></div>
 

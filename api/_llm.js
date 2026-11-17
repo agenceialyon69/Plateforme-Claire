@@ -119,10 +119,11 @@ async function callGemini({ system, messages, max_tokens, json }, signal) {
         ...(json ? { responseMimeType: 'application/json' } : {}),
       },
     };
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+    // Clé dans l'en-tête (et non dans l'URL) : les URL se retrouvent dans des journaux.
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
     const res = await fetch(url, {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: { 'content-type': 'application/json', 'x-goog-api-key': process.env.GEMINI_API_KEY },
       body: JSON.stringify(body),
       signal,
     });
@@ -158,15 +159,31 @@ async function callAnthropic({ system, messages, max_tokens }, signal) {
 
 const IMPL = { groq: callGroq, gemini: callGemini, anthropic: callAnthropic };
 
-export async function callLLM({ system, messages, max_tokens = 400, json = false }) {
-  const active = PROVIDERS.filter(p => process.env[p.key]);
+const PER_PROVIDER_TIMEOUT_MS = 20000;
+// Borne GLOBALE : 3 fournisseurs × 20 s (+ l'extraction qui suit) dépassaient la durée
+// maximale d'une fonction serverless. Au-delà, on arrête plutôt que d'être coupé en plein vol.
+const TOTAL_BUDGET_MS = 45000;
+
+// `providers` (optionnel) = liste blanche de fournisseurs autorisés pour CET appel.
+// Absent → tous les fournisseurs configurés (comportement historique, cabinet de démo).
+// Présent → uniquement ceux-là, et si aucun n'est configuré on ÉCHOUE (fail-closed) au lieu
+// de basculer en silence sur une offre gratuite non adaptée à des données de santé.
+export async function callLLM({ system, messages, max_tokens = 400, json = false, providers = null, budgetMs = TOTAL_BUDGET_MS }) {
+  const configured = PROVIDERS.filter(p => process.env[p.key]);
+  const allowed = Array.isArray(providers) ? new Set(providers.map(x => String(x).toLowerCase())) : null;
+  const active = allowed ? configured.filter(p => allowed.has(p.name)) : configured;
   if (active.length === 0) {
-    throw new Error('Aucun fournisseur IA configuré (GROQ_API_KEY, GEMINI_API_KEY ou ANTHROPIC_API_KEY).');
+    throw new Error(allowed
+      ? `Aucun fournisseur autorisé n'est configuré (autorisés : ${[...allowed].join(', ') || 'aucun'}). Les cabinets réels n'utilisent pas les offres gratuites : définir LLM_PROVIDERS_REAL et la clé correspondante.`
+      : 'Aucun fournisseur IA configuré (GROQ_API_KEY, GEMINI_API_KEY ou ANTHROPIC_API_KEY).');
   }
+  const started = Date.now();
   const errors = [];
   for (const p of active) {
+    const remaining = budgetMs - (Date.now() - started);
+    if (remaining < 1500) { errors.push(`${p.name}: budget de temps épuisé`); break; }
     try {
-      const text = await withTimeout(20000, (signal) =>
+      const text = await withTimeout(Math.min(PER_PROVIDER_TIMEOUT_MS, remaining), (signal) =>
         IMPL[p.name]({ system, messages, max_tokens, json }, signal));
       if (text && text.trim()) return text;          // succès
       errors.push(`${p.name}: réponse vide`);         // vide → on tente le suivant
