@@ -48,7 +48,9 @@ export function decideSmsAction({ smsRelanceActif, fromValid, cabinetNumberValid
 
 // Classement d'un SMS entrant : 'stop' | 'start' | 'message'.
 const STOP_WORDS = new Set(['STOP', 'STOPP', 'ARRET', 'ARRÊT', 'ARRETER', 'UNSUB', 'UNSUBSCRIBE', 'DESABONNER']);
-const START_WORDS = new Set(['START', 'DEBUT', 'DÉBUT', 'OUI', 'YES', 'REABONNER']);
+// NB : « OUI » / « YES » ne sont volontairement PAS des mots de réabonnement : un patient qui
+// répond « Oui » à notre SMS répond à une question, son message doit être transmis au cabinet.
+const START_WORDS = new Set(['START', 'DEBUT', 'DÉBUT', 'REABONNER']);
 export function classifyInboundSms(body) {
   const word = String(body || '').trim().toUpperCase().replace(/[^A-ZÀ-Ÿ]/g, '');
   if (STOP_WORDS.has(word)) return 'stop';

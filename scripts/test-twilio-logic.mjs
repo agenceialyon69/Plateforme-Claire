@@ -50,6 +50,10 @@ ok(decideSmsAction({ smsRelanceActif: false, fromValid: false, cabinetNumberVali
 ok(classifyInboundSms('STOP') === 'stop', 'STOP → stop');
 ok(classifyInboundSms('  Arrêt ! ') === 'stop', 'variante accentuée/ponctuée → stop');
 ok(classifyInboundSms('start') === 'start', 'start → start');
+ok(classifyInboundSms('Oui') === 'message', 'OUI → message transmis au cabinet (pas un réabonnement)');
+ok(classifyInboundSms('yes') === 'message', 'YES → message transmis au cabinet');
+ok(classifyInboundSms('Oui merci, rappelez-moi') === 'message', 'phrase commençant par Oui → message');
+ok(classifyInboundSms('REABONNER') === 'start', 'REABONNER → start (réabonnement explicite conservé)');
 ok(classifyInboundSms("J'ai mal à une dent") === 'message', 'message libre → message');
 
 // --- TwiML ---

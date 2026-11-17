@@ -53,7 +53,9 @@ export default async function handler(req, res) {
   // --- Message réel du patient : on ne perd rien, on transmet au cabinet ---
   const webhookUrl = process.env.NOTIFY_WEBHOOK_URL || process.env.N8N_WEBHOOK_URL;
   const webhookSecret = process.env.NOTIFY_WEBHOOK_SECRET || process.env.N8N_WEBHOOK_SECRET;
-  if (webhookUrl) {
+  if (webhookUrl && !/^https:\/\//i.test(webhookUrl)) {
+    console.error('[rgpd] Notif SMS entrant ignorée : NOTIFY_WEBHOOK_URL doit être en https (donnée de santé en jeu).');
+  } else if (webhookUrl) {
     const controller = new AbortController();
     const t = setTimeout(() => controller.abort(), 8000);
     try {

@@ -82,18 +82,32 @@ export default async function handler(req, res) {
     // N8N_* reste accepté pour rétrocompatibilité.
     const webhookUrl = process.env.NOTIFY_WEBHOOK_URL || process.env.N8N_WEBHOOK_URL;
     const webhookSecret = process.env.NOTIFY_WEBHOOK_SECRET || process.env.N8N_WEBHOOK_SECRET;
-    if (webhookUrl) {
-      fetch(webhookUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(webhookSecret ? { 'X-Claire-Secret': webhookSecret } : {}),
-        },
-        body: JSON.stringify({
-          event: 'nouveau_lead',
-          lead: { nom, cabinet, email, telephone, message },
-        }),
-      }).catch(e => console.error('Webhook notif failed:', e));
+    if (webhookUrl && !/^https:\/\//i.test(webhookUrl)) {
+      console.error('Webhook notif ignoré : NOTIFY_WEBHOOK_URL doit être en https.');
+    } else if (webhookUrl) {
+      // Attendu et borné (8 s) : en serverless, un fetch non attendu peut être gelé dès que la
+      // réponse part, et la notification ne partirait jamais. Le lead est DÉJÀ en base : un échec
+      // du webhook n'empêche pas de répondre « succès » au visiteur.
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 8000);
+      try {
+        await fetch(webhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(webhookSecret ? { 'X-Claire-Secret': webhookSecret } : {}),
+          },
+          body: JSON.stringify({
+            event: 'nouveau_lead',
+            lead: { nom, cabinet, email, telephone, message },
+          }),
+          signal: controller.signal,
+        });
+      } catch (e) {
+        console.error('Webhook notif failed:', e);
+      } finally {
+        clearTimeout(timer);
+      }
     }
     return ok(res, { success: true });
   } catch (err) {
