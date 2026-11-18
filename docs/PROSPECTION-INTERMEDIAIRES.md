@@ -69,6 +69,44 @@ Poser ces 5 questions (c'est de l'information, pas encore de la vente) :
 - Ne pas envoyer de pièce jointe lourde à un premier contact.
 - Ne pas dépenser d'argent pour cette prospection.
 
+## 5 bis. Liste de départ vérifiée (recherche web du 18/11/2026)
+
+Source : pages publiques de chaque entreprise, lues le jour de la recherche. **À revérifier avant
+l'envoi** (un site peut être obsolète). Je n'ai trouvé aucun contact nominatif de décideur : utiliser
+le formulaire ou l'adresse générale, et demander la bonne personne.
+
+### Priorité 1 — éditeurs de logiciels de cabinet (ils ont déjà les cabinets comme clients)
+| Entreprise | Ce que j'ai lu | Contact public |
+|---|---|---|
+| Julie Solutions (logiciel « Julie », Marne-la-Vallée) | « Plus de 20 000 utilisateurs », fondée en 1983, agenda et rappels SMS intégrés | 01 60 93 73 70, page « Contactez-nous » du site julie.fr |
+| Autres logiciels cités (LOGOSw, Visiodent) | Distribués par des revendeurs régionaux (ex. IMDgroup en PACA : contact@imdgroup.fr). L'éditeur de chacun reste à identifier | via le revendeur, en attendant |
+
+### Priorité 2 — fournisseurs de matériel (visitent les cabinets régulièrement)
+| Entreprise | Ce que j'ai lu | Contact public |
+|---|---|---|
+| DEC Matériel dentaire (région lyonnaise) | Spécialiste matériel dentaire et chirurgie en Auvergne-Rhône-Alpes, « entreprise à taille humaine » | dec-materieldentaire.com (formulaire) |
+| GACD | « Fournisseur dentaire depuis plus de 40 ans », dentistes-conseillers, accompagnement à la création de cabinet | gacd.fr |
+| MEGA Dental | « 30 ans », 60 000 références, interlocuteur dédié par cabinet | +33 1 69 83 90 91, megadental.fr |
+
+### Priorité 3 — secrétariat externalisé (⚠ en partie concurrents : ils font avec des personnes ce que fait Claire)
+Approche différente : non pas « remplacez-vous », mais « un complément pour les appels en dehors de vos
+heures ou en débordement ». Ils valident aussi que le besoin existe et qu'il se paie.
+| Entreprise | Ce que j'ai lu | Contact public |
+|---|---|---|
+| Servitel | Télésecrétariat médical depuis 1985, « plus de 1 000 professionnels de santé », agences hors Lyon | servitel.org |
+| Medicall | « 25 ans », annonce HDS et RGPD, « 100 % humain, en France » | 0 800 881 528, medicall.fr |
+| Cmondoc | Permanence téléphonique + agenda en ligne, Paris | contactez-nous@cmondoc.fr, 01 82 88 81 80 |
+| Altili-Services | Secrétariat spécialisé dentaire depuis 2016 | altili-services@orange.fr |
+| Dendist | Secrétaire dentaire à distance, annonce « 98 % d'appels décrochés » (chiffre du site, non vérifié) | dendist.fr |
+
+### Ce que cette recherche m'apprend (honnêtement)
+- **Le besoin existe et se paie déjà** : plusieurs entreprises vendent l'accueil téléphonique dentaire.
+  C'est aussi la preuve que Claire a des concurrents établis, avec des personnes réelles au bout du fil.
+- Medicall annonce « HDS » : un dentiste qui compare vous demandera la même chose. **Cette question
+  n'est toujours pas tranchée pour Claire** (voir `docs/HDS.md`). Ne pas l'éluder.
+- Je n'ai trouvé aucune adresse email personnelle de décideur, volontairement : on contacte
+  les adresses publiques des entreprises.
+
 ## 6. Suivi (à tenir à jour)
 
 | Date | Entreprise | Catégorie | Contact | Envoyé | Relance | Réponse | Prochaine étape |
