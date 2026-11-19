@@ -31,6 +31,27 @@ Pour une **société** (SAS, SARL…) : dénomination, forme, capital, siège, r
 **Bloquant tant que : l'entreprise n'est pas immatriculée.** Sans SIREN, impossible de remplir
 honnêtement ces champs, et vendre sans être immatriculé n'est pas possible.
 
+### 1 bis. Obtenir un SIREN (entreprise individuelle / micro-entreprise)
+
+Sources officielles (Service-Public Entreprendre, INPI, économie.gouv.fr) :
+
+1. **Vérifier d'abord le titre de séjour.** Un étranger hors UE résidant en France doit avoir un titre qui
+   **autorise une activité non salariée**. Selon les sources consultées : les titres « vie privée et
+   familiale » (au-delà de la première année), « carte de résident » et « résident longue durée UE » le
+   permettent ; les titres « étudiant » et « salarié » **ne suffisent pas** (changement de statut vers
+   « entrepreneur / profession libérale » nécessaire, avec un dossier de viabilité). L'inscription en ligne
+   peut aboutir même si le titre ne le permet pas, et le problème apparaît au renouvellement.
+   **À vérifier sur la carte, ou en préfecture, AVANT de s'immatriculer.**
+2. **Cumul avec un emploi salarié** (économie.gouv.fr) : possible si le contrat n'a pas de clause
+   d'exclusivité, si l'activité ne concurrence pas l'employeur, et si elle est exercée hors heures de travail.
+3. **Immatriculation** : en ligne sur le guichet des formalités des entreprises (INPI), **gratuite** pour
+   une micro-entreprise libérale/commerciale. Pièces : pièce d'identité, justificatif de domiciliation,
+   déclaration sur l'honneur de non-condamnation, attestation de filiation. Un récépissé « en attente
+   d'immatriculation » est délivré, puis le SIREN.
+4. **Adresse** : obligatoire et **rendue publique** (registre national des entreprises). Possibilités :
+   domicile, domiciliation, coworking. L'anonymisation des données personnelles est possible depuis le
+   guichet unique (INPI, depuis le 22/08/2025) — à vérifier.
+
 ## 2. Données de santé (HDS) — ce que disent les sources
 
 Source : Agence du Numérique en Santé (ANS), FAQ mise à jour en 2026.
